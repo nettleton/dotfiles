@@ -1,0 +1,11 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/usr/local/bin/fish
+
+defaults write com.freron.MailMate MmAutomaticallyExpandThreadsEnabled -bool YES
+defaults write com.freron.MailMate MmAutomaticallyExpandOnlyWhenCounted -bool YES
+defaults write com.freron.MailMate MmSendMessageDelayEnabled -bool YES
+defaults write com.freron.MailMate MmSendMessageDelay -integer 300
+defaults write com.freron.MailMate MmDefaultPygmentsStyleName github
+defaults write com.freron.MailMate MmComposerInitialFocus -string "alwaysTextView"
+
+{{ end - }}
