@@ -1,5 +1,5 @@
 {{- if (eq .chezmoi.os "darwin") -}}
-#!/usr/bin/env bash
+#!/usr/local/bin/fish
 
 # TODO: conditional brew packages for work/personal - see https://github.com/twpayne/dotfiles/blob/master/run_once_before_10-install-packages-darwin.sh.tmpl
 brew bundle --no-lock --file=/dev/stdin <<EOF
@@ -30,7 +30,6 @@ brew "theora"
 brew "ffmpeg"
 brew "fftw"
 brew "findutils"
-brew "fish"
 brew "pango"
 brew "fontforge"
 brew "fzf"
@@ -66,6 +65,7 @@ brew "media-info"
 brew "neovim"
 brew "node"
 brew "pillow"
+brew "podman"
 brew "pybind11"
 brew "ocrmypdf"
 brew "pandoc"

@@ -1,0 +1,9 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+
+brew install fish
+
+sudo -v
+sudo echo /usr/local/bin/fish >> /etc/shells
+chsh -s /usr/local/bin/fish
+{{ end -}}
