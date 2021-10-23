@@ -19,3 +19,8 @@ mkdir -p "$pipbin"
 echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_paths "$pipbin"
 
 pip3 install --user --upgrade neovim-remote
+
+podman machine init
+podman machine start
+
+ln -sfn (which podman) /usr/local/bin/docker

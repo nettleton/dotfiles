@@ -1,0 +1,10 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/usr/local/bin/fish
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+whalebrew "whalebrew/awscli"
+whalebrew "whalebrew/helm"
+whalebrew "whalebrew/jq"
+whalebrew "whalebrew/yq"
+EOF
+{{ end - }}
