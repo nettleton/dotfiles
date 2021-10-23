@@ -1,0 +1,80 @@
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+node_modules/
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+#*.sql
+*.sqlite
+
+# Unison files #
+######################
+.unison*
+*.tmp
+.tmp
+
+# IDE generated files #
+#######################
+.idea/
+*.iml
+
+# Maven generated files #
+#########################
+target/
+stack-instances.*.properties
+stack-instances.properties
+*.bck
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files #
+###################
+*.swp
+*.m~
+~$*.xlsx
+
+# Emacs #
+###################
+\#*\#
+
+# Neovim #
+###################
+workspace
+
+# VSCode #
+###################
+.classpath
+.settings
+.project
+.factorypath
+.vscode
+
+.perforce

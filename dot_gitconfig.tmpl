@@ -1,0 +1,20 @@
+[user]
+  name = Joshua Wang
+  {{ if (eq .chezmoi.username "joshuaw") }}email = ***REMOVED***{{ else }}email = wang.joshua.k@gmail.com{{ end }}
+[core]
+  editor = nvim -a=\\\"/usr/bin/vim\\\"
+  excludesfile = ~/.gitignore_global
+[merge]
+  tool = diff
+[alias]
+  co = checkout
+  ci = commit
+  st = status
+  br = branch  
+  hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+  type = cat-file -t
+  dump = cat-file -p
+[push]
+  default = upstream
+[init]
+  defaultBranch = main
