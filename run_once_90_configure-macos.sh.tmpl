@@ -709,11 +709,25 @@ defaults write com.apple.terminal SecureKeyboardEntry -bool true
 # Disable the annoying line marks
 defaults write com.apple.Terminal ShowLineMarks -int 0
 
-# Install the Solarized Dark theme for iTerm - in iterm install script
+# Install the Solarized Dark theme for iTerm
 # open "${HOME}/init/Solarized Dark.itermcolors"
 
-# Don’t display the annoying prompt when quitting iTerm - in iterm install script
-# defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+# Install dimmedMonokai themes
+open "$PWD/dimmedMonokai.itermcolors"
+open "$PWD/dimmedMonokai.terminal"
+
+# Don’t display the annoying prompt when quitting iTerm
+defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+
+# Set normal font in iTerm
+/usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Normal Font" HackNerdFontComplete-Regular 12' ~/Library/Preferences/com.googlecode.iterm2.plist
+
+# set window size in iTerm
+/usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Columns" 175' ~/Library/Preferences/com.googlecode.iterm2.plist
+/usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Rows" 30' ~/Library/Preferences/com.googlecode.iterm2.plist
+
+# set unlimited scrollback in iTerm
+/usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Unlimited Scrollback" true' ~/Library/Preferences/com.googlecode.iterm2.plist
 
 ###############################################################################
 # Time Machine                                                                #
