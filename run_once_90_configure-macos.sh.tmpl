@@ -946,6 +946,14 @@ defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool t
 # defaults write com.tapbots.TweetbotMac OpenURLsDirectly -bool true
 
 ###############################################################################
+# Safari stylesheet                                                           #
+###############################################################################
+defaults write com.apple.Safari UserStyleSheetEnabled -bool true
+defaults write com.apple.Safari UserStyleSheetLocationURLString -string "$PWD/styles.css"
+defaults write com.apple.Safari WebKitUserStyleSheetEnabledPreferenceKey -bool true
+defaults write com.apple.Safari WebKitUserStyleSheetLocationPreferenceKey -string "$PWD/styles.css"
+
+###############################################################################
 # Remove Dock items                                                           #
 ###############################################################################
 for dockItemLabel in \
