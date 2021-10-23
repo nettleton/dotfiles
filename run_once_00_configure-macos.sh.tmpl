@@ -946,6 +946,35 @@ defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool t
 # defaults write com.tapbots.TweetbotMac OpenURLsDirectly -bool true
 
 ###############################################################################
+# Remove Dock items                                                           #
+###############################################################################
+for dockItemLabel in \
+	Launchpad \
+	Safari \
+	Mail \
+	FaceTime \
+	Messages \
+	Maps \
+	Photos \
+	Contacts \
+	Calendar \
+	Reminders \
+	Notes \
+	Music \
+	Podcasts \
+	TV \
+	News \
+	Numbers \
+	Keynote \
+	Pages \
+	"App Store" \
+	"System Preferences" ; do
+	dockutil --find "$dockItemLabel" >/dev/null && dockutil --no-restart --remove "$dockItemLabel"
+done
+
+killall Dock
+
+###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################
 
