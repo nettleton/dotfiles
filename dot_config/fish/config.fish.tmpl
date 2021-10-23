@@ -1,0 +1,109 @@
+set FISH_CONFIG_DIR "$HOME/.config/fish"
+
+# ENV
+#SANDBOX
+set -g -x SANDBOX "$HOME/sandbox"
+
+#UTILS
+set -g -x UTILS "$HOME/utilities"
+
+#DOWNLOAD
+set -g -x DOWNLOADS "$HOME/Downloads"
+
+# NOTES
+set -g -x NOTES "$HOME/Documents/notes"
+
+#JAVA
+switch (uname)
+  case Darwin    
+    set -g -x JAVA_1_8_HOME (/usr/libexec/java_home -v 1.8)
+  case  Linux
+    set -g -x JAVA_1_8_HOME (update-alternatives --list javac | grep "8" | sed -e "s:/bin/javac::g")
+  case '*'
+end
+set -g -x JAVA_HOME $JAVA_1_8_HOME
+
+set -g -x EDITOR "nvim"
+
+set -g -x ALTERNATE_EDITOR "/usr/bin/vim"
+
+set -x -g WORK_KEY $HOME/.ssh/{{ .workuser }}-tmw
+set -x -g WORK_USER {{ .workuser }}
+set -x -g WORK_MAC ah-{{ .workuser }}-mac.dhcp.***REMOVED***
+set -x -g WORK_MAC_SCREENS_ALIAS {{ .workuser }}-maci
+set -x -g WORK_LINUX {{ .workuser }}-deb10-64.dhcp.***REMOVED***
+set -x -g OP_ACCOUNT {{ .opaccount }}
+# END ENV
+
+# ALIASES
+alias h "cd"
+alias doc "cd $HOME/Documents/"
+alias n "cd $NOTES"
+
+alias .. "cd .."
+alias ... "cd ../.."
+alias .... "cd ../../.."
+alias ..... "cd ../../../.."
+alias ...... "cd ../../../../.."
+
+alias rma "rm -rf"
+
+# GIT
+alias g "git"
+alias gs "git status"
+alias ga "git add "
+alias gb "git branch "
+alias gc "git commit"
+alias gd "git diff"
+alias gk "gitk --all&"
+alias gx "gitx --all"
+alias gp "git push "
+
+alias p4s "$SANDBOX/dotfiles/git/p4sync.fish"
+
+# MAVEN
+alias m "mvn"
+alias mct "mvn clean test"
+alias mi  "mvn install"
+alias mp  "mvn pre-integration-test"
+alias mcpk "mvn clean package"
+alias mci "mvn clean install"
+alias mcv "mvn clean verify"
+alias mcp "mvn clean pre-integration-test"
+
+alias l "ls -alh"
+alias clc "clear"
+
+alias dl "cd $DOWNLOADS"
+
+alias deb "vm '$LINUX_VMX'"
+alias win "vm '$WINDOWS_VMX'"
+
+alias vi "nvim"
+alias e "code"
+
+alias wm "sshf $WORK_KEY $WORK_USER $WORK_MAC"
+alias wmv "open screens://$WORK_MAC_SCREENS_ALIAS"
+alias wl "sshf $WORK_KEY $WORK_USER $WORK_LINUX"
+
+alias nas "ssh $NAS_IP"
+
+alias rlc ". $HOME/.config/fish/config.fish"
+
+alias pr "$SANDBOX/scratch/scripts/pr.sh"
+
+alias cat "bat" 
+
+alias docker "podman"
+# END ALIASES
+
+function sourceIfNecessary
+  functions -q "$argv[2]"; or source "$argv[1]"
+end
+
+test -s /Users/joshuaw/.nvm-fish/nvm.fish; and source /Users/joshuaw/.nvm-fish/nvm.fish
+
+# pyenv init
+if command -v pyenv 1>/dev/null 2>&1
+  pyenv init - | source
+end
