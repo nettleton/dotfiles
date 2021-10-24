@@ -53,11 +53,11 @@ require('packer').startup(function(use)
 --   use { 'norcalli/nvim-base16.lua' } -- Theme colours
 
   -- Autocompletion, formatting, linting & intellisense
---   use {
---     'neoclide/coc.nvim', -- Intellisense, LSP and other language smarts
---     run = 'yarn install --frozen-lockfile'
---   }
---   use { 'neoclide/coc-prettier', run = 'yarn install --frozen-lockfile' }
+  use {
+    'neoclide/coc.nvim', -- Intellisense, LSP and other language smarts
+    run = 'yarn install --frozen-lockfile'
+  }
+  use { 'neoclide/coc-prettier', run = 'yarn install --frozen-lockfile' }
 --   use { 'SirVer/ultisnips' } -- Snippets engine
 
   -- Treesitter
@@ -79,7 +79,7 @@ require('packer').startup(function(use)
 --   use { 'ludovicchabant/vim-gutentags' } -- Manage tag files automatically
 --   use { 'wakatime/vim-wakatime', event = 'VimEnter' } -- Auto generated metrics and time tracking
   use { 'miyakogi/conoline.vim' } -- Highlight the line of the cusor in the current window
---   use { 'airblade/vim-rooter' } -- Change vim working directory to project directory
+  use { 'airblade/vim-rooter' } -- Change vim working directory to project directory
 --   use { 'andymass/vim-matchup', event = 'VimEnter' } -- Highlight, navigate, and operate on sets of matching text
   use { 'lewis6991/impatient.nvim' } -- Speed up startup time
 
@@ -97,14 +97,15 @@ require('plugins.vim-fugitive')
 require('plugins.vim-markdown')
 require('plugins.lualine')
 require('plugins.nvim-bufferline')
+require('plugins.coc-nvim')
 require('plugins.nvim-autopairs')
 require('plugins.conoline')
 require('plugins.comment')
 require('plugins.go')
-
+require('plugins.vim-rooter')
 
 -- not used yet
--- require('plugins.coc-nvim')
+
 -- require('plugins.emmet-vim')
 -- require('plugins.indent-blankline')
 -- require('plugins.rainbow')
@@ -114,4 +115,4 @@ require('plugins.go')
 -- require('plugins.vim-gutentags')
 -- require('plugins.vim-pandoc')
 -- require('plugins.vim-qf')
--- require('plugins.vim-rooter')
+
