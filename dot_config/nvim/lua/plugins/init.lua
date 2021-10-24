@@ -39,10 +39,11 @@ require('packer').startup(function(use)
   use { 'ray-x/go.nvim' }
   use { 'mfussenegger/nvim-dap' }
   use { 'rcarriga/nvim-dap-ui' }
-  use { 'theHamsta/nvim-dap-virtual-text' }  
+  use { 'theHamsta/nvim-dap-virtual-text' }
   use { 'nvim-telescope/telescope-dap.nvim' }
 
   -- Appearance and themes
+  use { 'sainnhe/sonokai' }
 --   use { 'hoob3rt/lualine.nvim' } -- Statusline
 --   use { 'kyazdani42/nvim-web-devicons' } -- Dev icons
 --   use { 'akinsho/nvim-bufferline.lua' } -- Better nvim buffers
@@ -86,10 +87,15 @@ require('packer').startup(function(use)
 end)
 
 -- Config
+require('plugins.gitsigns')
+require('plugins.telescope')
+require('plugins.treesitter')
+require('plugins.vim-fugitive')
+-- require('plugins.vim-markdown')
+require('plugins.go')
 -- require('plugins.coc-nvim')
 -- require('plugins.conoline')
 -- require('plugins.emmet-vim')
-require('plugins.gitsigns')
 -- require('plugins.indent-blankline')
 -- require('plugins.lualine')
 -- require('plugins.nvim-autopairs')
@@ -97,14 +103,9 @@ require('plugins.gitsigns')
 -- require('plugins.comment')
 -- require('plugins.rainbow')
 -- require('plugins.supertab')
-require('plugins.telescope')
-require('plugins.treesitter')
 -- require('plugins.ultisnips')
 -- require('plugins.vim-bbye')
-require('plugins.vim-fugitive')
 -- require('plugins.vim-gutentags')
-require('plugins.vim-markdown')
 -- require('plugins.vim-pandoc')
 -- require('plugins.vim-qf')
 -- require('plugins.vim-rooter')
-require('plugins.go')

@@ -97,6 +97,11 @@ exec([[
 :augroup END
 ]], false)
 
+-- set colorscheme
+g.sonokai_style = 'shusia'
+g.sonokai_enable_italic = 1
+vim.cmd[[colorscheme sonokai]]
+
 -- REFERENCES
 -- https://github.com/ayoisaiah/dotfiles/blob/master/private_dot_config/nvim/lua/settings.lua
 -- https://github.com/airblade/vim-gitgutter#when-are-the-signs-updated

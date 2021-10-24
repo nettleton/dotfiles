@@ -183,7 +183,7 @@ defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 # Set language and text formats
 # Note: if you’re in the US, replace `EUR` with `USD`, `Centimeters` with
 # `Inches`, `en_GB` with `en_US`, and `true` with `false`.
-defaults write NSGlobalDomain AppleLanguages -array "en" 
+defaults write NSGlobalDomain AppleLanguages -array "en"
 defaults write NSGlobalDomain AppleLocale -string "en_US@currency=USD"
 defaults write NSGlobalDomain AppleMeasurementUnits -string "Inches"
 defaults write NSGlobalDomain AppleMetricUnits -bool false
@@ -713,8 +713,14 @@ defaults write com.apple.Terminal ShowLineMarks -int 0
 # open "${HOME}/init/Solarized Dark.itermcolors"
 
 # Install dimmedMonokai themes
-open "$PWD/dimmedMonokai.itermcolors"
-open "$PWD/dimmedMonokai.terminal"
+open "$PWD/colorthemes/dimmedMonokai.itermcolors"
+open "$PWD/colorthemes/dimmedMonokai.terminal"
+open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-andromeda.itermcolors"
+open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-atlantis.itermcolors"
+open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-default.itermcolors"
+open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-espresso.itermcolors"
+open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-maia.itermcolors"
+open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-shusia.itermcolors"
 
 # Don’t display the annoying prompt when quitting iTerm
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false
