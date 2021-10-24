@@ -58,7 +58,7 @@ require('packer').startup(function(use)
     run = 'yarn install --frozen-lockfile'
   }
   use { 'neoclide/coc-prettier', run = 'yarn install --frozen-lockfile' }
---   use { 'SirVer/ultisnips' } -- Snippets engine
+  use { 'SirVer/ultisnips' } -- Snippets engine
 
   -- Treesitter
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
@@ -98,6 +98,7 @@ require('plugins.vim-markdown')
 require('plugins.lualine')
 require('plugins.nvim-bufferline')
 require('plugins.coc-nvim')
+require('plugins.ultisnips')
 require('plugins.nvim-autopairs')
 require('plugins.conoline')
 require('plugins.comment')
@@ -110,7 +111,6 @@ require('plugins.vim-rooter')
 -- require('plugins.indent-blankline')
 -- require('plugins.rainbow')
 -- require('plugins.supertab')
--- require('plugins.ultisnips')
 -- require('plugins.vim-bbye')
 -- require('plugins.vim-gutentags')
 -- require('plugins.vim-pandoc')
