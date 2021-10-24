@@ -2,7 +2,7 @@
   name = Joshua Wang
   email = {{ .github.email | quote }}
 [core]
-  editor = nvim -a=\\\"/usr/bin/vim\\\"
+  editor = nvim
   excludesfile = ~/.gitignore_global
 [merge]
   tool = diff
@@ -10,7 +10,7 @@
   co = checkout
   ci = commit
   st = status
-  br = branch  
+  br = branch
   hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
   type = cat-file -t
   dump = cat-file -p
