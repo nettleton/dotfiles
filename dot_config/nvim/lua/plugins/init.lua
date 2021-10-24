@@ -44,9 +44,11 @@ require('packer').startup(function(use)
 
   -- Appearance and themes
   use { 'sainnhe/sonokai' }
---   use { 'hoob3rt/lualine.nvim' } -- Statusline
---   use { 'kyazdani42/nvim-web-devicons' } -- Dev icons
---   use { 'akinsho/nvim-bufferline.lua' } -- Better nvim buffers
+  use { 
+    'nvim-lualine/lualine.nvim',
+    requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+  } -- Statusline
+  use { 'akinsho/nvim-bufferline.lua' } -- Better nvim buffers
 --   use { 'lukas-reineke/indent-blankline.nvim' } -- Indenting
 --   use { 'norcalli/nvim-base16.lua' } -- Theme colours
 
@@ -65,18 +67,18 @@ require('packer').startup(function(use)
   -- Utilities
 --   use { 'romainl/vim-qf' } -- Quick fix settings, commands and mappings
 --   use { 'moll/vim-bbye' } -- Delete buffers without closing windows
---   use { 'windwp/nvim-autopairs' } -- Insert or delete brackets, parens, quotes in pair.
+  use { 'windwp/nvim-autopairs' } -- Insert or delete brackets, parens, quotes in pair.
 --   use { 'mattn/emmet-vim', event = 'VimEnter', ft = {'html', 'markdown', 'css', 'scss'} } -- Shortcuts for writing HTML and CSS
 --   use { 'norcalli/nvim-colorizer.lua', ft = { 'html', 'css', 'scss', 'javascript' } } -- Colour highlighting
 --   use { 'ervandew/supertab' } -- Use <Tab> for autocompletion in insert mode
 --   use { 'tpope/vim-surround' } -- Mappings for surroundings like brackets, quotes, e.t.c.
---   use { 'numtostr/comment.nvim' } -- Comment stuff out easily
+  use { 'numtostr/comment.nvim' } -- Comment stuff out easily
 --   use { 'tpope/vim-repeat' } -- Enhance the dot command
 --   use { 'tpope/vim-unimpaired' } -- Custom mappings for some ex commands
 --   use { 'luochen1990/rainbow' } -- Use different colours for parenthesis levels
 --   use { 'ludovicchabant/vim-gutentags' } -- Manage tag files automatically
 --   use { 'wakatime/vim-wakatime', event = 'VimEnter' } -- Auto generated metrics and time tracking
---   use { 'miyakogi/conoline.vim' } -- Highlight the line of the cusor in the current window
+  use { 'miyakogi/conoline.vim' } -- Highlight the line of the cusor in the current window
 --   use { 'airblade/vim-rooter' } -- Change vim working directory to project directory
 --   use { 'andymass/vim-matchup', event = 'VimEnter' } -- Highlight, navigate, and operate on sets of matching text
   use { 'lewis6991/impatient.nvim' } -- Speed up startup time
@@ -87,20 +89,24 @@ require('packer').startup(function(use)
 end)
 
 -- Config
+
 require('plugins.gitsigns')
 require('plugins.telescope')
 require('plugins.treesitter')
 require('plugins.vim-fugitive')
--- require('plugins.vim-markdown')
+require('plugins.vim-markdown')
+require('plugins.lualine')
+require('plugins.nvim-bufferline')
+require('plugins.nvim-autopairs')
+require('plugins.conoline')
+require('plugins.comment')
 require('plugins.go')
+
+
+-- not used yet
 -- require('plugins.coc-nvim')
--- require('plugins.conoline')
 -- require('plugins.emmet-vim')
 -- require('plugins.indent-blankline')
--- require('plugins.lualine')
--- require('plugins.nvim-autopairs')
--- require('plugins.nvim-bufferline')
--- require('plugins.comment')
 -- require('plugins.rainbow')
 -- require('plugins.supertab')
 -- require('plugins.ultisnips')
