@@ -7,7 +7,7 @@ go get -u github.com/jstemmer/gotags
 
 npm install -g vmd tern uuid js-beautify eslint http-server serverless remark remark-cli remark-stringify remark-frontmatter wcwidth prettier javascript-typescript-langserver bash-language-server yarn dockerfile-language-server-nodejs typescript webpack neovim npm-check-updates
 
-set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1)
+set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1 | string trim)
 pyenv install "$pylatest"
 pyenv global "$pylatest"
 
@@ -18,7 +18,7 @@ set pipbin "$HOME/.local/bin"
 mkdir -p "$pipbin"
 echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_paths "$pipbin"
 
-pip3 install --user --upgrade neovim-remote
+pip3 install --user --upgrade neovim-remote pynvim
 
 podman machine init
 podman machine start
