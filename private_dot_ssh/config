@@ -1,15 +1,15 @@
 Host insidelabs-git.***REMOVED***
-   User {{ .workuser }}
+   User {{- .workuser -}}
    IdentityFile ~/.ssh/gitlab_internal
 Host github.com
   User nettleton
   IdentityFile ~/.ssh/github_com
 Host github.***REMOVED***
-  User {{ .workuser }}
+  User {{- .workuser -}}
   IdentityFile ~/.ssh/github_internal
 Host gitlab.com
   User nettleton
   IdentityFile ~/.ssh/gitlab_com
-Host ah-{{ .workuser }}-mac.dhcp.***REMOVED***
-  User {{ .workuser }}
+Host ah-{{- .workuser -}}-mac.dhcp.***REMOVED***
+  User {{- .workuser -}}
   IdentityFile ~/.ssh/workmachine

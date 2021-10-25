@@ -1,6 +1,6 @@
-{{ if contains .chezmoi.username .chezmoi.hostname }}
+{{- if contains .chezmoi.username .chezmoi.hostname -}}
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8U30PDJtqwrVd5qwJiVRwfXHcvjX3USnL0aM/Eh+hp ***REMOVED***: ***REMOVED***
-{{ end }}
-{{ if contains "starship" .chezmoi.hostname }}
+{{- end -}}
+{{- if contains "starship" .chezmoi.hostname -}}
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGR/cDmG4dHsxkbElKEPoExNhceRGcrkxOc6U1dBSNpp gitlab@nettleton.io gitlab.com machine:starship
-{{ end }}
+{{- end -}}
