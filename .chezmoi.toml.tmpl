@@ -1,0 +1,10 @@
+{{- $workuser := promptString "workuser" -}}
+{{- $opaccount := promptString "opaccount" -}}
+{{- $ghemail := promptString "GitHub email" -}}
+
+[data]
+  workuser = {{ $workuser | quote }}
+  opaccount = {{ $opaccount | quote }}
+
+[data.github]
+  email = {{ $ghemail | quote }}
