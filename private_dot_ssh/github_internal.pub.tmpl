@@ -1,6 +1,6 @@
-{{- if contains .chezmoi.username .chezmoi.hostname -}}
+{{- if contains .work.domain .targetname -}}
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIgEGptl60jhV1k9rj9tQLfc4NIaYxEe22KwQ3uBpOic ***REMOVED*** github.***REMOVED*** machine:***REMOVED***
 {{- end -}}
-{{- if contains "starship" .chezmoi.hostname -}}
+{{- if contains "starship" .targetname -}}
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKG19Yw2/vo4tzRr9RMhdJPckI1YVvsSeveVDcqrPd0 ***REMOVED*** github.***REMOVED*** machine:starship
 {{- end -}}

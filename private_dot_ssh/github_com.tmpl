@@ -1,6 +1,6 @@
-{{- if contains .chezmoi.username .chezmoi.hostname -}}
+{{- if contains .work.domain .targetname -}}
 {{- onepasswordDocument "qaiqwonl4vqptwxb6tsee525vq" -}}
 {{- end -}}
-{{- if contains "starship" .chezmoi.hostname -}}
+{{- if contains "starship" .targetname -}}
 {{- onepasswordDocument "f7s6fw4qlaednt2z7xrlcr7bhu" -}}
 {{- end -}}

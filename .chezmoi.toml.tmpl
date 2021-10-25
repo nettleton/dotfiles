@@ -1,10 +1,25 @@
 {{- $workuser := promptString "workuser" -}}
+{{- $workdomain := promptString "workdomain" -}}
 {{- $opaccount := promptString "opaccount" -}}
-{{- $ghemail := promptString "GitHub email" -}}
+{{- $opemail := promptString "opemail" -}}
+{{- $ghemail := promptString "ghemail" -}}
+{{- $targetname := promptString "targetname" -}}
 
 [data]
-  workuser = {{ $workuser | quote }}
-  opaccount = {{ $opaccount | quote }}
+  targetname = {{ $targetname | quote }}
+
+[data.op]
+  account = {{ $opaccount | quote }}
+  email = {{ $opemail | quote }}
+
+[data.work]
+  user = {{ $workuser | quote }}
+  domain = {{ $workdomain | quote }}
+  email = "{{- $workuser -}}@{{- $workdomain -}}"
+
+[data.work.hostnames]
+  mac = "ah-{{- $workuser -}}-mac.dhcp.{{- $workdomain -}}"
+  linux = "{{- $workuser -}}-deb10-64.dhcp.{{- $workdomain -}}"
 
 [data.github]
   email = {{ $ghemail | quote }}

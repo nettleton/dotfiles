@@ -15,7 +15,7 @@ set -g -x NOTES "$HOME/Documents/notes"
 
 #JAVA
 switch (uname)
-  case Darwin    
+  case Darwin
     set -g -x JAVA_1_8_HOME (/usr/libexec/java_home -v 1.8)
   case  Linux
     set -g -x JAVA_1_8_HOME (update-alternatives --list javac | grep "8" | sed -e "s:/bin/javac::g")
@@ -27,12 +27,12 @@ set -g -x EDITOR "nvim"
 
 set -g -x ALTERNATE_EDITOR "/usr/bin/vim"
 
-set -x -g WORK_KEY $HOME/.ssh/{{ .workuser }}-tmw
-set -x -g WORK_USER {{ .workuser }}
-set -x -g WORK_MAC ah-{{ .workuser }}-mac.dhcp.***REMOVED***
-set -x -g WORK_MAC_SCREENS_ALIAS {{ .workuser }}-maci
-set -x -g WORK_LINUX {{ .workuser }}-deb10-64.dhcp.***REMOVED***
-set -x -g OP_ACCOUNT {{ .opaccount }}
+set -x -g WORK_KEY $HOME/.ssh/workmachine
+set -x -g WORK_USER {{- .work.user -}}
+set -x -g WORK_MAC {{- .work.hostnames.mac -}}
+set -x -g WORK_MAC_SCREENS_ALIAS {{- .work.user -}}-maci
+set -x -g WORK_LINUX {{- .work.hostnames.linux -}}
+set -x -g OP_ACCOUNT {{- .op.account -}}
 # END ENV
 
 # ALIASES
@@ -92,7 +92,7 @@ alias rlc ". $HOME/.config/fish/config.fish"
 
 alias pr "$SANDBOX/scratch/scripts/pr.sh"
 
-alias cat "bat" 
+alias cat "bat"
 
 alias docker "podman"
 # END ALIASES
