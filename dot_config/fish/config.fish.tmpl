@@ -101,7 +101,7 @@ function sourceIfNecessary
   functions -q "$argv[2]"; or source "$argv[1]"
 end
 
-test -s /Users/joshuaw/.nvm-fish/nvm.fish; and source /Users/joshuaw/.nvm-fish/nvm.fish
+test -s $HOME/.nvm-fish/nvm.fish; and source $HOME/.nvm-fish/nvm.fish
 
 # pyenv init
 if command -v pyenv 1>/dev/null 2>&1
