@@ -64,17 +64,12 @@ g.perl_host_prog = ''
 
 -- Templates
 -- Prefill new files created by vim with contents from the following templates
+--   https://shapeshed.com/vim-templates/
+--   https://github.com/IllyaStarikov/skeleton-files
 exec([[
 augroup templates
-  autocmd BufNewFile *.html 0r ~/.config/nvim/templates/skeleton.html
-  autocmd BufNewFile *.scss 0r ~/.config/nvim/templates/skeleton.scss
-  autocmd BufNewFile *.css 0r ~/.config/nvim/templates/skeleton.scss
-  autocmd BufNewFile LICENCE 0r ~/.config/nvim/templates/skeleton.LICENCE
-  autocmd BufNewFile LICENSE 0r ~/.config/nvim/templates/skeleton.LICENCE
-  autocmd BufNewFile .gitignore 0r ~/.config/nvim/templates/skeleton.gitignore
-  autocmd BufNewFile .stylelintrc.json 0r ~/.config/nvim/templates/skeleton.stylelintrc
-  autocmd BufNewFile .eslintrc.json 0r ~/.config/nvim/templates/skeleton.eslintrc
-  autocmd BufNewFile .prettierrc.json 0r ~/.config/nvim/templates/skeleton.prettierrc
+  autocmd BufNewFile *.* silent! execute '0r ~/.config/nvim/templates/skeleton.'.expand("<afile>:e")
+  autocmd BufNewFile * %substitute#\[:VIM_EVAL:\]\(.\{-\}\)\[:END_EVAL:\]#\=eval(submatch(1))#ge
 augroup END
 ]], false)
 

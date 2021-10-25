@@ -44,7 +44,7 @@ require('packer').startup(function(use)
 
   -- Appearance and themes
   use { 'sainnhe/sonokai' }
-  use { 
+  use {
     'nvim-lualine/lualine.nvim',
     requires = { 'kyazdani42/nvim-web-devicons', opt = true }
   } -- Statusline
@@ -59,6 +59,7 @@ require('packer').startup(function(use)
   }
   use { 'neoclide/coc-prettier', run = 'yarn install --frozen-lockfile' }
   use { 'SirVer/ultisnips' } -- Snippets engine
+  use { 'alker0/chezmoi.vim' } -- support for chezmoi templates
 
   -- Treesitter
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
