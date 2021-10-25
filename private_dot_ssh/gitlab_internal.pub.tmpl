@@ -1,0 +1,6 @@
+{{ if contains .chezmoi.username .chezmoi.hostname }}
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1j7y1bUtUNRhKpdGwTzU8FS/a5z/juR6NpmD6ZTPtG insidelabs-git joshuaw@***REMOVED***
+{{ end }}
+{{ if contains "starship" .chezmoi.hostname }}
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICPDXe8tMZgI+1cYXwa7q9CUr7H2ULK34jjvC4fkise6 ***REMOVED*** insidelabs-git.***REMOVED*** machine:starship
+{{ end }}
