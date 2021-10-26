@@ -1,10 +1,16 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/usr/local/bin/fish
 
+#whalebrew "whalebrew/awscli"
+#whalebrew "whalebrew/helm"
+#whalebrew "whalebrew/jq"
+#whalebrew "whalebrew/yq"
+
 brew bundle --no-lock --file=/dev/stdin <<EOF
-whalebrew "whalebrew/awscli"
-whalebrew "whalebrew/helm"
-whalebrew "whalebrew/jq"
-whalebrew "whalebrew/yq"
+brew "awscli"
+brew "kubernetes-cli"
+brew "helm"
+brew "jq"
+brew "yq"
 EOF
 {{ end }}
