@@ -1,5 +1,5 @@
 {{- if (eq .chezmoi.os "darwin") -}}
-#!/usr/local/bin/fish
+#!/usr/bin/env bash
 
 # References:
 #  https://github.com/mathiasbynens/dotfiles/blob/main/.macos
@@ -19,15 +19,15 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 ###############################################################################
 
 # Set computer name (as done via System Preferences → Sharing)
-{{- if not (contains .work.domain .targetname) -}}
+{{ if not (contains .work.domain .targetname) }}
 echo "Changing computer name of host {{ .chezmoi.hostname }} to {{ .targetname }}"
-sudo scutil --set ComputerName "{{- .targetname -}}"
-sudo scutil --set HostName "{{- .targetname -}}"
-sudo scutil --set LocalHostName "{{- .targetname -}}"
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "{{- .targetname -}}"
-{{- else -}}
+sudo scutil --set ComputerName "{{ .targetname }}"
+sudo scutil --set HostName "{{ .targetname }}"
+sudo scutil --set LocalHostName "{{ .targetname }}"
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "{{ .targetname }}"
+{{ else }}
 echo "Will not change computer name because host {{ .chezmoi.hostname }} (target {{ .targetname }}) contains {{ .work.domain }}"
-{{- end -}}
+{{ end }}
 
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
@@ -574,6 +574,14 @@ defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
 # Update extensions automatically
 defaults write com.apple.Safari InstallExtensionUpdatesAutomatically -bool true
 
+# Disable color in the tab bar
+defaults write com.apple.Safari NeverUseBackgroundColorInToolbar -bool true
+
+# Change Search Engine
+defaults write -g NSPreferredWebServices '{NSWebServicesProviderWebSearch = { NSDefaultDisplayName = Bing; NSProviderIdentifier = "com.duckduckgo.www"; }; }'
+defaults write com.apple.Safari SearchProviderIdentifier -string com.duckduckgo.www
+defaults write com.apple.Safari SearchProviderShortName -string "DuckDuckGo"
+
 ###############################################################################
 # Mail                                                                        #
 ###############################################################################
@@ -717,14 +725,14 @@ defaults write com.apple.Terminal ShowLineMarks -int 0
 # open "${HOME}/init/Solarized Dark.itermcolors"
 
 # Install dimmedMonokai themes
-open "$PWD/colorthemes/dimmedMonokai.itermcolors"
-open "$PWD/colorthemes/dimmedMonokai.terminal"
-open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-andromeda.itermcolors"
-open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-atlantis.itermcolors"
-open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-default.itermcolors"
-open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-espresso.itermcolors"
-open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-maia.itermcolors"
-open "$PWD/colorthemes/sonokai-iterm2/iTerm2/sonokai-shusia.itermcolors"
+open ".local/share/chezmoi/colorthemes/dimmedMonokai.itermcolors"
+open ".local/share/chezmoi/colorthemes/dimmedMonokai.terminal"
+open ".local/share/chezmoi/colorthemes/sonokai-iterm2/iTerm2/sonokai-andromeda.itermcolors"
+open ".local/share/chezmoi/colorthemes/sonokai-iterm2/iTerm2/sonokai-atlantis.itermcolors"
+open ".local/share/chezmoi/colorthemes/sonokai-iterm2/iTerm2/sonokai-default.itermcolors"
+open ".local/share/chezmoi/colorthemes/sonokai-iterm2/iTerm2/sonokai-espresso.itermcolors"
+open ".local/share/chezmoi/colorthemes/sonokai-iterm2/iTerm2/sonokai-maia.itermcolors"
+open ".local/share/chezmoi/colorthemes/sonokai-iterm2/iTerm2/sonokai-shusia.itermcolors"
 
 # Don’t display the annoying prompt when quitting iTerm
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false
@@ -973,9 +981,9 @@ defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool t
 # Safari stylesheet                                                           #
 ###############################################################################
 defaults write com.apple.Safari UserStyleSheetEnabled -bool true
-defaults write com.apple.Safari UserStyleSheetLocationURLString -string "$PWD/styles.css"
+defaults write com.apple.Safari UserStyleSheetLocationURLString -string "~/.local/share/chezmoi/styles.css"
 defaults write com.apple.Safari WebKitUserStyleSheetEnabledPreferenceKey -bool true
-defaults write com.apple.Safari WebKitUserStyleSheetLocationPreferenceKey -string "$PWD/styles.css"
+defaults write com.apple.Safari WebKitUserStyleSheetLocationPreferenceKey -string "~/.local/share/chezmoi/styles.css"
 
 ###############################################################################
 # Remove Dock items                                                           #
@@ -1021,16 +1029,10 @@ for app in "Activity Monitor" \
   "Google Chrome" \
 	"Mail" \
 	"Messages" \
-	# "Opera" \
 	"Photos" \
 	"Safari" \
-	# "SizeUp" \
-	# "Spectacle" \
 	"SystemUIServer" \
 	"Terminal" \
-	# "Transmission" \
-	# "Tweetbot" \
-	# "Twitter" \
 	"iCal"; do
 	killall "${app}" &> /dev/null
 done

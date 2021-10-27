@@ -3,7 +3,10 @@
 
 brew install fish
 
+FISH_PATH=$(which fish)
+
 sudo -v
-sudo echo /usr/local/bin/fish >> /etc/shells
-chsh -s /usr/local/bin/fish
+echo "Open a new terminal and add $FISH_PATH to /etc/shells (sudo vi /etc/shells).  Press any key once complete."
+read ignored
+chsh -s "$FISH_PATH"
 {{ end -}}

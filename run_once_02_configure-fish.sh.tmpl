@@ -1,8 +1,10 @@
-#!/usr/local/bin/fish
+#!/usr/bin/env fish
+
+fish_add_path (brew --prefix)/bin
 
 curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
 fisher install IlanCosman/tide
-{{- if (eq .chezmoi.os "darwin") -}}
+{{ if (eq .chezmoi.os "darwin") }}
 fisher install oh-my-fish/plugin-osx
 {{ end }}
 fisher install jorgebucaran/autopair.fish

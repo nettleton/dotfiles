@@ -1,4 +1,4 @@
-#!/usr/local/bin/fish
+#!/usr/bin/env fish
 
 mkdir -p $HOME/sandbox/go/bin
 set -x -U GOPATH $HOME/sandbox/go
@@ -23,4 +23,3 @@ pip3 install --user --upgrade neovim-remote pynvim
 podman machine init
 podman machine start
 
-ln -sfn (which podman) /usr/local/bin/docker

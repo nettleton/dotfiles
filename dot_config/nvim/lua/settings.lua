@@ -47,8 +47,8 @@ o.smartcase = true -- make searches case insensitive except if uppercase charate
 
 o.updatetime = 100
 
-o.shell = '/usr/local/bin/fish'
-g['$SHELL'] = '/usr/local/bin/fish'
+o.shell = '/opt/homebrew/bin/fish'
+g['$SHELL'] = '/opt/homebrew/bin/fish'
 
 -- Disable python2 provider
 g.loaded_python_provider = 0

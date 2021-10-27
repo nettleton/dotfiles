@@ -1,16 +1,16 @@
 {{- if (eq .chezmoi.os "darwin") -}}
-#!/usr/local/bin/fish
+#!/usr/bin/env fish
 
 #whalebrew "whalebrew/awscli"
 #whalebrew "whalebrew/helm"
 #whalebrew "whalebrew/jq"
 #whalebrew "whalebrew/yq"
 
-brew bundle --no-lock --file=/dev/stdin <<EOF
-brew "awscli"
-brew "kubernetes-cli"
-brew "helm"
-brew "jq"
-brew "yq"
-EOF
+echo "\
+brew \"awscli\"
+brew \"kubernetes-cli\"
+brew \"helm\"
+brew \"jq\"
+brew \"yq\"
+" | brew bundle --no-lock --file=/dev/stdin
 {{ end }}
