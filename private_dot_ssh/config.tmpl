@@ -1,15 +1,15 @@
-Host insidelabs-git.{{- .work.domain -}}
-   User {{- .work.user -}}
+Host insidelabs-git.{{ .work.domain }}
+   User {{ .work.user }}
    IdentityFile ~/.ssh/gitlab_internal
 Host github.com
   User nettleton
   IdentityFile ~/.ssh/github_com
-Host github.{{- .work.domain -}}
-  User {{- .work.user -}}
+Host github.{{ .work.domain }}
+  User {{ .work.user }}
   IdentityFile ~/.ssh/github_internal
 Host gitlab.com
   User nettleton
   IdentityFile ~/.ssh/gitlab_com
-Host ah-{{- .work.user -}}-mac.dhcp.{{- .work.domain -}}
-  User {{- .work.user -}}
+Host ah-{{ .work.user }}-mac.dhcp.{{ .work.domain }}
+  User {{ .work.user }}
   IdentityFile ~/.ssh/workmachine
