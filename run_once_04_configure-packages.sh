@@ -3,9 +3,8 @@
 mkdir -p $HOME/sandbox/go/bin
 set -x -U GOPATH $HOME/sandbox/go
 echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_paths "$GOPATH/bin"
-go get -u github.com/jstemmer/gotags
 
-npm install -g vmd tern uuid js-beautify eslint http-server serverless remark remark-cli remark-stringify remark-frontmatter wcwidth prettier javascript-typescript-langserver bash-language-server yarn dockerfile-language-server-nodejs typescript webpack neovim npm-check-updates
+npm install -g tern uuid js-beautify eslint http-server remark remark-cli remark-stringify remark-frontmatter wcwidth prettier javascript-typescript-langserver bash-language-server dockerfile-language-server-nodejs typescript webpack neovim npm-check-updates
 
 set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1 | string trim)
 pyenv install "$pylatest"
@@ -20,6 +19,10 @@ echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_
 
 pip3 install --user --upgrade neovim-remote pynvim
 
-podman machine init
-podman machine start
+if test (podman machine list --noheading | wc -l) -eq 1
+  echo "podman machine installed; not reinstalling"
+else
+  podman machine init
+  podman machine start
+end
 
