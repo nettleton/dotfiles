@@ -1,7 +1,7 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/usr/bin/env fish
 
-sudo softwareupdate --install-rosetta
+find /Library/Apple/usr/lib/ -name "*Rosetta*"; or sudo softwareupdate --install-rosetta
 
 # TODO: conditional brew packages for work/personal - see https://github.com/twpayne/dotfiles/blob/master/run_once_before_10-install-packages-darwin.sh.tmpl
 echo "\
@@ -92,6 +92,7 @@ cask \"1password\"
 cask \"1password-cli\"
 cask \"alfred\"
 cask \"arq\"
+cask \"bartender\"
 cask \"cardhop\"
 cask \"corretto\"
 cask \"fantastical\"
