@@ -1,1 +1,2 @@
 Copied from https://github.com/sainnhe/sonokai
+Converted to terminal themes via https://github.com/lysyi3m/macos-terminal-themes
