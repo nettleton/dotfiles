@@ -7,11 +7,11 @@ function vpn
       if test $status -gt 0
         printf "Unable to connect.  Did you enter the correct password?"
       else
-        printf %s\n%s\ny $WORK_USER (op get item ***REMOVED*** --fields password) | /opt/cisco/anyconnect/bin/vpn -s connect zakim2.***REMOVED***
+        printf %s\n%s\ny $WORK_USER (op get item ***REMOVED*** --fields password) | /opt/cisco/anyconnect/bin/vpn -s connect zakim.***REMOVED***
       end
     case disconnect
       /opt/cisco/anyconnect/bin/vpn disconnect
-    case '*' 
+    case '*'
       echo "Unrecognized option $argv[1]"
   end
 end
