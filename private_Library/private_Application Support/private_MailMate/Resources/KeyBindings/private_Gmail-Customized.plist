@@ -18,12 +18,12 @@
 	"s"	= "toggleFlag:";
 	"!"	= "moveToJunk:";
 //	"r"	= "reply:";
-  "r" = ( "reply:", "insertFormatString:", "Hi ${to.name.first},\n\n");
+  "r" = ( "replySender:", "insertFormatString:", "Hi ${to.name.first},\n\n");
 //	"a"	= "replyAll:";
   "a" = ("replyAll:", "insertFormatString:", "Hi ${to.name.first},\n\n");
 	"f"	= "forwardMessage:";
 	"^s"	= "saveDocument:";
-	// l Label	
+	// l Label
 	"v"	= "moveToMailbox:";
 	"#"   = "deleteMessage:";
 
@@ -84,5 +84,5 @@ y	Remove from Current View* Automatically removes the message or conversation fr
 .	Show more actions	Displays the 'More Actions' drop-down menu.
 
 y then o	Archive and next	Archives your conversation and moves to the next one.
-	
+
 */
