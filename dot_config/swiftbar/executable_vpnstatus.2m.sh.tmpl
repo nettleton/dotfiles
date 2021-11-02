@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# <bitbar.title>Anyconnect VPN status</bitbar.title>
+# <bitbar.version>v1.0</bitbar.version>
+# <bitbar.author>Joshua Wang</bitbar.author>
+# <bitbar.author.github>nettleton</bitbar.author.github>
+# <bitbar.desc>Displays VPN status</bitbar.desc>
+# <bitbar.dependencies>anyconnect</bitbar.dependencies>
+
+ANYCONNECT="/opt/cisco/anyconnect/bin/vpn"
+
+STATUS=$($ANYCONNECT status | grep -oi "state: [a-z]\+" | head -1 | cut -d' ' -f2)
+
+if [ "$STATUS" == "Connected" ]; then
+  echo ":lock.fill:"
+  echo "---"
+  STATS=$($ANYCONNECT stats)
+  HOST=$(echo "$STATS" | grep -oi "connected to [^\.]*" | cut -d' ' -f3)
+  REMAINING=$(echo "$STATS" |  grep -oi "session disconnect: .*" | tr -s ' ' | cut -d' ' -f3,4,5,6)
+  echo "$HOST: $REMAINING Remaining | refresh=false"
+else
+  echo ":lock.open.fill:"
+  echo "---"
+  echo "Disconnected | refresh=false"
+fi
+
+echo "Refresh | refresh=true"
+echo "Connect to Zakim 1 | bash=vpn param0=connect param1=zakim.{{ .work.domain }} terminal=true"
+echo "Connect to Zakim 2 | bash=vpn param0=connect param2=zakim2.{{ .work.domain }} terminal=true"
+echo "Disconnect | bash=$ANYCONNECT params=disconnect terminal=false"
