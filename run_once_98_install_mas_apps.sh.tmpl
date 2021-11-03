@@ -1,0 +1,29 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/usr/bin/env fish
+
+# TODO: conditional brew packages for work/personal - see https://github.com/twpayne/dotfiles/blob/master/run_once_before_10-install-packages-darwin.sh.tmpl
+echo "\
+mas \"1Blocker\", id: 1365531024
+mas \"Banktivity\", id: 1480779512
+mas \"FileBot\", id: 905384638
+mas \"GarageBand\", id: 682658836
+mas \"HomeControl\", id: 1547121417
+mas \"iMovie\", id: 408981434
+mas \"Keynote\", id: 409183694
+mas \"Microsoft Excel\", id: 462058435
+mas \"Microsoft OneNote\", id: 784801555
+mas \"Microsoft Outlook\", id: 985367838
+mas \"Microsoft PowerPoint\", id: 462062816
+mas \"Microsoft Remote Desktop\", id: 1295203466
+mas \"Microsoft Word\", id: 462054704
+mas \"Numbers\", id: 409203825
+mas \"OneDrive\", id: 823766827
+mas \"Pages\", id: 409201541
+mas \"PCalc\", id: 403504866
+mas \"Save to Pocket\", id: 1477385213
+mas \"Slack\", id: 803453959
+mas \"StopTheMadness\", id: 1376402589
+mas \"Vimari\", id: 1480933944
+mas \"Xcode\", id: 497799835
+" | brew bundle --no-lock --file=/dev/stdin
+{{ end -}}
