@@ -31,8 +31,8 @@ require('telescope').setup{
 }
 
 require('telescope').load_extension('fzf')
--- require('telescope').load_extension('ultisnips')
--- require('telescope').load_extension('coc')
+require('telescope').load_extension('ultisnips')
+require('telescope').load_extension('coc')
 
 map('n', '<c-p>', '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>', { noremap = true, silent = true })
 map('n', '<leader>gt', '<cmd>lua require("telescope.builtin").live_grep()<CR>', { noremap = true, silent = true })
@@ -52,6 +52,6 @@ map('n', '<leader>tl', '<cmd>lua require("telescope.builtin").loclist()<CR>', { 
 map('n', '<leader>th', '<cmd>lua require("telescope.builtin").highlights()<CR>', { noremap = true, silent = true })
 map('n', '<leader>tr', '<cmd>lua require("telescope.builtin").registers()<CR>', { noremap = true, silent = true })
 map('n', '<leader>ti', '<cmd>lua require("telescope.builtin").treesitter()<CR>', { noremap = true, silent = true })
--- map('n', '<leader>tcd', ':Telescope coc diagnostics<CR>', { noremap = true, silent = true })
--- map('n', '<leader>tcr', ':Telescope coc references<CR>', { noremap = true, silent = true })
--- map('n', '<leader>tu', ':Telescope ultisnips<CR>', { noremap = true, silent = true })
+map('n', '<leader>tcd', ':Telescope coc diagnostics<CR>', { noremap = true, silent = true })
+map('n', '<leader>tcr', ':Telescope coc references<CR>', { noremap = true, silent = true })
+map('n', '<leader>tu', ':Telescope ultisnips<CR>', { noremap = true, silent = true })

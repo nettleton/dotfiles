@@ -26,8 +26,8 @@ require('packer').startup(function(use)
   -- Telescope
   use { 'nvim-lua/plenary.nvim' }
   use { 'nvim-telescope/telescope.nvim' }
---   use { 'fannheyward/telescope-coc.nvim' }
---   use { 'fhill2/telescope-ultisnips.nvim' }
+  use { 'fannheyward/telescope-coc.nvim' }
+  use { 'fhill2/telescope-ultisnips.nvim' }
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
 
   -- Git
@@ -71,7 +71,7 @@ require('packer').startup(function(use)
   use { 'windwp/nvim-autopairs' } -- Insert or delete brackets, parens, quotes in pair.
 --   use { 'mattn/emmet-vim', event = 'VimEnter', ft = {'html', 'markdown', 'css', 'scss'} } -- Shortcuts for writing HTML and CSS
 --   use { 'norcalli/nvim-colorizer.lua', ft = { 'html', 'css', 'scss', 'javascript' } } -- Colour highlighting
---   use { 'ervandew/supertab' } -- Use <Tab> for autocompletion in insert mode
+  use { 'ervandew/supertab' } -- Use <Tab> for autocompletion in insert mode
 --   use { 'tpope/vim-surround' } -- Mappings for surroundings like brackets, quotes, e.t.c.
   use { 'numtostr/comment.nvim' } -- Comment stuff out easily
 --   use { 'tpope/vim-repeat' } -- Enhance the dot command
@@ -105,13 +105,12 @@ require('plugins.conoline')
 require('plugins.comment')
 require('plugins.go')
 require('plugins.vim-rooter')
+require('plugins.supertab')
 
 -- not used yet
-
 -- require('plugins.emmet-vim')
 -- require('plugins.indent-blankline')
 -- require('plugins.rainbow')
--- require('plugins.supertab')
 -- require('plugins.vim-bbye')
 -- require('plugins.vim-gutentags')
 -- require('plugins.vim-pandoc')

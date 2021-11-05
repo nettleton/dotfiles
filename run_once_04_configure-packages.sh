@@ -30,3 +30,4 @@ else
   podman machine start
 end
 
+echo "execute :CocInstall coc-snippets in neovim"
