@@ -4,6 +4,8 @@ local exec = vim.api.nvim_exec
 -- CONFIG
 require('go').setup()
 
+require("nvim-dap-virtual-text").setup()
+
 -- 1. format on save
 -- 2. import on save
 -- TODO: this erases valid code
@@ -14,5 +16,5 @@ require('go').setup()
 
 
 -- REFERENCES
--- https://github.com/ray-x/go.nvim 
+-- https://github.com/ray-x/go.nvim
 --   the linked treesitter config is actually https://github.com/ray-x/dotfiles/blob/zprezto-plug/lua/treesitter.lua
