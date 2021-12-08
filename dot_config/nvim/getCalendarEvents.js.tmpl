@@ -72,7 +72,7 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -fj -ic "Calendar"', 
   })
 
   const eventsToCreateNotesFrom = events.filter(calendarEvent => {
-    const invalidTitles = [/.*OOO.*/, /Canceled:.*/i, /.*Backlog grooming/i, /.*Sprint planning.*/i, /.*scrum.*/i, /CR 1-on-1/, /YL 1:1/, /Gremlin Customer Office Hours/, /work$/, /Observability work/, /CNCF work/, /Online Learning Architecture Meeting/, /OPDRx/, /Dashboard review/i, /reminder/i, /RTM/, /golf/i, /busy/]
+    const invalidTitles = [/.*OOO.*/, /Canceled:.*/i, /.*Backlog grooming/i, /.*Sprint planning.*/i, /.*scrum.*/i, /CR 1-on-1/, /YL 1:1/, /Gremlin Customer Office Hours/, /work$/, /Observability work$/, /CNCF work/, /Online Learning Architecture Meeting/, /OPDRx/, /Dashboard review/i, /reminder/i, /RTM/, /golf/i, /busy/]
 
     const invalidTitleMatches = invalidTitles.filter(rex => calendarEvent.title.match(rex))
     const anyInvalidTitles = invalidTitleMatches && invalidTitleMatches.length > 0
