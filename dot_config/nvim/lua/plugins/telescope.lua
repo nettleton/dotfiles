@@ -34,7 +34,7 @@ require('telescope').load_extension('fzf')
 require('telescope').load_extension('ultisnips')
 require('telescope').load_extension('coc')
 
-map('n', '<c-p>', '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>', { noremap = true, silent = true })
+map('n', '<leader>f', '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>', { noremap = true, silent = true })
 map('n', '<leader>gt', '<cmd>lua require("telescope.builtin").live_grep()<CR>', { noremap = true, silent = true })
 map('n', '<leader>tg', '<cmd>lua require("telescope.builtin").git_files()<CR>', { noremap = true, silent = true })
 map('n', '<leader>b', '<cmd>lua require("telescope.builtin").buffers()<CR>', { noremap = true, silent = true })
