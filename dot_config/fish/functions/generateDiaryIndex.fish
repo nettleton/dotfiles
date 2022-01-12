@@ -17,6 +17,7 @@ function generateDiaryIndex -d "generate diary index"
     set monthHeader "### $MONTHS[$YMD[2]] $YMD[1]"
 
     if not contains "$yearHeader" $writtenHeaders
+      echo "" >> "$INDEX"
       echo "$yearHeader" >> "$INDEX"
       set writtenHeaders $writtenHeaders "$yearHeader"
     end
