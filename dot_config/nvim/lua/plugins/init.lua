@@ -41,6 +41,7 @@ require('packer').startup(function(use)
   use { 'rcarriga/nvim-dap-ui' }
   use { 'theHamsta/nvim-dap-virtual-text' }
   use { 'nvim-telescope/telescope-dap.nvim' }
+  use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
 
   -- Appearance and themes
   use { 'sainnhe/sonokai' }
@@ -57,6 +58,7 @@ require('packer').startup(function(use)
     'neoclide/coc.nvim', -- Intellisense, LSP and other language smarts
     run = 'yarn install --frozen-lockfile'
   }
+  use { 'neovim/nvim-lspconfig' }
   use { 'neoclide/coc-prettier', run = 'yarn install --frozen-lockfile' }
   use { 'SirVer/ultisnips' } -- Snippets engine
   use { 'alker0/chezmoi.vim' } -- support for chezmoi templates
@@ -83,6 +85,7 @@ require('packer').startup(function(use)
   use { 'airblade/vim-rooter' } -- Change vim working directory to project directory
 --   use { 'andymass/vim-matchup', event = 'VimEnter' } -- Highlight, navigate, and operate on sets of matching text
   use { 'lewis6991/impatient.nvim' } -- Speed up startup time
+  use { 'fladson/vim-kitty' }
 
   if packer_bootstrap then
     require('packer').sync()
