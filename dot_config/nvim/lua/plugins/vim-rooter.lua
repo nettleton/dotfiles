@@ -1,1 +1,1 @@
-vim.g.rooter_patterns = { '!^package.json','.git' }
+vim.g.rooter_patterns = { 'go.mod','pom.xml','!^package.json','.git' }
