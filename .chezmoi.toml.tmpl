@@ -16,6 +16,7 @@
   user = {{ $workuser | quote }}
   domain = {{ $workdomain | quote }}
   email = "{{- $workuser -}}@{{- $workdomain -}}"
+  hostname = "ah-{{- $workuser -}}-mac"
 
 [data.work.hostnames]
   mac = "ah-{{- $workuser -}}-mac.dhcp.{{- $workdomain -}}"

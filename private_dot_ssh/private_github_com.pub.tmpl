@@ -1,5 +1,5 @@
 {{- if contains .work.domain .targetname -}}
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGd0enm15VemIVaguc+xISo2hAce6eoBuz3G3cII9c1i github@nettleton.io github.com machine:***REMOVED***
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGd0enm15VemIVaguc+xISo2hAce6eoBuz3G3cII9c1i github@nettleton.io github.com machine:{{- .work.hostname -}}
 {{- end -}}
 {{- if contains "starship" .targetname -}}
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM8fdrwD0r3zenmgT7eK9eDBgNVQI1kInpMTZq56Eb+m github@nettleton.io github.com machine:starship

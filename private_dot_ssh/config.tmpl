@@ -10,6 +10,6 @@ Host github.{{ .work.domain }}
 Host gitlab.com
   User nettleton
   IdentityFile ~/.ssh/gitlab_com
-Host ah-{{ .work.user }}-mac.dhcp.{{ .work.domain }}
+Host {{ .work.hostname }}.dhcp.{{ .work.domain }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/workmachine
