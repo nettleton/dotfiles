@@ -3,7 +3,7 @@ function vpn
     case status
       /opt/cisco/anyconnect/bin/vpn state | grep -iq "state: connected" ; and echo "connected"; or echo "disconnected"
     case connect
-      op get item ***REMOVED*** --fields username > /dev/null ; or set -Ux OP_SESSION_$OP_ACCOUNT (op signin $OP_ACCOUNT --raw)
+      op get item {{ .work.companyname }} --fields username > /dev/null ; or set -Ux OP_SESSION_$OP_ACCOUNT (op signin $OP_ACCOUNT --raw)
       if test $status -gt 0
         printf "Unable to connect.  Did you enter the correct password?"
       else
@@ -12,7 +12,7 @@ function vpn
         else
           set VPN_HOST "zakim.{{ .work.domain }}"
         end
-        printf %s\n%s\ny $WORK_USER (op get item ***REMOVED*** --fields password) | /opt/cisco/anyconnect/bin/vpn -s connect "$VPN_HOST"
+        printf %s\n%s\ny $WORK_USER (op get item {{ .work.companyname }} --fields password) | /opt/cisco/anyconnect/bin/vpn -s connect "$VPN_HOST"
       end
     case disconnect
       /opt/cisco/anyconnect/bin/vpn disconnect

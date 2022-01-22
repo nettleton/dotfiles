@@ -47,7 +47,7 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -fj -ic "Calendar"', 
 
     const teamsUrlMatch = trimmedNotes.match(/https:\/\/teams.microsoft.com\/l\/meetup-join[^\s>]*/)
     event.teamsUrl = teamsUrlMatch ? teamsUrlMatch[0] : ''
-    const oneNoteUrlMatch = trimmedNotes.match(/https:\/\/***REMOVED***-my.sharepoint.com[^>#]*/)
+    const oneNoteUrlMatch = trimmedNotes.match(/https:\/\/{{ .work.companyname }}-my.sharepoint.com[^>#]*/)
     let oneNoteUrl = oneNoteUrlMatch ? oneNoteUrlMatch[0] : ''
     if (oneNoteUrl.includes('Christina')) {
       oneNoteUrl = '{{ range (index (onepassword "fcww6q4a5bhnff4zcw7biwfvj4").details.sections 2 "fields") -}}
@@ -65,7 +65,7 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -fj -ic "Calendar"', 
     trimmedNotes = trimmedNotes.replace(/##NL##_+.*/g,'')        // videoconference invites are at the end of the notes and start with \n__..._\nJoin Teams Meeting
     trimmedNotes = trimmedNotes.replace(/\[https:\/\/.*.cdn.office.net.*\.png\]/g,'') //Outlook inserts images for office docs
     trimmedNotes = trimmedNotes.replace(/##NL##Thanks,.*/g,'')   // signature lines
-    trimmedNotes = trimmedNotes.replace(/##NL##https:\/\/***REMOVED***-my.sharepoint.com\/:o:\/[p|r][\/personal]*\/joshuaw.*/g,'') // my 1:1s have a personal onedrive link
+    trimmedNotes = trimmedNotes.replace(/##NL##https:\/\/{{ .work.companyname }}-my.sharepoint.com\/:o:\/[p|r][\/personal]*\/{{ .work.user }}.*/g,'') // my 1:1s have a personal onedrive link
     event.shortNotes = trimmedNotes
 
     return event

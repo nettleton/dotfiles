@@ -3,7 +3,7 @@
     {
       title = "Sending work email from personal account";
       details = "You are sending an email from a personal account to work recipients.  Do you really want to proceed?";
-      conditions = "(from.domain !=[x] '***REMOVED***' and to.domain ~ '***REMOVED***')";
+      conditions = "(from.domain !=[x] '{{ .work.domain }}' and to.domain ~ '{{ .work.domain }}')";
     }
 	);
 }

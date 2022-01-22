@@ -1,4 +1,5 @@
 {{- $workuser := promptString "workuser" -}}
+{{- $workname := promptString "company" -}}
 {{- $workdomain := promptString "workdomain" -}}
 {{- $opaccount := promptString "opaccount" -}}
 {{- $opemail := promptString "opemail" -}}
@@ -15,6 +16,7 @@
 [data.work]
   user = {{ $workuser | quote }}
   domain = {{ $workdomain | quote }}
+  companyname = {{ $workname | quote }}
   email = "{{- $workuser -}}@{{- $workdomain -}}"
   hostname = "ah-{{- $workuser -}}-mac"
 
