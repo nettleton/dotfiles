@@ -1,0 +1,8 @@
+function awslogin
+  op get item {{ .work.companyname }} --fields username > /dev/null ; or set -Ux OP_SESSION_$OP_ACCOUNT (op signin $OP_ACCOUNT --raw)
+  if test $status -gt 0
+    printf "Unable to login.  Did you enter the correct password?"
+  else
+    op get item {{ .work.companyname }} --fields password | awssaml --password-stdin
+  end
+end
