@@ -1,3 +1,6 @@
+{{- if eq "foo" "bar" }}
+Note: this is a public key
+{{ end -}}
 {{- if contains .work.domain .targetname -}}
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1j7y1bUtUNRhKpdGwTzU8FS/a5z/juR6NpmD6ZTPtG insidelabs-git {{ .work.user -}}@{{- .work.hostname -}}
 {{- end -}}
