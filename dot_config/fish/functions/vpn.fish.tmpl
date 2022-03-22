@@ -3,7 +3,7 @@ function vpn
     case status
       /opt/cisco/anyconnect/bin/vpn state | grep -iq "state: connected" ; and echo "connected"; or echo "disconnected"
     case connect
-      op item get {{ .work.companyname }} --fields username > /dev/null ; or set -Ux OP_SESSION_$OP_ACCOUNT (op signin $OP_ACCOUNT --raw)
+      op item get {{ .work.companyname }} --fields username > /dev/null ; or set -Ux OP_SESSION_$OP_ACCOUNT (op signin --account $OP_ACCOUNT --raw)
       if test $status -gt 0
         printf "Unable to connect.  Did you enter the correct password?"
       else
