@@ -50,11 +50,7 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -fj -ic "Calendar"', 
     const oneNoteUrlMatch = trimmedNotes.match(/https:\/\/{{ .work.companyname }}-my.sharepoint.com[^>#]*/)
     let oneNoteUrl = oneNoteUrlMatch ? oneNoteUrlMatch[0] : ''
     if (oneNoteUrl.includes('Christina')) {
-      oneNoteUrl = '{{ range (index (onepassword "fcww6q4a5bhnff4zcw7biwfvj4").details.sections 2 "fields") -}}
-  {{ if eq .t "special_one_note_url" -}}
-    {{ .v }}
-  {{- end }}
-{{- end }}'
+      oneNoteUrl = "{{ (index (onepassword "fcww6q4a5bhnff4zcw7biwfvj4").fields 4).value }}"
     }
     event.oneNoteUrl = oneNoteUrl
 

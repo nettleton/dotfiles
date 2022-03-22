@@ -13,16 +13,8 @@
 # User Configuration
 
 # solution to get additional fields: https://github.com/twpayne/chezmoi/issues/1279
-solaredge_site_id = "{{ range (index (onepassword "mblku5f6cvddlg342kx5eonuxu").details.sections 1 "fields") -}}
-  {{ if eq .t "site_id" -}}
-    {{ .v }}
-  {{- end }}
-{{- end }}"
-solaredge_api_key = "{{ range (index (onepassword "mblku5f6cvddlg342kx5eonuxu").details.sections 1 "fields") -}}
-  {{ if eq .t "api_key" -}}
-    {{ .v }}
-  {{- end }}
-{{- end }}"
+solaredge_site_id = "{{ (index (onepassword "mblku5f6cvddlg342kx5eonuxu").fields 4).value }}"
+solaredge_api_key = "{{ (index (onepassword "mblku5f6cvddlg342kx5eonuxu").fields 3).value }}"
 
 # Optional. Set to 0 to disable. Total panel DC watt capacity
 system_wattage = 19240
