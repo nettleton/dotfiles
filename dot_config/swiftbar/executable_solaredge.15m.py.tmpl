@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # <xbar.title>SolarEdge Monitoring</xbar.title>
 # <xbar.version>v1.1</xbar.version>
@@ -60,15 +60,15 @@ def formatWatts (Wh, unit_suffix=""):
 if solaredge_site_id == "" or solaredge_api_key == "":
     raise SystemExit("Site ID/API Key Required")
 
-import urllib2
+import urllib.request
 import json
 
 overview = "https://monitoringapi.solaredge.com/site/" + solaredge_site_id + "/overview?api_key=" + solaredge_api_key
 
 try:
-    result = urllib2.urlopen(overview, timeout = 10).read()
+    result = urllib.request.urlopen(overview, timeout = 10).read()
     json = json.loads(result)
-except Exception, err:
+except BaseException as err:
     print(asleep_icon + " <err>")
     print("---")
     raise SystemExit(err)
