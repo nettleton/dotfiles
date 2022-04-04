@@ -28,7 +28,7 @@ async function getJoke () {
 }
 
 // exec(`/usr/local/bin/icalBuddy -ic "Calendar" -ea -npn -stda -ss "##EVENT_DELIMITER##" -b "" -po "title,datetime,attendees,notes" -iep "title,datetime,attendees,notes" -df "%Y-%m-%d" -tf "%H:%M:%S" -ps "|!!PROP_SEPARATOR!!|" -nnr "##NEWLINE##" eventsFrom:"${daystr} 00:00:00 -0500" to:"${daystr} 23:59:59 -0500"`, { shell: '/bin/bash' }, (error, stdout, stderr) => {
-exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -fj -ic "Calendar"', (error, stdout, stderr) => {
+exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -ea -fj -ic "Calendar"', (error, stdout, stderr) => {
   if (error) {
     console.error(`stderr: ${stderr}`)
     console.error(`exec error: ${error}`)
