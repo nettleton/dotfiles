@@ -92,8 +92,7 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "transmit"
       "visual-studio-code"
       "vlc"
-      "zulu-jdk8"
-}}
+      "zulu-jdk8" -}}
 
 {{ if .personalpackages -}}
 {{  $brews = concat $brews (list
@@ -150,8 +149,7 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "resilio-sync"
       "screens-connect"
       "xld"
-      "xquartz"
-  )}}
+      "xquartz") -}}
 {{ end -}}
 
 brew bundle --no-lock --file=/dev/stdin <<EOF

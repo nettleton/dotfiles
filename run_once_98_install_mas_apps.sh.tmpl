@@ -1,30 +1,37 @@
 {{- if (eq .chezmoi.os "darwin") -}}
-#!/usr/bin/env fish
+#!/bin/bash
 
-# TODO: conditional brew packages for work/personal - see https://github.com/twpayne/dotfiles/blob/master/run_once_before_10-install-packages-darwin.sh.tmpl
-echo "\
-mas \"1Blocker\", id: 1365531024
-mas \"Banktivity\", id: 1480779512
-mas \"FileBot\", id: 905384638
-mas \"GarageBand\", id: 682658836
-mas \"HomeControl\", id: 1547121417
-mas \"iMovie\", id: 408981434
-mas \"Keynote\", id: 409183694
-mas \"Microsoft Excel\", id: 462058435
-mas \"Microsoft OneNote\", id: 784801555
-mas \"Microsoft Outlook\", id: 985367838
-mas \"Microsoft PowerPoint\", id: 462062816
-mas \"Microsoft Remote Desktop\", id: 1295203466
-mas \"Microsoft Word\", id: 462054704
-mas \"Numbers\", id: 409203825
-mas \"OneDrive\", id: 823766827
-mas \"Pages\", id: 409201541
-mas \"PCalc\", id: 403504866
-mas \"Save to Pocket\", id: 1477385213
-mas \"Slack\", id: 803453959
-mas \"StopTheMadness\", id: 1376402589
-mas \"Vimari\", id: 1480933944
-mas \"Vinegar - Tube Cleaner\", id: 1591303229
-mas \"Xcode\", id: 497799835
-" | brew bundle --no-lock --file=/dev/stdin
+{{ $mases := list
+      "\"1Blocker\", id: 1365531024"
+      "\"GarageBand\", id: 682658836"
+      "\"iMovie\", id: 408981434"
+      "\"Keynote\", id: 409183694"
+      "\"Numbers\", id: 409203825"
+      "\"Pages\", id: 409201541"
+      "\"PCalc\", id: 403504866"
+      "\"StopTheMadness\", id: 1376402589"
+      "\"Vimari\", id: 1480933944"
+      "\"Vinegar - Tube Cleaner\", id: 1591303229" -}}
+{{ if .personalpackages -}}
+{{  $mases = concat $mases (list
+      "\"Banktivity\", id: 1480779512"
+      "\"FileBot\", id: 905384638"
+      "\"HomeControl\", id: 1547121417"
+      "\"Microsoft Excel\", id: 462058435"
+      "\"Microsoft OneNote\", id: 784801555"
+      "\"Microsoft Outlook\", id: 985367838"
+      "\"Microsoft PowerPoint\", id: 462062816"
+      "\"Microsoft Remote Desktop\", id: 1295203466"
+      "\"Microsoft Word\", id: 462054704"
+      "\"OneDrive\", id: 823766827"
+      "\"Slack\", id: 803453959"
+      "\"Xcode\", id: 497799835") -}}
+{{ end -}}
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+{{ range ($mases | sortAlpha | uniq) -}}
+mas {{ . }}
+{{ end -}}
+EOF
+
 {{ end -}}
