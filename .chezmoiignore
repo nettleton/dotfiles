@@ -1,8 +1,8 @@
 colorthemes
 styles.css
 README.md
-{{- if contains .work.domain .targetname }}
-dot_config/swiftbar/executable_solaredge.15m.py.tmpl
-dot_config/swiftbar/executable_vpnstatus.2m.sh.tmpl
-private_Library/LaunchAgents/io.nettleton.calendar.poller.plist.tmpl
+{{- if contains .chezmoi.username .targetname }}
+.config/swiftbar/solaredge.15m.py
+.config/swiftbar/vpnstatus.2m.sh
+Library/LaunchAgents/io.nettleton.calendar.poller.plist
 {{- end }}

@@ -47,8 +47,13 @@ o.smartcase = true -- make searches case insensitive except if uppercase charate
 
 o.updatetime = 100
 
+{{ if eq .chezmoi.arch "arm64" -}}
 o.shell = '/opt/homebrew/bin/fish'
 g['$SHELL'] = '/opt/homebrew/bin/fish'
+{{ else -}}
+o.shell = '/usr/local/bin/fish'
+g['$SHELL'] = '/usr/local/bin/fish'
+{{ end -}}
 
 -- Disable python2 provider
 g.loaded_python_provider = 0
@@ -93,9 +98,9 @@ exec([[
 ]], false)
 
 -- set colorscheme
-g.sonokai_style = 'shusia'
-g.sonokai_enable_italic = 1
-vim.cmd[[colorscheme sonokai]]
+-- g.sonokai_style = 'shusia'
+-- g.sonokai_enable_italic = 1
+-- vim.cmd[[colorscheme sonokai]]
 
 -- REFERENCES
 -- https://github.com/ayoisaiah/dotfiles/blob/master/private_dot_config/nvim/lua/settings.lua

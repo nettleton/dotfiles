@@ -14,10 +14,11 @@ vim.cmd([[
   augroup end
 ]])
 
-require('impatient')
 require('packer').startup(function(use)
   -- Packer can manage itself
   use { 'wbthomason/packer.nvim' }
+  use { 'lewis6991/impatient.nvim', config = [[require('impatient')]] } -- Speed up startup time
+
 
   -- Markdown
   use { 'plasticboy/vim-markdown', config = [[require('plugins.vim-markdown')]] }
@@ -52,7 +53,13 @@ require('packer').startup(function(use)
   use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
 
   -- Appearance and themes
-  use { 'sainnhe/sonokai' }
+  use { 'sainnhe/sonokai', 
+    config = function()
+      vim.g.sonokai_style = 'shusia'
+      vim.g.sonokai_enable_italic = 1
+      vim.cmd[[colorscheme sonokai]]
+    end,
+  }
   use {
     'nvim-lualine/lualine.nvim',
     requires = { 'kyazdani42/nvim-web-devicons', opt = true },
@@ -94,7 +101,6 @@ require('packer').startup(function(use)
   use { 'miyakogi/conoline.vim', config = [[require('plugins.conoline')]] } -- Highlight the line of the cusor in the current window
   use { 'airblade/vim-rooter', config = [[require('plugins.vim-rooter')]] } -- Change vim working directory to project directory
 --   use { 'andymass/vim-matchup', event = 'VimEnter' } -- Highlight, navigate, and operate on sets of matching text
-  use { 'lewis6991/impatient.nvim' } -- Speed up startup time
   use { 'fladson/vim-kitty' }
 
   if packer_bootstrap then
