@@ -5,9 +5,11 @@
 {{- $opemail := promptString "opemail" -}}
 {{- $ghemail := promptString "ghemail" -}}
 {{- $targetname := promptString "targetname" -}}
+{{- $personalpackages := promptBool "install personal packages" -}}
 
 [data]
   targetname = {{ $targetname | quote }}
+  personalpackages = {{ $personalpackages }}
 
 [data.op]
   account = {{ $opaccount | quote }}
