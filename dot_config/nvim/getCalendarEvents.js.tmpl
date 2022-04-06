@@ -80,7 +80,7 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -ea -fj -ic "Calendar
     const startTimeHM = nEvent.startDate.split(':').slice(0, 2).join('').split(' ').join('_')
     const shortfn = `${startTimeHM}_${nEvent.title.replace(/\s|#/g, '_').replace(/\//g, '-').replace(/"/g, '').replace(/:/g, '-').replace(/\(|\)/g, '')}`
     nEvent.shortfn = shortfn
-    const filename = `${os.homedir}/Documents/notes/default/diary/${shortfn}.md`
+    const filename = `~/Documents/notes/default/diary/${shortfn}.md`
     nEvent.diaryFilename = filename
     nEvent.uid = filename
     nEvent.title = shortfn
@@ -92,7 +92,7 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -ea -fj -ic "Calendar
     nEvent.variables = { teamsUrl: nEvent.teamsUrl.replace(/https:/, 'msteams:'), oneNoteUrl: nEvent.oneNoteUrl, noteType: 'existing', noteFilename: filename, confluenceUrl: nEvent.confluenceUrl }
 
     if (nEvent.fullAttendeeList.length === 1) {
-      nEvent.variables.attendees = `${os.homedir}/Documents/notes/default/${nEvent.fullAttendeeList[0]}.md`
+      nEvent.variables.attendees = `~/Documents/notes/default/${nEvent.fullAttendeeList[0]}.md`
     }
 
     nEvent.match = shortfn.replace(/[^a-z0-9]/gi, ' ')
@@ -116,7 +116,7 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -ea -fj -ic "Calendar
           console.log(`${noteEvent.diaryFilename} exists, not recreating`)
         } else if (err.code === 'ENOENT') {
           console.log(`Creating ${noteEvent.diaryFilename}`)
-          fs.writeFile(noteEvent.diaryFilename, body, (err) => {
+          fs.writeFile(noteEvent.diaryFilename.replace("~",`${os.homedir}`), body, (err) => {
             if (err) {
               console.error(err)
             } else {
@@ -131,8 +131,8 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -ea -fj -ic "Calendar
   })
 
   // map into Alfred JSON object
-  const newNonDiary = { uid: 'new', title: 'Create new note', type: 'default', subtitle: 'Create a new non-diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'new', noteFilename: `${os.homedir}/Documents/notes/default/` } }
-  const newDiary = { uid: 'new', title: 'Create new diary note', type: 'default', subtitle: 'Create a new diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'newDiary', noteFilename: `${os.homedir}/Documents/notes/default/diary/${daystr}_` } }
+  const newNonDiary = { uid: 'new', title: 'Create new note', type: 'default', subtitle: 'Create a new non-diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'new', noteFilename: `~/Documents/notes/default/` } }
+  const newDiary = { uid: 'new', title: 'Create new diary note', type: 'default', subtitle: 'Create a new diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'newDiary', noteFilename: `~/Documents/notes/default/diary/${daystr}_` } }
   const generateDaysNotes = { uid: 'generateToday', title: 'Generate today\'s notes', type: 'default', subtitle: 'Generate placeholders for today\'s meetings', arg: '', icon: { type: 'fileicon', path: '~/sandbox/dotfiles/vim/vimwiki-helpers/getCalendarEvents.js' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'genToday', noteFilename: '' } }
   const cleanupOldNotes = { uid: 'cleanup', title: 'Cleanup', type: 'default', subtitle: 'Cleanup old and empty notes', arg: '', icon: { type: 'fileicon', path: '~/sandbox/dotfiles/vim/vimwiki-helpers/cleanOldNotes.sh' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'cleanup', noteFilename: '' } }
 
