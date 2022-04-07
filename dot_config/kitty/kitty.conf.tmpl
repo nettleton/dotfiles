@@ -1,6 +1,6 @@
 # vim:fileencoding=utf-8:foldmethod=marker
 
-#: Fonts {{{
+#: Fonts
 
 #: kitty has very powerful font management. You can configure
 #: individual font faces and even specify special fonts for particular
@@ -165,9 +165,9 @@ disable_ligatures cursor
 #: monitor DPI to arrive at a pixel value. There must be four values
 #: corresponding to thin, normal, thick, and very thick lines.
 
-#: }}}
+#:
 
-#: Cursor customization {{{
+#: Cursor customization
 
 # cursor #cccccc
 
@@ -217,9 +217,9 @@ disable_ligatures cursor
 #: Stop blinking cursor after the specified number of seconds of
 #: keyboard inactivity.  Set to zero to never stop blinking.
 
-#: }}}
+#:
 
-#: Scrollback {{{
+#: Scrollback
 
 # scrollback_lines 2000
 
@@ -275,9 +275,9 @@ scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
 #: for high precision scrolling devices on platforms such as macOS and
 #: Wayland. Use negative numbers to change scroll direction.
 
-#: }}}
+#:
 
-#: Mouse {{{
+#: Mouse
 
 # mouse_hide_wait 3.0
 
@@ -371,7 +371,7 @@ scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
 #: The default shape of the mouse pointer when dragging across text.
 #: Valid values are: arrow, beam and hand
 
-#: Mouse actions {{{
+#: Mouse actions
 
 #: Mouse buttons can be remapped to perform arbitrary actions. The
 #: syntax for doing so is:
@@ -521,11 +521,11 @@ scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
 #::  Requires https://sw.kovidgoyal.net/kitty/shell-integration/ to
 #::  work
 
-#: }}}
+#:
 
-#: }}}
+#:
 
-#: Performance tuning {{{
+#: Performance tuning
 
 # repaint_delay 10
 
@@ -554,9 +554,9 @@ scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
 #: keyboard repeat rate, you may notice some slight input latency. If
 #: so, set this to no.
 
-#: }}}
+#:
 
-#: Terminal bell {{{
+#: Terminal bell
 
 # enable_audio_bell yes
 
@@ -598,9 +598,9 @@ scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
 #: the operating systems sound API, such as WAV or OGA on Linux
 #: (libcanberra) or AIFF, MP3 or WAV on macOS (NSSound)
 
-#: }}}
+#:
 
-#: Window layout {{{
+#: Window layout
 
 # remember_window_size  yes
 # initial_window_width  640
@@ -773,9 +773,9 @@ scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
 #: https://sw.kovidgoyal.net/kitty/actions/#close-window-with-
 #: confirmation action.
 
-#: }}}
+#:
 
-#: Tab bar {{{
+#: Tab bar
 
 # tab_bar_edge bottom
 
@@ -904,9 +904,9 @@ tab_powerline_style slanted
 #: Color for the tab bar margin area. Defaults to using the terminal
 #: background color.
 
-#: }}}
+#:
 
-#: Color scheme {{{
+#: Color scheme
 
 # foreground #dddddd
 # background #000000
@@ -980,7 +980,7 @@ tab_powerline_style slanted
 #: to be used unchanged. Note that these colors can be overridden by
 #: the program running in the terminal.
 
-#: The color table {{{
+#: The color table
 
 #: The 256 terminal colors. There are 8 basic colors, each color has a
 #: dull and bright version, for the first 16 colors. You can set the
@@ -1050,13 +1050,15 @@ tab_powerline_style slanted
 
 #: Color for marks of type 3 (violet)
 
-#: }}}
+#:
 
-#: }}}
+#:
 
-#: Advanced {{{
+#: Advanced
 
+{{- if contains .chezmoi.username .targetname -}}
 shell fish --login --interactive
+{{ end -}}
 
 #: The shell program to execute. The default value of . means to use
 #: whatever shell is set as the default shell for the current user.
@@ -1232,9 +1234,9 @@ shell_integration enabled
 #: work. Changing this option by reloading the config will only affect
 #: newly created windows.
 
-#: }}}
+#:
 
-#: OS specific tweaks {{{
+#: OS specific tweaks
 
 # wayland_titlebar_color system
 
@@ -1319,9 +1321,9 @@ shell_integration enabled
 #: to x11 or wayland to force the choice. Changing this setting by
 #: reloading the config is not supported.
 
-#: }}}
+#:
 
-#: Keyboard shortcuts {{{
+#: Keyboard shortcuts
 
 #: Keys are identified simply by their lowercase unicode characters.
 #: For example: ``a`` for the A key, ``[`` for the left square bracket
@@ -1434,7 +1436,7 @@ map ctrl+shift+cmd+down scroll_end
 map shift+cmd+up scroll_to_prompt -1
 map shift+cmd+down scroll_to_prompt 1
 
-#: Clipboard {{{
+#: Clipboard
 
 #: Copy to clipboard
 
@@ -1472,9 +1474,9 @@ map shift+cmd+down scroll_to_prompt 1
 
 #::      map kitty_mod+y new_window less @selection
 
-#: }}}
+#:
 
-#: Scrolling {{{
+#: Scrolling
 
 #: Scroll line up
 
@@ -1563,9 +1565,9 @@ map alt+cmd+i launch --stdin-source=@last_cmd_output --stdin-add-formatting --ty
 #::  Requires https://sw.kovidgoyal.net/kitty/shell-integration/ to
 #::  work.
 
-#: }}}
+#:
 
-#: Window management {{{
+#: Window management
 
 #: New window
 
@@ -1694,9 +1696,9 @@ map opt+cmd+0 tenth_window
 
 # map kitty_mod+f8 swap_with_window
 
-#: }}}
+#:
 
-#: Tab management {{{
+#: Tab management
 
 #: Next tab
 
@@ -1751,9 +1753,9 @@ map cmd+left previous_tab
 #: the current tab rather than at the end of the tabs list, use::
 
 #:     map ctrl+t new_tab !neighbor [optional cmd to run]
-#: }}}
+#:
 
-#: Layout management {{{
+#: Layout management
 
 #: Next layout
 
@@ -1775,9 +1777,9 @@ map cmd+left previous_tab
 #: stack layout::
 
 #:     map ctrl+alt+z toggle_layout stack
-#: }}}
+#:
 
-#: Font sizes {{{
+#: Font sizes
 
 #: You can change the font size for all top-level kitty OS windows at
 #: a time or only the current one.
@@ -1812,9 +1814,9 @@ map cmd+left previous_tab
 #: size::
 
 #:     map kitty_mod+f6 change_font_size current 10.0
-#: }}}
+#:
 
-#: Select and act on visible text {{{
+#: Select and act on visible text
 
 #: Use the hints kitten to select text and either pass it to an
 #: external program or insert it into the terminal or copy it to the
@@ -1879,9 +1881,9 @@ map cmd+left previous_tab
 
 #: The hints kitten has many more modes of operation that you can map
 #: to different shortcuts. For a full description see kittens/hints.
-#: }}}
+#:
 
-#: Miscellaneous {{{
+#: Miscellaneous
 
 #: Toggle fullscreen
 
@@ -2009,9 +2011,9 @@ map cmd+left previous_tab
 #::      map ctrl+alt+a send_text normal Word\x1b[H
 #::      map ctrl+alt+a send_text application Word\x1bOH
 
-#: }}}
+#:
 
-#: }}}
+#:
 
 
 # BEGIN_KITTY_THEME
