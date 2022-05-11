@@ -1,0 +1,18 @@
+function cloneRepo -a repoUrl
+
+  set repoName (string split -r -m1 "/" -f2 $repoUrl | string split -m1 "." -f1)
+  echo "Using repo name $repoName"
+
+  set repoDomain (string split -f1 ":" "$repoUrl" | string split -f2 "@")
+  echo "Using repo domain $repoDomain"
+
+  mkdir "$SANDBOX/$repoName"
+  cd "$SANDBOX/$repoName"
+
+  git init .
+  string match -ieq '{{ .work.domain }}' "$repoDomain"; and git config user.email {{ .work.email }}
+  git remote add "$repoDomain" "$repoUrl"
+  git fetch --all
+  git pull "$repoDomain" main
+
+end
