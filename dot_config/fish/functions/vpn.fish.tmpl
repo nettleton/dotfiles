@@ -1,21 +1,41 @@
 function vpn
+  set PIDFILE $HOME/.openconnect_pid
+
+  set EXISTING_PID ""
+  set CMD_AT_PID ""
+
+  if test -e "$PIDFILE"
+    set EXISTING_PID (cat -p $HOME/.openconnect_pid)
+    set CMD_AT_PID (ps -p $EXISTING_PID -o command | sed -n '2p' | cut -f1 -d' ')
+  end
+
+  test "$CMD_AT_PID" = "openconnect"; and set CONNECTION_STATUS "connected"; or set CONNECTION_STATUS "disconnected"
+
   switch $argv[1]
     case status
-      /opt/cisco/anyconnect/bin/vpn state | grep -iq "state: connected" ; and echo "connected"; or echo "disconnected"
+      echo "$CONNECTION_STATUS"
     case connect
-      op item get {{ .work.companyname }} --fields username > /dev/null ; or set -Ux OP_SESSION_$OP_ACCOUNT (op signin --account $OP_ACCOUNT --raw)
-      if test $status -gt 0
-        printf "Unable to connect.  Did you enter the correct password?"
-      else
+      if test "$CONNECTION_STATUS" = "disconnected"
         if test -n "$argv[2]"
           set VPN_HOST "$argv[2]"
         else
           set VPN_HOST "zakim.{{ .work.domain }}"
         end
-        printf %s\n%s\ny $WORK_USER (op item get {{ .work.companyname }} --fields password) | /opt/cisco/anyconnect/bin/vpn -s connect "$VPN_HOST"
+
+        echo "openconnect requires sudo access to connect, prompting now..."
+        sudo -v
+        echo "sudo successful, starting connect"
+
+        op item get {{ .work.companyname }} --fields password | sudo openconnect --user (op item get {{ .work.companyname }} --field username) --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --passwd-on-stdin "$VPN_HOST"
+      else
+        echo "already connected, disconnect first"
       end
     case disconnect
-      /opt/cisco/anyconnect/bin/vpn disconnect
+      if test "$CONNECTION_STATUS" = "connected"
+        kill -9 $EXISTING_PID
+      else
+        echo "openconnect not running, doing nothing"
+      end
     case '*'
       echo "Unrecognized option $argv[1]"
   end
