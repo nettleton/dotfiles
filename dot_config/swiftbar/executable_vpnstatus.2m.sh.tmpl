@@ -1,22 +1,29 @@
 #!/usr/bin/env bash
-# <bitbar.title>Anyconnect VPN status</bitbar.title>
+# <bitbar.title>Openconnect VPN status</bitbar.title>
 # <bitbar.version>v1.0</bitbar.version>
 # <bitbar.author>Joshua Wang</bitbar.author>
 # <bitbar.author.github>nettleton</bitbar.author.github>
 # <bitbar.desc>Displays VPN status</bitbar.desc>
-# <bitbar.dependencies>anyconnect</bitbar.dependencies>
+# <bitbar.dependencies>openconnect</bitbar.dependencies>
 
-ANYCONNECT="/opt/cisco/anyconnect/bin/vpn"
+PIDFILE=$HOME/.openconnect_pid
 
-STATUS=$($ANYCONNECT status | grep -oi "state: [a-z]\+" | head -1 | cut -d' ' -f2)
+EXISTING_PID=""
+CMD_AT_PID=""
 
-if [ "$STATUS" == "Connected" ]; then
+if test -f "$PIDFILE"; then
+  EXISTING_PID=$(cat $HOME/.openconnect_pid)
+  CMD_AT_PID=$(ps -p $EXISTING_PID -o command | sed -n '2p' | cut -f1 -d' ')
+fi
+
+if [ "$CMD_AT_PID" == "openconnect" ]; then
   echo ":lock.fill:"
   echo "---"
-  STATS=$($ANYCONNECT stats)
-  HOST=$(echo "$STATS" | grep -oi "connected to [^\.]*" | cut -d' ' -f3)
-  REMAINING=$(echo "$STATS" |  grep -oi "session disconnect: .*" | tr -s ' ' | cut -d' ' -f3,4,5,6)
-  echo "$HOST: $REMAINING Remaining | refresh=false"
+  VPN_SESSION_START=$(date -r "$PIDFILE" +%s)
+  VPN_SESSION_END_SEC=$(($VPN_SESSION_START+43200)) #12h
+  VPN_SESSION_END_DATE=$(date -r $VPN_SESSION_END_SEC +'%m/%d %H:%M:%S')
+
+  echo "Connected (Expires $VPN_SESSION_END_DATE) | refresh=false"
 else
   echo ":lock.open.fill:"
   echo "---"
@@ -26,4 +33,4 @@ fi
 echo "Refresh | refresh=true"
 echo "Connect to Zakim 1 | bash=vpn param0=connect param1=zakim.{{ .work.domain }} terminal=true"
 echo "Connect to Zakim 2 | bash=vpn param0=connect param2=zakim2.{{ .work.domain }} terminal=true"
-echo "Disconnect | bash=$ANYCONNECT params=disconnect terminal=false"
+echo "Disconnect | bash=vpn params=disconnect terminal=true"
