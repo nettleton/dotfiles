@@ -17,6 +17,15 @@
   email = {{ $opemail | quote }}
   sudoItem = {{ $sudoItem | quote }}
 
+[data.op.urls]
+  github_internal = "op://personal/github {{ $workname }} {{ $targetname }} SSH key/public key"
+  gitlab_internal = "op://personal/github {{ $workname }} {{ $targetname }} SSH key/public key"
+  github_com      = "op://personal/github.com {{ $targetname }} SSH key/public key"
+  gitlab_com      = "op://personal/gitlab.com {{ $targetname }} SSH key/public key"
+  work_desktop    = "op://personal/ah-{{- $workuser -}}-mac {{ $targetname }} SSH key/public key"
+  work_laptop     = "op://personal/fixme-{{- $workuser -}}-fixme {{ $targetname }} SSH key/public key"
+
+
 [data.work]
   user = {{ $workuser | quote }}
   domain = {{ $workdomain | quote }}

@@ -1,15 +1,25 @@
 Host insidelabs-git.{{ .work.domain }}
-   User {{ .work.user }}
-   IdentityFile ~/.ssh/gitlab_internal
+  User {{ .work.user }}
+  IdentityFile ~/.ssh/gitlab_internal.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host github.com
   User nettleton
-  IdentityFile ~/.ssh/github_com
+  IdentityFile ~/.ssh/github_com.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host github.{{ .work.domain }}
   User {{ .work.user }}
-  IdentityFile ~/.ssh/github_internal
+  IdentityFile ~/.ssh/github_internal.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host gitlab.com
   User nettleton
-  IdentityFile ~/.ssh/gitlab_com
+  IdentityFile ~/.ssh/gitlab_com.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host {{ .work.hostname }}.dhcp.{{ .work.domain }}
   User {{ .work.user }}
-  IdentityFile ~/.ssh/workmachine
+  IdentityFile ~/.ssh/work_desktop.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"

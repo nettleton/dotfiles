@@ -1,6 +1,0 @@
-{{- if eq "foo" "bar" }}
-Note: this is a public key
-{{ end -}}
-{{- if contains "starship" .targetname -}}
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEZj6pSY6oPS5l1d/KBhFOvJ0U1J2L68ACUWLPwX7zef {{ .work.email }} {{ .work.hostname }}.dhcp.{{ .work.domain }} machine:starship
-{{- end -}}

@@ -1,9 +1,1 @@
-{{- if eq "foo" "bar" }}
-Note: this is a public key
-{{ end -}}
-{{- if contains .chezmoi.username .targetname -}}
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1j7y1bUtUNRhKpdGwTzU8FS/a5z/juR6NpmD6ZTPtG insidelabs-git {{ .work.user -}}@{{- .work.hostname -}}
-{{- end -}}
-{{- if contains "starship" .targetname -}}
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICPDXe8tMZgI+1cYXwa7q9CUr7H2ULK34jjvC4fkise6 {{ .work.email }} insidelabs-git.{{- .work.domain }} machine:starship
-{{- end -}}
+{{ onepasswordRead .op.urls.gitlab_internal }}

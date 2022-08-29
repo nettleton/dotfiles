@@ -28,9 +28,8 @@ set -g -x EDITOR "nvim"
 
 set -g -x ALTERNATE_EDITOR "/usr/bin/vim"
 
-set -x -g WORK_KEY $HOME/.ssh/workmachine
 set -x -g WORK_USER {{ .work.user }}
-set -x -g WORK_MAC {{ .work.hostnames.mac }}
+set -x -g WORK_MAC_DESKTOP {{ .work.hostnames.mac }}
 set -x -g WORK_MAC_SCREENS_ALIAS {{ .work.user }}-maci
 set -x -g WORK_LINUX {{ .work.hostnames.linux }}
 set -x -g OP_ACCOUNT {{ .op.account }}
@@ -84,7 +83,7 @@ alias win "vm '$WINDOWS_VMX'"
 alias vi "nvim"
 alias e "code"
 
-alias wm "sshf $WORK_KEY $WORK_USER $WORK_MAC"
+alias wm "ssh -t -p 22 $WORK_USER@$WORK_MAC_DESKTOP 'exec fish'"
 alias wmv "open screens://$WORK_MAC_SCREENS_ALIAS"
 alias wl "sshf $WORK_KEY $WORK_USER $WORK_LINUX"
 
