@@ -23,7 +23,7 @@ function vpn
         end
 
         echo "openconnect requires sudo access to connect, prompting now..."
-        sudo -v
+        op item get "{{ .op.sudoitem }}" --fields password | sudo -S -v
         echo "sudo successful, starting connect"
 
         op item get {{ .work.companyname }} --fields password | sudo openconnect --user (op item get {{ .work.companyname }} --field username) --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --passwd-on-stdin "$VPN_HOST"

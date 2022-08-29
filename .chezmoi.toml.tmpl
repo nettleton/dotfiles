@@ -6,6 +6,7 @@
 {{- $ghemail := promptString "ghemail" -}}
 {{- $targetname := promptString "targetname" -}}
 {{- $personalpackages := promptBool "install personal packages" -}}
+{{- $sudoItem := promptString "sudoItem" -}}
 
 [data]
   targetname = {{ $targetname | quote }}
@@ -14,6 +15,7 @@
 [data.op]
   account = {{ $opaccount | quote }}
   email = {{ $opemail | quote }}
+  sudoItem = {{ $sudoItem | quote }}
 
 [data.work]
   user = {{ $workuser | quote }}
