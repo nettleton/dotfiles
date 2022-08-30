@@ -1,1 +1,3 @@
+{{- if (not (contains .chezmoi.hostname .work.hostnames.mac_desktop)) -}}
 {{ onepasswordRead .op.urls.work_desktop }}
+{{ end }}
