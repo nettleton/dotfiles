@@ -1057,7 +1057,12 @@ tab_powerline_style slanted
 #: Advanced
 
 {{ if contains .chezmoi.username .targetname }}
-shell fish --login --interactive
+{{ if eq .chezmoi.arch "amd64" }}
+shell /usr/local/bin/fish --login --interactive
+{{ end }}
+{{ if eq .chezmoi.arch "arm64" }}
+shell /opt/homebrew/bin/fish --login --interactive
+{{ end }}
 {{ end }}
 
 #: The shell program to execute. The default value of . means to use

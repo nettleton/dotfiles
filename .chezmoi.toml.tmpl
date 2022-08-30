@@ -24,10 +24,10 @@
   gitlab_com      = "op://personal/gitlab.com {{ $targetname }} SSH key/public key"
   work_desktop    = "op://personal/ah-{{- $workuser -}}-mac {{ $targetname }} SSH key/public key"
   wd_starship     = "op://personal/ah-{{- $workuser -}}-mac starship SSH key/public key"
-  wd_wl           = "op://personal/ah-{{- $workuser -}}-mac fixme-{{- $workuser -}}-fixme SSH key/public key"
-  work_laptop     = "op://personal/fixme-{{- $workuser -}}-fixme {{ $targetname }} SSH key/public key"
-  wl_starship     = "op://personal/fixme-{{- $workuser -}}-fixme starship SSH key/public key"
-  wl_wd           = "op://personal/fixme-{{- $workuser -}}-fixme ah-{{- $workuser -}}-mac SSH key/public key"
+  wd_wl           = "op://personal/ah-{{- $workuser -}}-mac ah-{{- $workuser -}}1-m SSH key/public key"
+  work_laptop     = "op://personal/ah-{{- $workuser -}}1-m {{ $targetname }} SSH key/public key"
+  wl_starship     = "op://personal/ah-{{- $workuser -}}1-m starship SSH key/public key"
+  wl_wd           = "op://personal/ah-{{- $workuser -}}1-m ah-{{- $workuser -}}-mac SSH key/public key"
 
 [data.work]
   user = {{ $workuser | quote }}
