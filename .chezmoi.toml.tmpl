@@ -23,18 +23,21 @@
   github_com      = "op://personal/github.com {{ $targetname }} SSH key/public key"
   gitlab_com      = "op://personal/gitlab.com {{ $targetname }} SSH key/public key"
   work_desktop    = "op://personal/ah-{{- $workuser -}}-mac {{ $targetname }} SSH key/public key"
+  wd_starship     = "op://personal/ah-{{- $workuser -}}-mac starship SSH key/public key"
+  wd_wl           = "op://personal/ah-{{- $workuser -}}-mac fixme-{{- $workuser -}}-fixme SSH key/public key"
   work_laptop     = "op://personal/fixme-{{- $workuser -}}-fixme {{ $targetname }} SSH key/public key"
-
+  wl_starship     = "op://personal/fixme-{{- $workuser -}}-fixme starship SSH key/public key"
+  wl_wd           = "op://personal/fixme-{{- $workuser -}}-fixme ah-{{- $workuser -}}-mac SSH key/public key"
 
 [data.work]
   user = {{ $workuser | quote }}
   domain = {{ $workdomain | quote }}
   companyname = {{ $workname | quote }}
   email = "{{- $workuser -}}@{{- $workdomain -}}"
-  hostname = "ah-{{- $workuser -}}-mac"
 
 [data.work.hostnames]
-  mac = "ah-{{- $workuser -}}-mac.dhcp.{{- $workdomain -}}"
+  mac_desktop = "ah-{{- $workuser -}}-mac.dhcp.{{- $workdomain -}}"
+  mac_laptop = "fixme-{{- $workuser -}}-fixme.dhcp.{{- $workdomain -}}"
   linux = "{{- $workuser -}}-deb10-64.dhcp.{{- $workdomain -}}"
 
 [data.github]
