@@ -1,3 +1,4 @@
+{{- if (not (eq .targetname "nessie") ) -}}
 const { exec } = require('child_process')
 const fs = require('fs')
 const os = require('os')
@@ -150,3 +151,4 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -ea -fj -ic "Calendar
     }
   })
 })
+{{- end -}}
