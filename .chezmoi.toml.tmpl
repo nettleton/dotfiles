@@ -1,8 +1,6 @@
 {{- $workuser := promptString "workuser" -}}
 {{- $workname := promptString "company" -}}
 {{- $workdomain := promptString "workdomain" -}}
-{{- $opaccount := promptString "opaccount" -}}
-{{- $opemail := promptString "opemail" -}}
 {{- $ghemail := promptString "ghemail" -}}
 {{- $targetname := promptString "targetname" -}}
 {{- $personalpackages := promptBool "install personal packages" -}}
@@ -13,8 +11,6 @@
   personalpackages = {{ $personalpackages }}
 
 [data.op]
-  account = {{ $opaccount | quote }}
-  email = {{ $opemail | quote }}
   sudoItem = {{ $sudoItem | quote }}
 
 [data.op.urls]
