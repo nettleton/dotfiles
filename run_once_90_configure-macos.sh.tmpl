@@ -154,6 +154,10 @@ sudo defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking 
 # Three-finger drag
 #   https://apple.stackexchange.com/questions/110277/how-to-enable-three-finger-drag-from-command-line
 defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerSwipeGesture -int 1
+#   https://discussions.apple.com/thread/7387742
+#   Enable 3-finger drag. (Moving with 3 fingers in any window "chrome" moves the window.)
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
 
 # Trackpad: map bottom right corner to right-click
 # defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
