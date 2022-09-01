@@ -1,20 +1,20 @@
 {{- $workuser := promptString "workuser" -}}
 {{- $workname := promptString "company" -}}
 {{- $workdomain := promptString "workdomain" -}}
-{{- $opaccount := promptString "opaccount" -}}
-{{- $opemail := promptString "opemail" -}}
 {{- $ghemail := promptString "ghemail" -}}
 {{- $targetname := promptString "targetname" -}}
 {{- $personalpackages := promptBool "install personal packages" -}}
 {{- $sudoItem := promptString "sudoItem" -}}
+{{- $starshipuser := promptString "starship user" -}}
+{{- $nessieuser := promptString "nessie user" -}}
 
 [data]
   targetname = {{ $targetname | quote }}
   personalpackages = {{ $personalpackages }}
+  starshipuser = {{ $starshipuser | quote }}
+  nessieuser   = {{ $nessieuser | quote }}
 
 [data.op]
-  account = {{ $opaccount | quote }}
-  email = {{ $opemail | quote }}
   sudoItem = {{ $sudoItem | quote }}
 
 [data.op.urls]
@@ -28,6 +28,8 @@
   work_laptop     = "op://personal/ah-{{- $workuser -}}1-m {{ $targetname }} SSH key/public key"
   wl_starship     = "op://personal/ah-{{- $workuser -}}1-m starship SSH key/public key"
   wl_wd           = "op://personal/ah-{{- $workuser -}}1-m ah-{{- $workuser -}}-mac SSH key/public key"
+  starship_nessie = "op://personal/starship nessie SSH key/public key"
+  nessie_starship = "op://personal/nessie starship SSH key/public key"
 
 [data.work]
   user = {{ $workuser | quote }}

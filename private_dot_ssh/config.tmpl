@@ -1,16 +1,6 @@
-Host insidelabs-git.{{ .work.domain }}
-  User {{ .work.user }}
-  IdentityFile ~/.ssh/gitlab_internal.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host github.com
   User nettleton
   IdentityFile ~/.ssh/github_com.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-Host github.{{ .work.domain }}
-  User {{ .work.user }}
-  IdentityFile ~/.ssh/github_internal.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host gitlab.com
@@ -18,15 +8,39 @@ Host gitlab.com
   IdentityFile ~/.ssh/gitlab_com.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-{{- if (not (contains .chezmoi.hostname .work.hostnames.mac_desktop)) -}}
+{{ if (not (eq .targetname "nessie")) }}
+Host insidelabs-git.{{ .work.domain }}
+  User {{ .work.user }}
+  IdentityFile ~/.ssh/gitlab_internal.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+Host github.{{ .work.domain }}
+  User {{ .work.user }}
+  IdentityFile ~/.ssh/github_internal.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host {{ .work.hostnames.mac_desktop }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/work_desktop.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-{{- end -}}
 Host {{ .work.hostnames.mac_laptop }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/work_laptop.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{ end }}
+{{ if (eq .targetname "nessie") }}
+Host starship.local
+  User {{ .starshipuser }}
+  IdentityFile ~/.ssh/starship.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{ end }}
+{{ if (eq .targetname "starship") }}
+Host nessie.local
+  User {{ .nessieuser }}
+  IdentityFile ~/.ssh/nessie.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{ end }}

@@ -1,0 +1,7 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+echo "If you want to enable SSH access:"
+echo "  1. sudo vi /etc/ssh/sshd_config"
+echo "  2. make edits described here: https://apple.stackexchange.com/questions/58632/enable-ssh-key-only-login-to-my-mac-for-1-user"
+echo "  3. enable \"Remote Login\" under System Preferences -> Sharing"
+{{- end -}}

@@ -6,3 +6,9 @@
 {{ onepasswordRead .op.urls.wl_starship }}
 {{ onepasswordRead .op.urls.wl_wd }}
 {{- end -}}
+{{- if eq .targetname "starship" -}}
+{{ onepasswordRead .op.urls.starship_nessie }}
+{{- end -}}
+{{- if eq .targetname "nessie" -}}
+{{ onepasswordRead .op.urls.nessie_starship }}
+{{- end -}}
