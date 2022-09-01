@@ -3,50 +3,46 @@ local g = vim.g
 local o = vim.opt
 local exec = vim.api.nvim_exec
 
--- More natural split opening.
-o.splitbelow = true
-o.splitright = true
+local options = {
+  splitbelow = true,                       -- force all horizontal splits to go below current window
+  splitright = true,                       -- force all vertical splits to go to the right of current window
+  showcmd = true,                          -- Show leader key
+  expandtab = true,                        -- convert tabs to spaces
+  tabstop = 2,                             -- insert 2 spaces for a tab
+  shiftwidth = 2,                          -- the number of spaces inserted for each indentation
+  softtabstop = 2,                         -- number of spaces that a tab counts for while editing
+  number = true,                           -- set numbered lines
+  relativenumber = true,                   -- set relative numbered lines
+  numberwidth = 4,                         -- set number column width to 2 {default 4}
+  signcolumn = "yes",                      -- always show the sign column, otherwise it would shift the text each time
+  path = o.path + '**',                    -- Search all subfolders
+  termguicolors = true,                    -- enable 24-bit TUI colours
+  wildmenu = true,                         -- Display matching files on tab complete
+  wildignore = o.wildignore + '**/node_modules/**,**/dist/**,**_site/**,*.swp,*.png,*.jpg,*.gif,*.webp,*webm,*.ogg,*.dng,*.jpeg,*.map,*.woff*', -- Ignore node_modules and images from search results
+  nrformats = '',                          -- Treat all numbers as decimal regardless of whether they are padded with zeros
+  ignorecase = true,                       -- needed for smartcase to work
+  smartcase = true,                        -- make searches case insensitive except if uppercase charater is present
+  smartindent = true,                      -- make indenting smarter again
+  updatetime = 100,                        -- faster completion (4000ms default)
+  scrolloff = 8,                           -- keep at least 8 lines above & below the cursor (default 0)
+  sidescrolloff = 8,                       -- keep at least 8 columns to left and right of cursor if nowrap is set
+  showmode = false,                        -- we don't need to see things like -- INSERT -- anymore
+  mouse = "a",                             -- allow the mouse to be used in neovim
+  completeopt = { "menuone", "noselect" }, -- mostly just for cmp
+  pumheight = 10,                          -- pop up menu height
+  cursorline = true,                       -- highlight the current line
+}
 
-o.showcmd = true -- Show leader key
+o.shortmess:append "c"                     -- don't give ins-completion-menu messages
 
--- Tabs behaviour
-o.expandtab = true -- On pressing tab, insert 2 spaces
-o.tabstop = 2 -- show existing tab with 2 spaces width
-o.softtabstop = 2
-o.shiftwidth = 2 -- when indenting with '>', use 2 spaces width
+for k, v in pairs(options) do
+  o[k] = v
+end
 
--- Toggle Hybrid Numbers in insert and normal mode
-o.relativenumber = true
-o.number = true -- Show line numbers
+vim.cmd "set whichwrap+=<,>,[,],h,l"       -- allow h/l move lines when cursor is on first/last cursor
+vim.cmd [[set iskeyword+=-]]               -- include dash in words
 
--- #FINDING FILES
--- Use the `:find` command to fuzzy search files in the working directory
--- The `:b` command can also be used to do the same for open buffers
-
--- Search all subfolders
-o.path = o.path + '**'
-
-o.termguicolors = true -- enable 24-bit TUI colours
-
--- Display matching files on tab complete
-o.wildmenu = true
-
--- Ignore node_modules and images from search results
-o.wildignore = o.wildignore + '**/node_modules/**,**/dist/**,**_site/**,*.swp,*.png,*.jpg,*.gif,*.webp,*webm,*.ogg,*.dng,*.jpeg,*.map,*.woff*'
-
--- Show Invisibles
-o.list = true
-o.listchars = 'tab:→→,eol:¬,space:.'
-
--- Treat all numbers as decimal regardless of whether they are padded with zeros
-o.nrformats = ''
-
--- Change case sensitivity behaviour
-o.ignorecase = true -- needed for smartcase to work
-o.smartcase = true -- make searches case insensitive except if uppercase charater is present
-
-o.updatetime = 100
-
+-- set shell
 {{ if eq .chezmoi.arch "arm64" -}}
 o.shell = '/opt/homebrew/bin/fish'
 g['$SHELL'] = '/opt/homebrew/bin/fish'
@@ -78,9 +74,6 @@ augroup templates
 augroup END
 ]], false)
 
--- Auto update dotfiles
--- exec([[ autocmd BufWritePost ~/.local/share/chezmoi/* silent! !chezmoi apply ]], false)
-
 -- Strip trailing whitespace from all files
 exec([[
 autocmd BufWritePre * %s/\s\+$//e
@@ -97,11 +90,7 @@ exec([[
 :augroup END
 ]], false)
 
--- set colorscheme
--- g.sonokai_style = 'shusia'
--- g.sonokai_enable_italic = 1
--- vim.cmd[[colorscheme sonokai]]
-
 -- REFERENCES
 -- https://github.com/ayoisaiah/dotfiles/blob/master/private_dot_config/nvim/lua/settings.lua
 -- https://github.com/airblade/vim-gitgutter#when-are-the-signs-updated
+-- https://github.com/LunarVim/Neovim-from-scratch
