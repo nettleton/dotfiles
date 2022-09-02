@@ -113,6 +113,7 @@ return packer.startup(function(use)
   use { 'williamboman/mason.nvim' }
   use { 'williamboman/mason-lspconfig.nvim' }
   use { 'neovim/nvim-lspconfig' }
+  use { 'b0o/schemastore.nvim' }
 
 
   -- use { 'neovim/nvim-lspconfig', config = [[require('lspconfig').gopls.setup{}]] }

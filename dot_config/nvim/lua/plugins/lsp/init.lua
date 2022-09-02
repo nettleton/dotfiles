@@ -23,6 +23,11 @@ if not lsp_handlers_ok then
   vim.notify("require('plugins.lsp.handers') failed")
   return
 end
+local schemastore_ok, schemastore = pcall(require, 'schemastore')
+if not schemastore_ok then
+  vim.notify("require('schemastore') failed")
+  return
+end
 
 mason.setup({
     ui = {
@@ -35,7 +40,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "jsonls", "tsserver", "marksman" },
+  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "tsserver", "marksman" },
   automatic_installation = true,
 })
 
@@ -116,6 +121,12 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 lspconfig.jsonls.setup {
   on_attach = lsp_handlers.on_attach,
   capabilities = capabilities,
+  settings = {
+    json = {
+      schemas = schemastore.json.schemas(),
+      validate = { enable = true },
+    },
+  },
 }
 
 lsp_handlers.setup()
