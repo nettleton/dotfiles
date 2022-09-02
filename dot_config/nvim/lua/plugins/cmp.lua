@@ -112,6 +112,7 @@ cmp.setup {
     { name = "luasnip" },
     { name = "buffer" },
     { name = "path" },
+    { name = "fish" },
   },
   confirm_opts = {
     behavior = cmp.ConfirmBehavior.Replace,
@@ -129,3 +130,18 @@ cmp.setup {
 }
 
 -- https://github.com/LunarVim/Neovim-from-scratch
+
+-- Completions for command mode
+--   http://github.com/hrsh7th/cmp-cmdline
+cmp.setup.cmdline(':', {
+  sources = {
+    { name = 'cmdline' }
+  }
+})
+
+cmp.setup.cmdline('/', {
+  sources = {
+    { name = 'buffer' }
+  }
+})
+
