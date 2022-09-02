@@ -97,6 +97,14 @@ alias rlc ". $HOME/.config/fish/config.fish"
 alias pr "$SANDBOX/scratch/scripts/pr.sh"
 
 alias cat "bat"
+
+# https://github.com/cljoly/telescope-repo.nvim/discussions/13
+if which glocate > /dev/null
+  alias locate="glocate -d $HOME/.cache/locatedb"
+  set -x LOCATE_PATH "$HOME/.cache/locatedb"
+end
+alias loaddb "gupdatedb --localpaths=$HOME --prunepaths=/Volumes --output=$HOME/.cache/locatedb"
+
 # END ALIASES
 
 function sourceIfNecessary

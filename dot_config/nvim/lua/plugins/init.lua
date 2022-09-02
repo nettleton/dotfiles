@@ -52,9 +52,43 @@ return packer.startup(function(use)
   use { 'plasticboy/vim-markdown', config = [[require('plugins.vim-markdown')]] }
 
   -- Telescope
-  -- use { 'nvim-telescope/telescope.nvim', config = [[require('plugins.telescope')]] }
-  -- use { 'fhill2/telescope-ultisnips.nvim' }
-  -- use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  use {
+    'nvim-telescope/telescope.nvim',
+    config = [[require('plugins.telescope')]],
+  }
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  use { 'cljoly/telescope-repo.nvim',
+    requires = {
+      { 'nvim-lua/plenary.nvim' }
+    }
+  }
+  use {
+    'AckslD/nvim-neoclip.lua',
+    requires = {
+      {'kkharji/sqlite.lua', module = 'sqlite'},
+      {'nvim-telescope/telescope.nvim'},
+    },
+    config = function()
+      require('neoclip').setup()
+    end,
+  }
+  use {
+    'sudormrfbin/cheatsheet.nvim',
+
+    requires = {
+      {'nvim-telescope/telescope.nvim'},
+      {'nvim-lua/popup.nvim'},
+      {'nvim-lua/plenary.nvim'},
+    },
+
+    config = [[require('cheatsheet').setup()]]
+  }
+  use {
+    "benfowler/telescope-luasnip.nvim",
+    module = "telescope._extensions.luasnip",  -- if you wish to lazy-load
+  }
+  use { 'nvim-telescope/telescope-file-browser.nvim' }
+  use { 'nvim-telescope/telescope-packer.nvim' }
 
   -- Git
   use { 'tpope/vim-fugitive', event = 'VimEnter', config = [[require('plugins.vim-fugitive')]] } -- Git wrapper for vim

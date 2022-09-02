@@ -1,4 +1,6 @@
 #!/usr/bin/env fish
+mkdir -p $HOME/.cache
+touchn $HOME/.cache/locatedb
 
 mkdir -p $HOME/sandbox/go/bin
 set -x -U GOPATH $HOME/sandbox/go

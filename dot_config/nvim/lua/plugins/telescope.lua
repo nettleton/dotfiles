@@ -1,7 +1,17 @@
 local map = vim.api.nvim_set_keymap
 
-local actions = require('telescope.actions')
-require('telescope').setup{
+local telescope_ok, telescope = pcall(require, "telescope")
+if not telescope_ok then
+  vim.notify("require('telescope') failed")
+  return
+end
+local actions_ok, actions = pcall(require, "telescope.actions")
+if not actions_ok then
+  vim.notify("require('telescope.actions') failed")
+  return
+end
+
+telescope.setup{
   defaults = {
     vimgrep_arguments = {
       'rg',
@@ -28,11 +38,23 @@ require('telescope').setup{
       sort_lastused = true,
     },
   },
+  extensions = {
+    repo = {
+      search_dirs = {
+        "~/sandbox"
+      }
+    },
+    file_browser = {
+      files = false,
+    },
+  },
 }
 
-require('telescope').load_extension('fzf')
-require('telescope').load_extension('ultisnips')
-require('telescope').load_extension('coc')
+telescope.load_extension('fzf')
+telescope.load_extension('repo')
+telescope.load_extension('luasnip')
+telescope.load_extension('file_browser')
+telescope.load_extension('packer')
 
 map('n', '<leader>f', '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>', { noremap = true, silent = true })
 map('n', '<leader>gt', '<cmd>lua require("telescope.builtin").live_grep()<CR>', { noremap = true, silent = true })
@@ -52,6 +74,12 @@ map('n', '<leader>tl', '<cmd>lua require("telescope.builtin").loclist()<CR>', { 
 map('n', '<leader>th', '<cmd>lua require("telescope.builtin").highlights()<CR>', { noremap = true, silent = true })
 map('n', '<leader>tr', '<cmd>lua require("telescope.builtin").registers()<CR>', { noremap = true, silent = true })
 map('n', '<leader>ti', '<cmd>lua require("telescope.builtin").treesitter()<CR>', { noremap = true, silent = true })
-map('n', '<leader>tcd', ':Telescope coc diagnostics<CR>', { noremap = true, silent = true })
-map('n', '<leader>tcr', ':Telescope coc references<CR>', { noremap = true, silent = true })
-map('n', '<leader>tu', ':Telescope ultisnips<CR>', { noremap = true, silent = true })
+map('n', '<leader>tsb', '<cmd>lua require("telescope").extensions.repo.list{fd_opts=[[--ignore-file=~/.config/nvim/lua/plugins/telescope_fdignore]]}<CR>', { noremap = true, silent = true })
+map('n', '<leader>y', '<cmd>lua require("telescope").extensions.neoclip.default()<CR>', { noremap = true, silent = true })
+map('n', '<leader>tch', '<cmd>:Cheatsheet<CR>', { noremap = true, silent = true })
+map('n', '<leader>tsn', '<cmd>lua require("telescope").extensions.luasnip.luasnip{}<CR>', { noremap = true, silent = true })
+map('n', '<leader>fb', '<cmd>:Telescope file_browser<CR>', { noremap = true, silent = true })
+map('n', '<leader>tp', '<cmd>:Telescope packer<CR>', { noremap = true, silent = true })
+-- map('n', '<leader>tcd', ':Telescope coc diagnostics<CR>', { noremap = true, silent = true })
+-- map('n', '<leader>tcr', ':Telescope coc references<CR>', { noremap = true, silent = true })
+-- map('n', '<leader>tu', ':Telescope ultisnips<CR>', { noremap = true, silent = true })
