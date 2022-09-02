@@ -102,10 +102,18 @@ return packer.startup(function(use)
   use { 'hrsh7th/cmp-cmdline' } -- cmdline completions
   use { 'saadparwaiz1/cmp_luasnip' } -- snippet completions
   use { 'mtoohey31/cmp-fish', ft = 'fish' } -- fish completions
+  use { 'hrsh7th/cmp-nvim-lsp' } -- lsp completions
+  use { 'hrsh7th/cmp-nvim-lua' } -- neovim lua API completions
 
   -- cmp snippets
   use { 'L3MON4D3/LuaSnip' } --snippet engine
   use { 'rafamadriz/friendly-snippets' } -- a bunch of snippets to use
+
+  -- LSP
+  use { 'williamboman/mason.nvim' }
+  use { 'williamboman/mason-lspconfig.nvim' }
+  use { 'neovim/nvim-lspconfig' }
+
 
   -- use { 'neovim/nvim-lspconfig', config = [[require('lspconfig').gopls.setup{}]] }
   -- use { 'SirVer/ultisnips', config = [[require('plugins.ultisnips')]] } -- Snippets engine
