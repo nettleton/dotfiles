@@ -35,7 +35,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "jsonls", "tsserver", "zk" },
+  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "jsonls", "tsserver", "marksman" },
   automatic_installation = true,
 })
 
@@ -61,6 +61,15 @@ lspconfig.util.default_config = vim.tbl_deep_extend(
   lsp_defaults
 )
 
+-- marksman
+lspconfig.marksman.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- JS
+lspconfig.tsserver.setup {
+  on_attach = lsp_handlers.on_attach
+}
 
 -- Lua
 lspconfig.sumneko_lua.setup {
@@ -85,6 +94,21 @@ lspconfig.sumneko_lua.setup {
       },
     },
   },
+}
+
+-- Gopls
+lspconfig.gopls.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- Docker
+lspconfig.dockerls.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- Bash
+lspconfig.bashls.setup {
+  on_attach = lsp_handlers.on_attach
 }
 
 -- JSON

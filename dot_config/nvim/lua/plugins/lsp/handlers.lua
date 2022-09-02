@@ -2,7 +2,6 @@ local M = {}
 
 -- TODO: backfill this to template
 M.setup = function()
-  vim.notify("in LSP handlers setup")
   local signs = {
     { name = "DiagnosticSignError", text = "" },
     { name = "DiagnosticSignWarn", text = "" },
@@ -86,7 +85,6 @@ local function lsp_keymaps(bufnr)
 end
 
 M.on_attach = function(client, bufnr)
-  vim.notify("in LSP handlers on_attach")
   if client.name == "tsserver" then
     client.resolved_capabilities.document_formatting = false
   end
