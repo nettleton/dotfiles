@@ -116,7 +116,6 @@ return packer.startup(function(use)
   use { 'b0o/schemastore.nvim' }
 
 
-  -- use { 'neovim/nvim-lspconfig', config = [[require('lspconfig').gopls.setup{}]] }
   -- use { 'SirVer/ultisnips', config = [[require('plugins.ultisnips')]] } -- Snippets engine
   -- Treesitter
   -- use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = [[require('plugins.treesitter')]] }
