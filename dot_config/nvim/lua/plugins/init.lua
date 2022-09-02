@@ -3,33 +3,58 @@ local fn = vim.fn
 
 local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
-  packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+  PACKER_BOOTSTRAP = fn.system {
+    "git",
+    "clone",
+    "--depth",
+    "1",
+    "https://github.com/wbthomason/packer.nvim",
+    install_path,
+  }
+  print "Installing packer close and reopen Neovim..."
+  vim.cmd [[packadd packer.nvim]]
 end
 
 -- Auto compile when there are changes in plugins.lua
 vim.cmd([[
   augroup packer_user_config
     autocmd!
-    autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+    autocmd BufWritePost */plugins/init.lua source <afile> | PackerSync
   augroup end
 ]])
 
-require('packer').startup(function(use)
-  -- Packer can manage itself
-  use { 'wbthomason/packer.nvim' }
-  use { 'lewis6991/impatient.nvim', config = [[require('impatient')]] } -- Speed up startup time
+-- Use a protected call so we don't error out on first use
+local status_ok, packer = pcall(require, "packer")
+if not status_ok then
+  vim.notify("require('packer') failed")
+  return
+end
 
+-- Have packer use a popup window
+packer.init {
+  display = {
+    open_fn = function()
+      return require("packer.util").float { border = "rounded" }
+    end,
+  },
+}
+
+-- Install your plugins here
+return packer.startup(function(use)
+  -- Packer can manage itself
+  use { 'wbthomason/packer.nvim' } -- Have packer manage itself
+  use { 'lewis6991/impatient.nvim' } -- Speed up startup time
+
+  use { 'nvim-lua/popup.nvim' }    -- An implementation of the Popup API from vim in Neovim
+  use { 'nvim-lua/plenary.nvim' }  -- Useful lua functions used by lots of plugins
 
   -- Markdown
   use { 'plasticboy/vim-markdown', config = [[require('plugins.vim-markdown')]] }
---   use { 'vim-pandoc/vim-pandoc-syntax' }
 
   -- Telescope
-  use { 'nvim-lua/plenary.nvim' }
-  use { 'nvim-telescope/telescope.nvim', config = [[require('plugins.telescope')]] }
-  use { 'fannheyward/telescope-coc.nvim' }
-  use { 'fhill2/telescope-ultisnips.nvim' }
-  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  -- use { 'nvim-telescope/telescope.nvim', config = [[require('plugins.telescope')]] }
+  -- use { 'fhill2/telescope-ultisnips.nvim' }
+  -- use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
 
   -- Git
   use { 'tpope/vim-fugitive', event = 'VimEnter', config = [[require('plugins.vim-fugitive')]] } -- Git wrapper for vim
@@ -37,101 +62,66 @@ require('packer').startup(function(use)
   use { 'rhysd/git-messenger.vim', event = 'VimEnter' } -- Show Git info in a popup
 
   -- Golang
-  use { 'ray-x/go.nvim',
-    config = function()
-      require('go').setup()
+  -- use { 'ray-x/go.nvim',
+    -- config = function()
+      -- require('go').setup()
       -- 1. format on save
       -- 2. import on save
       -- Run gofmt + goimport on save
-      vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').goimport() ]], false)
-    end,
-  }
-  use { 'mfussenegger/nvim-dap' }
-  use { 'rcarriga/nvim-dap-ui' }
-  use { 'theHamsta/nvim-dap-virtual-text', config = [[require('nvim-dap-virtual-text').setup()]] }
-  use { 'nvim-telescope/telescope-dap.nvim' }
-  use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
+  --     vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').goimport() ]], false)
+  --   end,
+  -- }
+  -- use { 'mfussenegger/nvim-dap' }
+  -- use { 'rcarriga/nvim-dap-ui' }
+  -- use { 'theHamsta/nvim-dap-virtual-text', config = [[require('nvim-dap-virtual-text').setup()]] }
+  -- use { 'nvim-telescope/telescope-dap.nvim' }
+  -- use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
 
   -- Appearance and themes
-  use { 'sainnhe/sonokai', 
+  use { 'sainnhe/sonokai',
     config = function()
       vim.g.sonokai_style = 'shusia'
       vim.g.sonokai_enable_italic = 1
       vim.cmd[[colorscheme sonokai]]
     end,
   }
+
+  -- Statusline
   use {
     'nvim-lualine/lualine.nvim',
     requires = { 'kyazdani42/nvim-web-devicons', opt = true },
     config = [[require('plugins.lualine')]]
-  } -- Statusline
+  }
   use { 'akinsho/nvim-bufferline.lua', config = [[require('plugins.nvim-bufferline')]] } -- Better nvim buffers
---   use { 'lukas-reineke/indent-blankline.nvim' } -- Indenting
---   use { 'norcalli/nvim-base16.lua' } -- Theme colours
 
   -- Autocompletion, formatting, linting & intellisense
-  use {
-    'neoclide/coc.nvim', -- Intellisense, LSP and other language smarts
-    run = 'yarn install --frozen-lockfile',
-    config = [[require('plugins.coc-nvim')]]
-  }
-  use { 'neovim/nvim-lspconfig', config = [[require('lspconfig').gopls.setup{}]] }
-  use { 'neoclide/coc-prettier', run = 'yarn install --frozen-lockfile' }
-  use { 'SirVer/ultisnips', config = [[require('plugins.ultisnips')]] } -- Snippets engine
-  use { 'alker0/chezmoi.vim' } -- support for chezmoi templates
+  -- cmp plugins
+  use { 'hrsh7th/nvim-cmp', config = [[require('plugins.cmp')]] } -- The completion plugin
+  use { 'hrsh7th/cmp-buffer' } -- buffer completions
+  use { 'hrsh7th/cmp-path' } -- path completions
+  use { 'hrsh7th/cmp-cmdline' } -- cmdline completions
+  use { 'saadparwaiz1/cmp_luasnip' } -- snippet completions
 
+  -- cmp snippets
+  use { 'L3MON4D3/LuaSnip' } --snippet engine
+  use { 'rafamadriz/friendly-snippets' } -- a bunch of snippets to use
+
+  -- use { 'neovim/nvim-lspconfig', config = [[require('lspconfig').gopls.setup{}]] }
+  -- use { 'SirVer/ultisnips', config = [[require('plugins.ultisnips')]] } -- Snippets engine
   -- Treesitter
-  use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = [[require('plugins.treesitter')]] }
-  use { 'nvim-treesitter/nvim-treesitter-textobjects' }
+  -- use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = [[require('plugins.treesitter')]] }
+  -- use { 'nvim-treesitter/nvim-treesitter-textobjects' }
 
   -- Utilities
---   use { 'romainl/vim-qf' } -- Quick fix settings, commands and mappings
---   use { 'moll/vim-bbye' } -- Delete buffers without closing windows
   use { 'windwp/nvim-autopairs', config = [[require('plugins.nvim-autopairs')]] } -- Insert or delete brackets, parens, quotes in pair.
---   use { 'mattn/emmet-vim', event = 'VimEnter', ft = {'html', 'markdown', 'css', 'scss'} } -- Shortcuts for writing HTML and CSS
---   use { 'norcalli/nvim-colorizer.lua', ft = { 'html', 'css', 'scss', 'javascript' } } -- Colour highlighting
-  use { 'ervandew/supertab', config = [[require('plugins.supertab')]] } -- Use <Tab> for autocompletion in insert mode
---   use { 'tpope/vim-surround' } -- Mappings for surroundings like brackets, quotes, e.t.c.
   use { 'numtostr/comment.nvim', config = [[require('plugins.comment')]] } -- Comment stuff out easily
---   use { 'tpope/vim-repeat' } -- Enhance the dot command
---   use { 'tpope/vim-unimpaired' } -- Custom mappings for some ex commands
---   use { 'luochen1990/rainbow' } -- Use different colours for parenthesis levels
---   use { 'ludovicchabant/vim-gutentags' } -- Manage tag files automatically
---   use { 'wakatime/vim-wakatime', event = 'VimEnter' } -- Auto generated metrics and time tracking
   use { 'miyakogi/conoline.vim', config = [[require('plugins.conoline')]] } -- Highlight the line of the cusor in the current window
   use { 'airblade/vim-rooter', config = [[require('plugins.vim-rooter')]] } -- Change vim working directory to project directory
---   use { 'andymass/vim-matchup', event = 'VimEnter' } -- Highlight, navigate, and operate on sets of matching text
-  use { 'fladson/vim-kitty' }
+  use { 'fladson/vim-kitty' } -- highlighting support for kitty config
+  use { 'alker0/chezmoi.vim' } -- highlighting support for chezmoi templates
 
-  if packer_bootstrap then
+
+  if PACKER_BOOTSTRAP then
     require('packer').sync()
   end
 end)
-
--- Config
-
--- require('plugins.gitsigns')
--- require('plugins.telescope')
--- require('plugins.treesitter')
--- require('plugins.vim-fugitive')
--- require('plugins.vim-markdown')
--- require('plugins.lualine')
--- require('plugins.nvim-bufferline')
--- require('plugins.coc-nvim')
--- require('plugins.ultisnips')
--- require('plugins.nvim-autopairs')
--- require('plugins.conoline')
--- require('plugins.comment')
--- require('plugins.go')
--- require('plugins.vim-rooter')
--- require('plugins.supertab')
-
--- not used yet
--- require('plugins.emmet-vim')
--- require('plugins.indent-blankline')
--- require('plugins.rainbow')
--- require('plugins.vim-bbye')
--- require('plugins.vim-gutentags')
--- require('plugins.vim-pandoc')
--- require('plugins.vim-qf')
-
