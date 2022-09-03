@@ -1,6 +1,7 @@
 colorthemes
 styles.css
 README.md
+.luarc.json
 {{- if contains .chezmoi.username .targetname }}
 .config/swiftbar/solaredge.15m.py
 .config/swiftbar/vpnstatus.2m.sh

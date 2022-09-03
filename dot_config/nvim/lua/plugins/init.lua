@@ -132,7 +132,7 @@ return packer.startup(function(use)
   -- Statusline
   use {
     'nvim-lualine/lualine.nvim',
-    requires = { 'kyazdani42/nvim-web-devicons', opt = true },
+    requires = { 'kyazdani42/nvim-web-devicons' },
     config = [[require('plugins.lualine')]]
   }
   use { 'akinsho/nvim-bufferline.lua', config = [[require('plugins.nvim-bufferline')]] } -- Better nvim buffers
@@ -162,6 +162,16 @@ return packer.startup(function(use)
   use { 'neovim/nvim-lspconfig' }
   use { 'b0o/schemastore.nvim' }
   use { 'jose-elias-alvarez/null-ls.nvim' }
+  use {
+    "folke/trouble.nvim",
+    requires = "kyazdani42/nvim-web-devicons",
+    config = function()
+      require("trouble").setup {
+        -- your configuration comes here
+        -- https://github.com/folke/trouble.nvim/
+      }
+    end
+  }
 
   -- Treesitter
   use {
@@ -179,6 +189,8 @@ return packer.startup(function(use)
   use { 'airblade/vim-rooter', config = [[require('plugins.vim-rooter')]] } -- Change vim working directory to project directory
   use { 'fladson/vim-kitty' } -- highlighting support for kitty config
   use { 'alker0/chezmoi.vim' } -- highlighting support for chezmoi templates
+
+  use { 'folke/which-key.nvim', config = [[require('plugins.which-key')]] } -- key bindings
 
 
   if PACKER_BOOTSTRAP then
