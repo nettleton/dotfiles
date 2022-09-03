@@ -13,6 +13,6 @@ defaults write com.freron.MailMate MmDefaultPygmentsStyleName github
 defaults write com.freron.MailMate MmComposerInitialFocus -string "alwaysTextView"
 
 mkdir -p $HOME/.local/bin/
-ln -s /Applications/MailMate.app/Contents/Resources/emate $HOME/.local/bin/emate
+test -f "$HOME/.local/bin/emate"; and echo "emate already exists"; or ln -s /Applications/MailMate.app/Contents/Resources/emate $HOME/.local/bin/emate
 
 {{ end }}
