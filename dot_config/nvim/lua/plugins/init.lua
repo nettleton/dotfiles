@@ -138,6 +138,8 @@ return packer.startup(function(use)
   use { 'mtoohey31/cmp-fish', ft = 'fish' } -- fish completions
   use { 'hrsh7th/cmp-nvim-lsp' } -- lsp completions
   use { 'hrsh7th/cmp-nvim-lua' } -- neovim lua API completions
+  use { 'hrsh7th/cmp-nvim-lsp-signature-help' } -- LSP signature suggestions
+  use { 'ray-x/cmp-treesitter' } -- treesitter nodes
 
   -- cmp snippets
   use { 'L3MON4D3/LuaSnip' } --snippet engine

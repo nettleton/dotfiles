@@ -40,7 +40,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "tsserver", "marksman" },
+  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "ltex", "jdtls", "cssls", "clangd", "vimls" },
   automatic_installation = true,
 })
 
@@ -116,8 +116,61 @@ lspconfig.bashls.setup {
   on_attach = lsp_handlers.on_attach
 }
 
+-- XML
+lspconfig.lemminx.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- YAML
+-- You can add/overwrite schema as described here:
+-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#yamlls
+lspconfig.yamlls.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- SQL
+lspconfig.sqls.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- Rust
+lspconfig.rust_analyzer.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- Terraform
+lspconfig.terraformls.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- Python
+lspconfig.pyright.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- LaTeX
+lspconfig.ltex.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- Java
+lspconfig.jdtls.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- C++
+lspconfig.clangd.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
+-- VimL
+lspconfig.vimls.setup {
+  on_attach = lsp_handlers.on_attach
+}
+
 -- JSON
 capabilities.textDocument.completion.completionItem.snippetSupport = true
+
 lspconfig.jsonls.setup {
   on_attach = lsp_handlers.on_attach,
   capabilities = capabilities,
@@ -128,5 +181,18 @@ lspconfig.jsonls.setup {
     },
   },
 }
+
+-- HTML also supports snippets
+lspconfig.html.setup {
+  on_attach = lsp_handlers.on_attach,
+  capabilities = capabilities,
+}
+
+-- CSS
+lspconfig.cssls.setup {
+  on_attach = lsp_handlers.on_attach,
+  capabilities = capabilities,
+}
+
 
 lsp_handlers.setup()
