@@ -1,10 +1,58 @@
-require'nvim-treesitter.configs'.setup {
-    ensure_installed = { 'javascript', 'go', 'typescript', 'lua', 'dockerfile', 'c', 'cpp', 'bash', 'fish', 'gomod', 'css', 'html', 'json', 'rust', 'toml', 'yaml', 'tsx', 'regex', 'scss', 'vim'},
+local treesitter_configs_ok, treesitter_configs = pcall(require, "nvim-treesitter.configs")
+if not treesitter_configs_ok then
+  vim.notify("require('nvim-treesitter.configs') failed")
+  return
+end
+treesitter_configs.setup {
+    ensure_installed = {
+      'bash',
+      'c',
+      'comment',
+      'cpp',
+      'css',
+      'dockerfile',
+      'fish',
+      'gitignore',
+      'go',
+      'gomod',
+      'gowork',
+      'graphql',
+      'hcl',
+      'hocon',
+      'html',
+      'http',
+      'java',
+      'javascript',
+      'jsdoc',
+      'json',
+      'kotlin',
+      'latex',
+      'lua',
+      'make',
+      'markdown',
+      'regex',
+      'rego',
+      'ruby',
+      'rust',
+      'scala',
+      'scss',
+      'sql',
+      'swift',
+      'toml',
+      'tsx',
+      'typescript',
+      'vim',
+      'yaml'
+    },
     highlight = {
       enable = true,
+      additional_vim_regex_highlighting = true,
     },
     indent = {
-      enable = true
+      enable = true,
+      disable = {
+        'yaml'
+      },
     },
     matchup = {
       enable = true,
@@ -12,10 +60,10 @@ require'nvim-treesitter.configs'.setup {
     textobjects = {
       select = {
         enable = true,
-  
+
         -- Automatically jump forward to textobj, similar to targets.vim
         lookahead = true,
-  
+
         keymaps = {
           -- You can use the capture groups defined in textobjects.scm
           ["af"] = "@function.outer",
@@ -24,5 +72,10 @@ require'nvim-treesitter.configs'.setup {
           ["ic"] = "@class.inner",
         },
       },
+    },
+    rainbow = {
+      enable = true,
+      extended_mode = true,
+      max_file_lines = nil,
     },
   }

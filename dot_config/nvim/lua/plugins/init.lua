@@ -149,11 +149,14 @@ return packer.startup(function(use)
   use { 'neovim/nvim-lspconfig' }
   use { 'b0o/schemastore.nvim' }
 
-
-  -- use { 'SirVer/ultisnips', config = [[require('plugins.ultisnips')]] } -- Snippets engine
   -- Treesitter
-  -- use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = [[require('plugins.treesitter')]] }
-  -- use { 'nvim-treesitter/nvim-treesitter-textobjects' }
+  use {
+    'nvim-treesitter/nvim-treesitter',
+    run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
+    config = [[require('plugins.treesitter')]]
+  }
+  use { 'nvim-treesitter/nvim-treesitter-textobjects' }
+  use { 'p00f/nvim-ts-rainbow' }
 
   -- Utilities
   use { 'windwp/nvim-autopairs', config = [[require('plugins.nvim-autopairs')]] } -- Insert or delete brackets, parens, quotes in pair.

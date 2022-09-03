@@ -1,12 +1,12 @@
 #!/usr/bin/env fish
 mkdir -p $HOME/.cache
-touchn $HOME/.cache/locatedb
+touch $HOME/.cache/locatedb
 
 mkdir -p $HOME/sandbox/go/bin
 set -x -U GOPATH $HOME/sandbox/go
 echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_paths "$GOPATH/bin"
 
-npm install -g tern uuid js-beautify eslint http-server remark remark-cli remark-stringify remark-frontmatter wcwidth prettier javascript-typescript-langserver bash-language-server dockerfile-language-server-nodejs typescript webpack neovim npm-check-updates
+npm install -g neovim npm-check-updates
 
 set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1 | string trim)
 pyenv install "$pylatest"
@@ -32,4 +32,4 @@ else
   podman machine start
 end
 
-echo "execute :CocInstall coc-snippets in neovim"
+echo "execute 'loaddb' in a new shell"
