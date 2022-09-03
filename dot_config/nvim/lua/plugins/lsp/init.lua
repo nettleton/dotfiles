@@ -35,7 +35,7 @@ if not mason_tool_installer_ok then
 end
 local null_ls_ok, null_ls = pcall(require, "null-ls")
 if not null_ls_ok then
-  vim.nofity("require('null-ls') failed")
+  vim.notify("require('null-ls') failed")
   return
 end
 
@@ -252,6 +252,12 @@ lsp_handlers.setup()
 local code_actions = null_ls.builtins.code_actions
 local diagnostics = null_ls.builtins.diagnostics
 local formatting = null_ls.builtins.formatting
+
+-- Mason installs tools into ~/.local/share/nvim/mason/bin
+-- Some of these tools may benefit from configurations
+-- Some config can just be defined in files like .luacheckrc
+-- You can test your config with commands like the following:
+-- ~/.local/share/nvim/mason/bin/luacheck ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/init.lua
 
 null_ls.setup {
   debug = false,
