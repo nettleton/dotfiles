@@ -28,6 +28,16 @@ if not schemastore_ok then
   vim.notify("require('schemastore') failed")
   return
 end
+local mason_tool_installer_ok, mason_tool_installer = pcall(require, 'mason-tool-installer')
+if not mason_tool_installer_ok then
+  vim.notify("require('mason-tool-installer') failed")
+  return
+end
+local null_ls_ok, null_ls = pcall(require, "null-ls")
+if not null_ls_ok then
+  vim.nofity("require('null-ls') failed")
+  return
+end
 
 mason.setup({
     ui = {
@@ -40,9 +50,46 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "ltex", "jdtls", "cssls", "clangd", "vimls" },
+  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "golangci-lint-langserver", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "ltex", "jdtls", "cssls", "clangd", "vimls" },
   automatic_installation = true,
 })
+
+mason_tool_installer.setup {
+  ensure_installed = {
+    "actionlint",
+    "buf",
+    "buildifier",
+    "cbfmt",
+    "cfn-lint",
+    "clang-format",
+    "codespell",
+    "cpplint",
+    "fixjson",
+    "gitlint",
+    "gofumpt",
+    "goimports",
+    "golangci-lint",
+    "golines",
+    "gomodifytags",
+    "gotests",
+    "impl",
+    "jq",
+    "json-to-struct",
+    "luacheck",
+    "luaformatter",
+    "markdownlint",
+    "proselint",
+    "pylint",
+    "shellcheck",
+    "shellharden",
+    "sql-formatter",
+    "staticcheck",
+    "vint",
+    "xmlformatter",
+    "yamlfmt",
+    "yamllint"
+  }
+}
 
 -- configure lspconfig
 -- https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
@@ -99,6 +146,11 @@ lspconfig.sumneko_lua.setup {
       },
     },
   },
+}
+
+-- golangci-lint-langserver
+lspconfig.golangci_lint_ls.setup{
+  on_attach = lsp_handlers.on_attach
 }
 
 -- Gopls
@@ -194,5 +246,51 @@ lspconfig.cssls.setup {
   capabilities = capabilities,
 }
 
-
 lsp_handlers.setup()
+
+-- null-ls
+local code_actions = null_ls.builtins.code_actions
+local diagnostics = null_ls.builtins.diagnostics
+local formatting = null_ls.builtins.formatting
+
+null_ls.setup {
+  debug = false,
+  sources = {
+    code_actions.gitsigns,
+    code_actions.proselint,
+    code_actions.shellcheck,
+    diagnostics.actionlint,
+    diagnostics.buf,
+    diagnostics.buildifier,
+    diagnostics.cfn_lint,
+    diagnostics.codespell,
+    diagnostics.fish,
+    diagnostics.gitlint,
+    diagnostics.golangci_lint,
+    diagnostics.luacheck,
+    diagnostics.markdownlint,
+    diagnostics.proselint,
+    diagnostics.pylint,
+    diagnostics.shellcheck,
+    diagnostics.staticcheck,
+    diagnostics.yamllint,
+    formatting.buf,
+    formatting.buildifier,
+    formatting.clang_format,
+    formatting.codespell,
+    formatting.fish_indent,
+    formatting.fixjson,
+    formatting.gofumpt,
+    formatting.goimports,
+    formatting.golines,
+    formatting.jq,
+    formatting.markdownlint,
+    formatting.shellharden,
+    formatting.sql_formatter,
+    formatting.xmllint,
+    formatting.yamlfmt,
+  }
+}
+
+
+

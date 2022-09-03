@@ -55,6 +55,7 @@ telescope.load_extension('repo')
 telescope.load_extension('luasnip')
 telescope.load_extension('file_browser')
 telescope.load_extension('packer')
+telescope.load_extension('dap')
 
 map('n', '<leader>f', '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>', { noremap = true, silent = true })
 map('n', '<leader>gt', '<cmd>lua require("telescope.builtin").live_grep()<CR>', { noremap = true, silent = true })

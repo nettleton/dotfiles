@@ -1,4 +1,3 @@
-local execute = vim.api.nvim_command
 local fn = vim.fn
 
 local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
@@ -96,20 +95,30 @@ return packer.startup(function(use)
   use { 'rhysd/git-messenger.vim', event = 'VimEnter' } -- Show Git info in a popup
 
   -- Golang
-  -- use { 'ray-x/go.nvim',
-    -- config = function()
-      -- require('go').setup()
+  use { 'ray-x/go.nvim',
+    config = function()
+      require('go').setup()
       -- 1. format on save
       -- 2. import on save
+      -- Run gofmt on save
+      vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').gofmt() ]], false)
       -- Run gofmt + goimport on save
-  --     vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').goimport() ]], false)
-  --   end,
-  -- }
-  -- use { 'mfussenegger/nvim-dap' }
-  -- use { 'rcarriga/nvim-dap-ui' }
-  -- use { 'theHamsta/nvim-dap-virtual-text', config = [[require('nvim-dap-virtual-text').setup()]] }
-  -- use { 'nvim-telescope/telescope-dap.nvim' }
-  -- use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
+      vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').goimport() ]], false)
+
+    end,
+  }
+  use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
+  use { 'leoluz/nvim-dap-go', config = [[require('dap-go').setup()]] }
+
+  -- DAP / debugging
+  use { 'mfussenegger/nvim-dap' }
+  use {
+    'rcarriga/nvim-dap-ui',
+    requires = { 'mfussenegger/nvim-dap' },
+    config = [[require('dapui').setup()]]
+  }
+  use { 'theHamsta/nvim-dap-virtual-text', config = [[require('nvim-dap-virtual-text').setup()]] }
+  use { 'nvim-telescope/telescope-dap.nvim' }
 
   -- Appearance and themes
   use { 'sainnhe/sonokai',
@@ -140,6 +149,7 @@ return packer.startup(function(use)
   use { 'hrsh7th/cmp-nvim-lua' } -- neovim lua API completions
   use { 'hrsh7th/cmp-nvim-lsp-signature-help' } -- LSP signature suggestions
   use { 'ray-x/cmp-treesitter' } -- treesitter nodes
+  use { 'rcarriga/cmp-dap' } -- nvim-dap
 
   -- cmp snippets
   use { 'L3MON4D3/LuaSnip' } --snippet engine
@@ -148,8 +158,10 @@ return packer.startup(function(use)
   -- LSP
   use { 'williamboman/mason.nvim' }
   use { 'williamboman/mason-lspconfig.nvim' }
+  use { 'WhoIsSethDaniel/mason-tool-installer.nvim', requires = { 'williamboman/mason.nvim' } }
   use { 'neovim/nvim-lspconfig' }
   use { 'b0o/schemastore.nvim' }
+  use { 'jose-elias-alvarez/null-ls.nvim' }
 
   -- Treesitter
   use {

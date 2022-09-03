@@ -1,10 +1,15 @@
 #!/usr/bin/env fish
-mkdir -p $HOME/.cache
-touch $HOME/.cache/locatedb
+mkdir -p "$HOME/.cache"
+touch "$HOME/.cache/locatedb"
 
-mkdir -p $HOME/sandbox/go/bin
-set -x -U GOPATH $HOME/sandbox/go
+mkdir -p "$HOME/sandbox/go/bin"
+set -x -U GOPATH "$HOME/sandbox/go"
 echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_paths "$GOPATH/bin"
+
+go install github.com/golang/mock/mockgen@latest
+go install gotest.tools/gotestsum@latest
+go install golang.org/x/tools/cmd/callgraph@latest
+go install golang.org/x/tools/cmd/guru@latest
 
 npm install -g neovim npm-check-updates
 
