@@ -6,12 +6,7 @@ mkdir -p "$HOME/sandbox/go/bin"
 set -x -U GOPATH "$HOME/sandbox/go"
 echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_paths "$GOPATH/bin"
 
-go install github.com/golang/mock/mockgen@latest
-go install gotest.tools/gotestsum@latest
-go install golang.org/x/tools/cmd/callgraph@latest
-go install golang.org/x/tools/cmd/guru@latest
-
-npm install -g neovim npm-check-updates
+npm outdated -g neovim; or npm install -g neovim
 
 set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1 | string trim)
 pyenv install "$pylatest"
@@ -38,3 +33,4 @@ else
 end
 
 echo "execute 'loaddb' in a new shell"
+echo "execute ':GoInstallBinaries in nvim"
