@@ -9,14 +9,11 @@ which_key.setup {
 }
 
 which_key.register({
-  c = {
-    name = "OS Clipboard",
-    d = { '"*d', "Cut" },
-    p = { '"*p', "Paste" },
-    P = { '"*P', "Another Paste?"},
-    y = { '"*y', "Copy/Yank"}
-  }
-}, { mode = '', prefix = "<leader>", noremap = true, silent = true })
+  d = { '"*d', "Cut to OS clipboard" },
+  p = { '"*p', "Paste OS clipboard" },
+  P = { '"*P', "Another Paste ?"},
+  y = { '"*y', "Copy/Yank to OS clipboard"}
+}, { mode = 'v', prefix = "<leader>", noremap = true, silent = true })
 
 which_key.register({
   b = {
@@ -69,7 +66,7 @@ which_key.register({
 which_key.register({
   h = {
     name = "History",
-    h = { '<cmd>lua require("telescope.builtin").command_history()<CR>', "Commands" },
+    c = { '<cmd>lua require("telescope.builtin").command_history()<CR>', "Commands" },
     s = { '<cmd>lua require("telescope.builtin").search_history()<CR>', "Searches" },
   }
 }, { prefix = "<leader>f", noremap = true, silent = true })
@@ -79,6 +76,7 @@ which_key.register({
     name = "Git",
     a = { ':Git commit --amend<CR>', "Amend" },
     c = { ':Git commit --verbose<CR>', "Commit" },
+    m = { ':GitMessenger<CR>', 'Show Message'},
     w = { ':Gwrite<CR>', "Write" },
   }
 }, { prefix = "<leader>", noremap = true, silent = true })
@@ -140,6 +138,10 @@ which_key.register({
 }, { prefix = "<leader>w", noremap = true, silent = true })
 
 which_key.register({
-  c = "OS Clipboard",
+  c = "Comment",
   t = { ':TroubleToggle<CR>', "Trouble" }
 }, { prefix = "<leader>", noremap = true, silent = true} )
+
+which_key.register({
+  c = "Comment",
+}, { mode = 'v', prefix = "<leader>", noremap = true, silent = true} )
