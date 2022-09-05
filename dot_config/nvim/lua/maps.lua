@@ -1,5 +1,5 @@
 -- This file is for custom key bindings for native vim functions
-local g = vim.g
+-- local g = vim.g
 local map = vim.api.nvim_set_keymap
 local opts = { noremap = true, silent = true }
 
@@ -13,30 +13,28 @@ map('i', '<F1>', '<ESC>', opts)
 map('n', '<F1>', '<ESC>', opts)
 map('v', '<F1>', '<ESC>', opts)
 
-map('i', 'jj', '<ESC>', opts)
-
 -- Copy and paste to the system clipboard
-map('', '<leader>y', '"*y', opts)
-map('', '<leader>d', '"*d', opts)
-map('', '<leader>p', '"*p', opts)
-map('', '<leader>P', '"*P', opts)
-
+-- map('', '<leader>y', '"*y', opts)
+-- map('', '<leader>d', '"*d', opts)
+-- map('', '<leader>p', '"*p', opts)
+-- map('', '<leader>P', '"*P', opts)
+--
 -- Normal
 -- Better window navigation
-map('n', '<leader>wh', '<C-w>h', opts)
-map('n', '<leader>wj', '<C-w>j', opts)
-map('n', '<leader>wk', '<C-w>k', opts)
-map('n', '<leader>wl', '<C-w>l', opts)
+-- map('n', '<leader>wh', '<C-w>h', opts)
+-- map('n', '<leader>wj', '<C-w>j', opts)
+-- map('n', '<leader>wk', '<C-w>k', opts)
+-- map('n', '<leader>wl', '<C-w>l', opts)
 
 -- Resize windows with arrows
-map("n", "<C-Up>", ":resize -2<CR>", opts)
-map("n", "<C-Down>", ":resize +2<CR>", opts)
-map("n", "<C-Left>", ":vertical resize -2<CR>", opts)
-map("n", "<C-Right>", ":vertical resize +2<CR>", opts)
+-- map("n", "<C-Up>", ":resize -2<CR>", opts)
+-- map("n", "<C-Down>", ":resize +2<CR>", opts)
+-- map("n", "<C-Left>", ":vertical resize -2<CR>", opts)
+-- map("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 
 -- Navigate buffers
-map("n", "<leader>bj", ":bnext<CR>", opts)
-map("n", "<leader>bk", ":bprevious<CR>", opts)
+-- map("n", "<leader>bj", ":bnext<CR>", opts)
+-- map("n", "<leader>bk", ":bprevious<CR>", opts)
 
 -- Insert --
 

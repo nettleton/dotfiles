@@ -90,7 +90,7 @@ return packer.startup(function(use)
   use { 'nvim-telescope/telescope-packer.nvim' }
 
   -- Git
-  use { 'tpope/vim-fugitive', event = 'VimEnter', config = [[require('plugins.vim-fugitive')]] } -- Git wrapper for vim
+  use { 'tpope/vim-fugitive', event = 'VimEnter' } -- Git wrapper for vim
   use { 'lewis6991/gitsigns.nvim', config = [[require('plugins.gitsigns')]] } -- Git signs
   use { 'rhysd/git-messenger.vim', event = 'VimEnter' } -- Show Git info in a popup
 
