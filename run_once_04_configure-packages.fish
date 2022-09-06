@@ -34,5 +34,7 @@ else
   podman machine start
 end
 
+gh auth login
+
 echo "execute 'loaddb' in a new shell"
 echo "execute ':GoInstallBinaries in nvim"
