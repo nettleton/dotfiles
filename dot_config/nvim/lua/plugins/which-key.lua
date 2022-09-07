@@ -39,6 +39,7 @@ which_key.register({
     b = { '<cmd>lua require("telescope.builtin").buffers()<CR>', "Buffer" },
     ["/"] = { '<cmd>lua require("telescope.builtin").current_buffer_fuzzy_find()<CR>', "Buffer Grep" },
     c = { '<cmd>:Cheatsheet<CR>', "Cheatsheet" },
+    d = { '<cmd>:Telescope lsp_document_symbols<CR>', "Document Symbols" },
     f = { '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>',
       "File" },
     F = "File Kinds",
@@ -85,6 +86,7 @@ which_key.register({
 which_key.register({
   l = {
     name = "Language / LSP",
+    d = { '<cmd>:Telescope lsp_document_symbols<CR>', "Document Symbols" },
     f = { '<cmd>lua vim.lsp.buf.formatting()<CR>', "Format" },
     g = "GoTo",
     h = { '<cmd>lua vim.lsp.buf.hover()<CR>', "Hover" },
@@ -138,10 +140,10 @@ which_key.register({
 }, { prefix = "<leader>w", noremap = true, silent = true })
 
 which_key.register({
-  c = "Comment",
+  -- c = "Comment",
   t = { ':TroubleToggle<CR>', "Trouble" }
 }, { prefix = "<leader>", noremap = true, silent = true} )
 
-which_key.register({
-  c = "Comment",
-}, { mode = 'v', prefix = "<leader>", noremap = true, silent = true} )
+-- which_key.register({
+  -- c = "Comment",
+-- }, { mode = 'v', prefix = "<leader>", noremap = true, silent = true} )

@@ -50,7 +50,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "golangci-lint-langserver", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "ltex", "jdtls", "cssls", "clangd", "vimls" },
+  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "golangci-lint-langserver", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
   automatic_installation = true,
 })
 
@@ -197,11 +197,6 @@ lspconfig.terraformls.setup {
 
 -- Python
 lspconfig.pyright.setup {
-  on_attach = lsp_handlers.on_attach
-}
-
--- LaTeX
-lspconfig.ltex.setup {
   on_attach = lsp_handlers.on_attach
 }
 
