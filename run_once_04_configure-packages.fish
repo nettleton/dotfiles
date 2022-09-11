@@ -8,6 +8,8 @@ echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_
 
 go install github.com/rhysd/vim-startuptime@latest
 
+vale sync
+
 npm outdated -g neovim; or npm install -g neovim
 
 set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1 | string trim)
