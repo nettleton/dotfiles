@@ -10,7 +10,6 @@ function cloneRepo -a repoUrl
   cd "$SANDBOX/$repoName"
 
   git init .
-  string match -ieq '{{ .work.domain }}' "$repoDomain"; and git config user.email {{ .work.email }}
   git remote add "$repoDomain" "$repoUrl"
   git fetch --all
   git pull "$repoDomain" main

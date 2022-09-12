@@ -20,3 +20,15 @@
   path = ~/.ssh/github_com_config/.gitconfig
 [includeIf "hasconfig:remote.*.url:https://github.com/**"]
   path = ~/.ssh/github_com_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:git@github.{{ .work.domain }}:*/**"]
+  path = ~/.ssh/github_internal_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:https://github.{{ .work.domain }}/**"]
+  path = ~/.ssh/github_internal_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:git@*-git.{{ .work.domain }}:*/**"]
+  path = ~/.ssh/gitlab_internal_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:https://*-git.{{ .work.domain }}/**"]
+  path = ~/.ssh/gitlab_internal_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:git@gitlab.com:*/**"]
+  path = ~/.ssh/gitlab_com_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:https://gitlab.com/**"]
+  path = ~/.ssh/gitlab_com_config/.gitconfig
