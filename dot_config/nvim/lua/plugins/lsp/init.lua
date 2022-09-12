@@ -78,12 +78,12 @@ mason_tool_installer.setup {
     "luacheck",
     "luaformatter",
     "markdownlint",
-    "proselint",
     "pylint",
     "shellcheck",
     "shellharden",
     "sql-formatter",
     "staticcheck",
+    "vale",
     "vint",
     "xmlformatter",
     "yamlfmt",
@@ -253,12 +253,12 @@ local formatting = null_ls.builtins.formatting
 -- Some config can just be defined in files like .luacheckrc
 -- You can test your config with commands like the following:
 -- ~/.local/share/nvim/mason/bin/luacheck ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/init.lua
+-- TODO: unclear if "vale sync needs to be run after Mason installs vale
 
 null_ls.setup {
   debug = false,
   sources = {
     code_actions.gitsigns,
-    code_actions.proselint,
     code_actions.shellcheck,
     diagnostics.actionlint,
     diagnostics.buf,
@@ -270,10 +270,10 @@ null_ls.setup {
     diagnostics.golangci_lint,
     diagnostics.luacheck,
     diagnostics.markdownlint,
-    diagnostics.proselint,
     diagnostics.pylint,
     diagnostics.shellcheck,
     diagnostics.staticcheck,
+    diagnostics.vale,
     diagnostics.yamllint,
     formatting.buf,
     formatting.buildifier,

@@ -5,7 +5,11 @@ function generateDiaryIndex -d "generate diary index"
   set MONTHS "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"
 
   echo "# Diary" > "$INDEX"
-  echo "" >> "$INDEX"
+
+  echo "<!-- vale Vale.Spelling = NO -->" >> "$INDEX"
+  echo "<!-- vale Microsoft.Dashes = NO -->" >> "$INDEX"
+  echo "<!-- vale Microsoft.AMPM = NO -->" >> "$INDEX"
+  echo "<!-- vale Microsoft.Acronyms = NO -->" >> "$INDEX"
 
   set writtenHeaders ""
 
