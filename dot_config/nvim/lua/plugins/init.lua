@@ -91,6 +91,11 @@ return packer.startup(function(use)
 
   -- Git
   use { 'tpope/vim-fugitive', event = 'VimEnter' } -- Git wrapper for vim
+  use {
+    'tpope/vim-rhubarb',
+    requires = { 'tpope/vim-fugitive' },
+    event = 'VimEnter'
+  } -- Open files in GitHub UI
   use { 'lewis6991/gitsigns.nvim', config = [[require('plugins.gitsigns')]] } -- Git signs
   use { 'rhysd/git-messenger.vim', event = 'VimEnter' } -- Show Git info in a popup
 

@@ -63,6 +63,9 @@ g.ruby_host_prog = ''
 g.loaded_perl_provider = 0
 g.perl_host_prog = ''
 
+-- GitHub Enterprise configurations
+g.github_enterprise_urls = {'https://github.{{ .work.domain }}', 'git@github.{{ .work.domain }}'}
+
 -- Templates
 -- Prefill new files created by vim with contents from the following templates
 --   https://shapeshed.com/vim-templates/
