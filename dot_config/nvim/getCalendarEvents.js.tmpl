@@ -150,5 +150,17 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy -ea -fj -ic "Calendar
       console.log(`Wrote alfred script filter to ${os.homedir}/Documents/notes/default/diary/alfred.json`)
     }
   })
+
+
+  exec('fish -c "generateDiaryIndex"', (error, stdout, stderr) => {
+    if (error) {
+      console.error(error)
+      console.error('-----------------')
+      console.error(stderr)
+    } else {
+      console.log(stdout)
+      console.log('Generated new diary index')
+    }
+  })
 })
 {{- end -}}
