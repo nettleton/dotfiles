@@ -28,7 +28,7 @@ function vpn
           sudo -v
         else
           echo "Clamshell state is closed, using password manager"
-          op item get "{{ .op.sudoitem }}" --fields password | sudo -S -v
+          op item get "{{ .op.sudoItem }}" --fields password | sudo -S -v
         end
         echo "sudo successful, starting connect"
 
