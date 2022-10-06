@@ -4,7 +4,7 @@ function generateNotesSnippets -d "Generate ultisnips from frontmatter"
   echo '{' > "$dest"
 
   # Find all notes with a non-empty Snippet: tag
-  grep -r -e 'Snippet:[[:space:]]\+[^ ].*' $NOTES | while read -l snippetLine
+  grep -R -e 'Snippet:[[:space:]]\+[^ ].*' $NOTES/ | while read -l snippetLine
     set filepath (echo "$snippetLine" | cut -f1 -d':' )
     set filename (basename "$filepath")
     set snippetDefinition (echo "$snippetLine" | sed 's/.*Snippet:[[:space:]]*//')
