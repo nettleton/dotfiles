@@ -1,1 +1,3 @@
+{{ if (not (eq .targetname "nessie")) }}
 machine github.{{ .work.domain }} login {{ .work.user }} password {{ onepasswordRead "op://personal/github enterprise pat/credential" }}
+{{ end }}
