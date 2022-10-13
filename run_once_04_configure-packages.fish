@@ -4,6 +4,8 @@ touch "$HOME/.cache/locatedb"
 
 mkdir -p "$HOME/sandbox/go/bin"
 set -x -U GOPATH "$HOME/sandbox/go"
+set -x -U GOBIN "$GOPATH/bin"
+set -x -U GOROOT (go env GOROOT)
 echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_paths "$GOPATH/bin"
 
 go install github.com/rhysd/vim-startuptime@latest
