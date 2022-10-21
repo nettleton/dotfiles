@@ -11,6 +11,14 @@ defaults write com.freron.MailMate MmSendMessageDelayEnabled -bool YES
 defaults write com.freron.MailMate MmSendMessageDelay -integer 300
 defaults write com.freron.MailMate MmDefaultPygmentsStyleName github
 defaults write com.freron.MailMate MmComposerInitialFocus -string "alwaysTextView"
+# Enable diagram rendering via Mermaid
+defaults write com.freron.MailMate MmBundleCommandForDiagramGeneration -string "BCA016BB-96DF-4EBB-8DD6-4BE467FCA194"
+
+# Sometimes, bundled filters do not show up in preferences without first being touched
+#   See https://www.mail-archive.com/mailmate@lists.freron.com/msg14753.html
+touch /Applications/MailMate.app/Contents/SharedSupport/Bundles/MailMate.mmbundle/Filters/Mermaid.mmFilter
+touch /Applications/MailMate.app/Contents/SharedSupport/Bundles/MailMate.mmbundle/Filters/Prism.mmFilter
+
 
 mkdir -p $HOME/.local/bin/
 test -L "$HOME/.local/bin/emate"; and echo "emate already exists"; or ln -s /Applications/MailMate.app/Contents/Resources/emate $HOME/.local/bin/emate
