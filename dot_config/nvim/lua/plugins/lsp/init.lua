@@ -50,7 +50,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "golangci-lint-langserver", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
+  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "golangci_lint_ls", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
   automatic_installation = true,
 })
 
@@ -212,11 +212,11 @@ lspconfig.vimls.setup {
 }
 
 -- JSON
-capabilities.textDocument.completion.completionItem.snippetSupport = true
+lsp_defaults.capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 lspconfig.jsonls.setup {
   on_attach = lsp_handlers.on_attach,
-  capabilities = capabilities,
+  capabilities = lsp_defaults.capabilities,
   settings = {
     json = {
       schemas = schemastore.json.schemas(),
@@ -228,13 +228,13 @@ lspconfig.jsonls.setup {
 -- HTML also supports snippets
 lspconfig.html.setup {
   on_attach = lsp_handlers.on_attach,
-  capabilities = capabilities,
+  capabilities = lsp_defaults.capabilities,
 }
 
 -- CSS
 lspconfig.cssls.setup {
   on_attach = lsp_handlers.on_attach,
-  capabilities = capabilities,
+  capabilities = lsp_defaults.capabilities,
 }
 
 lsp_handlers.setup()
