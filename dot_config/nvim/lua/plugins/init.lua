@@ -49,6 +49,7 @@ return packer.startup(function(use)
 
   -- Markdown
   use { 'plasticboy/vim-markdown', config = [[require('plugins.vim-markdown')]] }
+  use { 'gaoDean/autolist.nvim', config = [[require('autolist').setup({})]] }
 
   -- Telescope
   use {
