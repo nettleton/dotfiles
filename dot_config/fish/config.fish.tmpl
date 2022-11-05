@@ -24,6 +24,9 @@ end
 set -g -x JAVA_HOME $JAVA_1_8_HOME
 set -g -x MATLAB_JAVA "$JAVA_1_8_HOME/jre"
 
+# GO
+set -x GOROOT (go env GOROOT)
+
 set -g -x EDITOR "nvim"
 
 set -g -x ALTERNATE_EDITOR "/usr/bin/vim"
