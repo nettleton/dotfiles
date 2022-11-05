@@ -36,6 +36,7 @@ which_key.register({
 which_key.register({
   f = {
     name = "Find",
+    a = { '<cmd>:Telescope telescope-tabs list_tab<CR>', "Tabs" },
     b = { '<cmd>lua require("telescope.builtin").buffers()<CR>', "Buffer" },
     ["/"] = { '<cmd>lua require("telescope.builtin").current_buffer_fuzzy_find()<CR>', "Buffer Grep" },
     c = { '<cmd>:Cheatsheet<CR>', "Cheatsheet" },

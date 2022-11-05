@@ -89,6 +89,15 @@ return packer.startup(function(use)
   }
   use { 'nvim-telescope/telescope-file-browser.nvim' }
   use { 'nvim-telescope/telescope-packer.nvim' }
+  use {
+    'LukasPietzschmann/telescope-tabs',
+    requires = { 'nvim-telescope/telescope.nvim' },
+    config = function()
+      require('telescope-tabs').setup{
+          -- Your custom config :^)
+      }
+    end
+  }
 
   -- Git
   use { 'tpope/vim-fugitive', event = 'VimEnter' } -- Git wrapper for vim
