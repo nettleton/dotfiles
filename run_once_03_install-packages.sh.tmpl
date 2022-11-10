@@ -12,9 +12,9 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "homebrew/cask-versions"
       "homebrew/core"
       "homebrew/services"
+      "1password/tap"
       "buo/cask-upgrade"
       "keith/formulae"
-      "mdogan/zulu"
       "aws/tap" -}}
 {{ $brews := list
       "aws-sam-cli"
@@ -78,7 +78,7 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "bartender"
       "cardhop"
       "chrysalis"
-      "corretto"
+      "corretto8"
       "devonthink"
       "fantastical"
       "firefox"
@@ -104,8 +104,7 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "timing"
       "transmit"
       "visual-studio-code"
-      "vlc"
-      "zulu-jdk8" -}}
+      "vlc" -}}
 
 {{ if .personalpackages -}}
 {{  $brews = concat $brews (list
