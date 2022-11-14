@@ -48,7 +48,11 @@ return packer.startup(function(use)
   use { 'nvim-lua/plenary.nvim' }  -- Useful lua functions used by lots of plugins
 
   -- Markdown
-  use { 'plasticboy/vim-markdown', config = [[require('plugins.vim-markdown')]] }
+  use { 'preservim/vim-markdown',
+        requires = {
+          { 'godlygeek/tabular' }
+        },
+        config = [[require('plugins.vim-markdown')]] }
   use { 'gaoDean/autolist.nvim', config = [[require('autolist').setup({})]] }
 
   -- Telescope
