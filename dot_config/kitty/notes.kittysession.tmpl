@@ -1,6 +1,11 @@
 layout vertical
+{{ if (contains .work.user .chezmoi.hostname) }}
+os_window_size 35c 143c
+{{- else -}}
 os_window_size 89c 120c
+{{ end }}
 launch fish -c "vim ~/Documents/notes/default/diary/diary.md"
+{{ if (not (contains .work.user .chezmoi.hostname)) }}
 launch fish
 resize_window shorter 20
-
+{{ end }}
