@@ -145,6 +145,13 @@ which_key.register({
   t = { ':TroubleToggle<CR>', "Trouble" }
 }, { prefix = "<leader>", noremap = true, silent = true} )
 
+which_key.register({
+  v = {
+    name = "View",
+    s = { ':SymbolsOutline<CR>', "Toggle Symbols Outline" }
+  }
+}, { prefix = "<leader>", noremap = true, silent = true})
+
 -- which_key.register({
   -- c = "Comment",
 -- }, { mode = 'v', prefix = "<leader>", noremap = true, silent = true} )

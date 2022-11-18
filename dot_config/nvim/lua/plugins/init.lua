@@ -200,6 +200,7 @@ return packer.startup(function(use)
   }
   use { 'nvim-treesitter/nvim-treesitter-textobjects' }
   use { 'p00f/nvim-ts-rainbow' }
+  use { 'simrat39/symbols-outline.nvim', config = [[require('symbols-outline').setup()]] }
 
   -- Utilities
   use { 'windwp/nvim-autopairs', config = [[require('plugins.nvim-autopairs')]] } -- Insert or delete brackets, parens, quotes in pair.
