@@ -277,7 +277,7 @@ null_ls.setup {
     formatting.codespell,
     formatting.fish_indent,
     formatting.fixjson,
-    formatting.gofumpt,
+    -- formatting.gofumpt,
     formatting.goimports,
     formatting.golines,
     formatting.jq,

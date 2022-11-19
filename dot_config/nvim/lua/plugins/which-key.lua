@@ -77,6 +77,7 @@ which_key.register({
   g = {
     name = "Git",
     a = { ':Git commit --amend<CR>', "Amend" },
+    b = { ':GBrowse<CR>', "Browse on GitHub"},
     c = { ':Git commit --verbose<CR>', "Commit" },
     m = { ':GitMessenger<CR>', 'Show Message'},
     w = { ':Gwrite<CR>', "Write" },
