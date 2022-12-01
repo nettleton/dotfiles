@@ -116,13 +116,18 @@ return packer.startup(function(use)
   -- Golang
   use { 'ray-x/go.nvim',
     config = function()
-      require('go').setup()
-      -- 1. format on save
-      -- 2. import on save
-      -- Run gofmt on save
-      vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').gofmt() ]], false)
+      require('go').setup({
+        gofmt = 'gofmt',
+        max_line_len = 999,
+      })
       -- Run gofmt + goimport on save
-      vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').goimport() ]], false)
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        pattern = "*.go",
+        callback = function()
+         require('go.format').goimport()
+        end,
+        group = format_sync_grp,
+      })
 
     end,
   }
@@ -211,6 +216,10 @@ return packer.startup(function(use)
   use { 'alker0/chezmoi.vim' } -- highlighting support for chezmoi templates
 
   use { 'folke/which-key.nvim', config = [[require('plugins.which-key')]] } -- key bindings
+
+  -- strip trailing whitespace from edited lines
+  use {
+    'lewis6991/spaceless.nvim', config = [[require('spaceless').setup()]]}
 
 
   if PACKER_BOOTSTRAP then
