@@ -17,6 +17,8 @@
   rebase = true
 [init]
   defaultBranch = main
+[url "git@github.{{ .work.domain }}:"]
+    insteadOf = https://github.{{ .work.domain }}
 
 [includeIf "hasconfig:remote.*.url:git@github.com:*/**"]
   path = ~/.ssh/github_com_config/.gitconfig

@@ -26,6 +26,9 @@ set -g -x MATLAB_JAVA "$JAVA_1_8_HOME/jre"
 
 # GO
 set -x GOROOT (go env GOROOT)
+set -x GOPROXY http://iat-go-proxy-prod-01.{{ .work.domain }}:7000/go-proxy
+set -x GOPRIVATE golang.dhcp,github.{{ .work.domain }}
+set -x GONOPROXY github.{{ .work.domain }}
 
 set -g -x EDITOR "nvim"
 
