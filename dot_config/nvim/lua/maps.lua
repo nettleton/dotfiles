@@ -8,6 +8,9 @@ local opts = { noremap = true, silent = true }
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Clear search highlights on escape
+map('n', '<ESC>', ':noh<CR><ESC>', opts)
+
 -- Disable F1 bringing up the help doc every time
 map('i', '<F1>', '<ESC>', opts)
 map('n', '<F1>', '<ESC>', opts)
