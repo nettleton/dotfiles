@@ -19,3 +19,12 @@ vim.g.vim_markdown_autowrite = 1
 
 -- open links in new tab
 vim.g.vim_markdown_edit_url_in = 'tab'
+
+-- follow named anchors
+vim.g.vim_markdown_follow_anchor = 1
+
+-- set conceallevel for markdown files
+vim.api.nvim_create_autocmd({"FileType"}, {
+  pattern = {"markdown"},
+  command = "lua vim.opt.conceallevel = 2",
+})
