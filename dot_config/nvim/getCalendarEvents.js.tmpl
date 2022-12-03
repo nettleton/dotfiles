@@ -29,7 +29,7 @@ async function getJoke () {
 }
 
 // exec(`/usr/local/bin/icalBuddy -ic "Calendar" -ea -npn -stda -ss "##EVENT_DELIMITER##" -b "" -po "title,datetime,attendees,notes" -iep "title,datetime,attendees,notes" -df "%Y-%m-%d" -tf "%H:%M:%S" -ps "|!!PROP_SEPARATOR!!|" -nnr "##NEWLINE##" eventsFrom:"${daystr} 00:00:00 -0500" to:"${daystr} 23:59:59 -0500"`, { shell: '/bin/bash' }, (error, stdout, stderr) => {
-exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses canceled -nrd -df "YYYY-MM-dd" -tf "HH:mm" -ea -fj -ic "Calendar" --referenceUrlExcludedPaths ".one,Using a Microsoft Teams Room.aspx" --excludeTitles "OOO,ET work,Commute,work,CNCF work"', (error, stdout, stderr) => {
+exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses canceled -nrd -df "YYYY-MM-dd" -tf "HH:mm" -ea -fj -ic "Calendar" --referenceUrlExcludedPaths ".one,Using a Microsoft Teams Room.aspx" --excludeTitles "OOO,^(?:CNCF |ET )?work[ ]*$,CNCF End User,Commute"', (error, stdout, stderr) => {
   if (error) {
     console.error(`stderr: ${stderr}`)
     console.error(`exec error: ${error}`)
