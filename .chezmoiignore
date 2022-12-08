@@ -4,6 +4,8 @@ README.md
 .luarc.json
 {{- if contains .chezmoi.username .targetname }}
 .config/swiftbar/solaredge.15m.py
-.config/swiftbar/vpnstatus.2m.sh
 Library/LaunchAgents/io.nettleton.calendar.poller.plist
+{{- end }}
+{{- if contains (printf "-%s-" .work.user) .targetname }}
+.config/swiftbar/vpnstatus.2m.sh
 {{- end }}

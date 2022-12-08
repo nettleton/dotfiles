@@ -37,6 +37,14 @@ else
   podman machine start
 end
 
+defaults write com.ameba.SwiftBar StealthMode -bool NO
+defaults write com.ameba.SwiftBar DisableBashWrapper -bool NO
+defaults write com.ameba.SwiftBar PluginDeveloperMode -bool YES
+defaults write com.ameba.Swiftbar PluginDebugMode -bool YES
+defaults write com.ameba.SwiftBar Terminal -string "iTerm"
+defaults write com.ameba.SwiftBar PluginDirectory -string "$HOME/.config/swiftbar"
+defaults write com.ameba.SwiftBar Shell -string "zsh"
+
 gh auth login
 
 echo "execute 'loaddb' in a new shell"
