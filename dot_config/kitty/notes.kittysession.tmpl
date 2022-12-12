@@ -4,8 +4,15 @@ os_window_size 35c 143c
 {{- else -}}
 os_window_size 89c 120c
 {{ end }}
+new_tab notes
 launch --title notes fish -c "vim ~/Documents/notes/default/diary/diary.md"
 {{ if (not (contains (printf "-%s-" .work.user) .chezmoi.hostname)) -}}
-launch --title notes_scratch fish
+launch --title notes_terminal fish
+resize_window shorter 20
+{{ end }}
+new_tab scratch 
+launch --title scratch fish -c "nvr -s --servername /tmp/scratch_editor"
+{{ if (not (contains (printf "-%s-" .work.user) .chezmoi.hostname)) -}}
+launch --title scratch_terminal fish
 resize_window shorter 20
 {{ end }}
