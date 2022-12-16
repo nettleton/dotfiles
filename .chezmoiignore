@@ -2,9 +2,11 @@ colorthemes
 styles.css
 README.md
 .luarc.json
+{{- if (not (eq "starship" .targetname)) }}
+Library/LaunchAgents/io.nettleton.calendar.poller.plist
+{{- end }}
 {{- if contains .chezmoi.username .targetname }}
 .config/swiftbar/solaredge.15m.py
-Library/LaunchAgents/io.nettleton.calendar.poller.plist
 {{- end }}
 {{- if contains (printf "-%s-" .work.user) .targetname }}
 .config/swiftbar/vpnstatus.2m.sh
