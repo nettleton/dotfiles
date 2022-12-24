@@ -5,7 +5,7 @@ function vpn
   set CMD_AT_PID ""
 
   if test -e "$PIDFILE"
-    set EXISTING_PID (cat -p $HOME/.openconnect_pid)
+    set EXISTING_PID (bat -p $HOME/.openconnect_pid)
     set CMD_AT_PID (ps -p $EXISTING_PID -o command | sed -n '2p' | cut -f1 -d' ')
   end
 

@@ -38,81 +38,68 @@ set -x -g WORK_USER {{ .work.user }}
 set -x -g WORK_MAC_DESKTOP {{ .work.hostnames.mac_desktop }}
 set -x -g WORK_MAC_SCREENS_ALIAS {{ .work.user }}-maci
 set -x -g WORK_LINUX {{ .work.hostnames.linux }}
+
 # END ENV
 
-# ALIASES
-alias h "cd"
-alias doc "cd $HOME/Documents/"
-alias n "cd $NOTES"
+# ALIASES / ABBREVIATIONS
+abbr h "cd ~"
+abbr dl "cd $DOWNLOADS"
+abbr doc "cd $HOME/Documents/"
+abbr icd "cd $HOME/Library/Mobile Documents/com~apple~CloudDocs"
+abbr od "cd $HOME/OneDrive\ -\ {{ .work.companyname }}"
+abbr n "cd $NOTES"
 
-alias .. "cd .."
-alias ... "cd ../.."
-alias .... "cd ../../.."
-alias ..... "cd ../../../.."
-alias ...... "cd ../../../../.."
+abbr ...... "cd ../../../../.."
+abbr .6     "cd ../../../../.."
 
-alias rma "rm -rf"
-
-# GIT
-alias g "git"
-alias gs "git status"
-alias ga "git add "
-alias gb "git branch "
-alias gc "git commit"
-alias gd "git diff"
-alias gk "gitk --all&"
-alias gx "gitx --all"
-alias gp "git push "
-
-alias p4s "$SANDBOX/dotfiles/git/p4sync.fish"
+abbr p4s "$SANDBOX/dotfiles/git/p4sync.fish"
 
 # MAVEN
-alias m "mvn"
-alias mct "mvn clean test"
-alias mi  "mvn install"
-alias mp  "mvn pre-integration-test"
-alias mcpk "mvn clean package"
-alias mci "mvn clean install"
-alias mcv "mvn clean verify"
-alias mcp "mvn clean pre-integration-test"
+abbr m "mvn"
+abbr mct "mvn clean test"
+abbr mi  "mvn install"
+abbr mp  "mvn pre-integration-test"
+abbr mcpk "mvn clean package"
+abbr mci "mvn clean install"
+abbr mcv "mvn clean verify"
+abbr mcp "mvn clean pre-integration-test"
 
-alias l "exa --git --icons -alh"
-alias clc "clear"
+abbr l "exa --git --icons -alh"
+abbr clc "clear"
 
-alias dkr "podman"
-alias dl "cd $DOWNLOADS"
+abbr dkr "podman"
 
-alias deb "vm '$LINUX_VMX'"
-alias win "vm '$WINDOWS_VMX'"
+abbr deb "vm '$LINUX_VMX'"
+abbr win "vm '$WINDOWS_VMX'"
 
-alias vi "nvim"
-alias e "code"
+abbr vi "nvim"
+abbr e "code"
 
 # KITTY
-alias icat "kitty +kitten icat"
-alias diffk "kitty +kitten diff"
+abbr icat "kitty +kitten icat"
+abbr diffk "kitty +kitten diff"
 
-alias sshk "kitty +kitten ssh"
-alias wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_DESKTOP 'exec fish'"
-alias wmv "open screens://$WORK_MAC_SCREENS_ALIAS"
-alias wl "sshf $WORK_KEY $WORK_USER $WORK_LINUX"
+abbr sshk "kitty +kitten ssh"
+abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_DESKTOP 'exec fish'"
+abbr wmv "open screens://$WORK_MAC_SCREENS_ALIAS"
+abbr wl "sshf $WORK_KEY $WORK_USER $WORK_LINUX"
 
-alias nas "ssh $NAS_IP"
+abbr nas "ssh $NAS_IP"
 
-alias rlc ". $HOME/.config/fish/config.fish"
+abbr rlc ". $HOME/.config/fish/config.fish"
 
-alias pr "$SANDBOX/scratch/scripts/pr.sh"
+abbr pr "$SANDBOX/scratch/scripts/pr.sh"
 
-alias cat "bat"
+abbr cat "bat"
 
 # https://github.com/cljoly/telescope-repo.nvim/discussions/13
 if which glocate > /dev/null
   alias locate="glocate -d $HOME/.cache/locatedb"
   set -x LOCATE_PATH "$HOME/.cache/locatedb"
 end
-alias loaddb "gupdatedb --localpaths=$HOME --prunepaths=/Volumes --output=$HOME/.cache/locatedb"
+abbr loaddb "gupdatedb --localpaths=$HOME --prunepaths=/Volumes --output=$HOME/.cache/locatedb"
 
-# END ALIASES
+# END ALIASES / ABBREVIATIONS
 
 function sourceIfNecessary
   functions -q "$argv[2]"; or source "$argv[1]"

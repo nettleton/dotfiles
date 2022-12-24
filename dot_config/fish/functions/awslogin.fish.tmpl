@@ -1,3 +1,4 @@
 function awslogin
+  set -xg AWS_REGION us-east-1
   op item get {{ .work.companyname }} --fields password | awssaml --password-stdin eks login
 end
