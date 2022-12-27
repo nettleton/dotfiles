@@ -8,27 +8,50 @@ add_newline = true
 scan_timeout = 10
 
 format = '''
-$username$sudo$hostname$aws$kubernetes$helm$golang
+$username$sudo$hostname$shell$aws$kubernetes$helm$golang
 $directory$git_branch$git_commit$git_state$git_status$git_metrics
 $time$cmd_duration$status$character'''
 
+[username]
+show_always = true
+format = '[$user]($style)'
+style_user = 'dimmed yellow'
+
+[hostname]
+ssh_only = false
+format = '[@$hostname ]($style)'
+style = 'dimmed green'
+
+[shell]
+fish_indicator = ''
+# powershell_indicator = '_'
+unknown_indicator = 'mystery'
+format = '[$indicator]($style)'
+style = '#5B5B5B'
+disabled = false
+
 [status]
 # symbol = '🔴 '
-success_symbol = '✔'
-format = '[ $symbol \($signal_name$int\)]($style) '
+symbol = '[ 🔴 \($signal_name$int\) ](red)'
+success_symbol = '[ ✔ ](green)'
+not_executable_symbol = '[ 🚫 \($signal_name$int\) ](red)'
+not_found_symbol = '[ 🔍 \($signal_name$int\) ](red)'
+sigint_symbol = '[ 🧱 \($signal_name$int\) ](red)'
+signal_symbol = '[ ⚡ \($signal_name$int\) ](red)'
+format = '$symbol'
+# format = '[ $symbol \($signal_name$int\)]($style) '
 map_symbol = true
 disabled = false
 
 [cmd_duration]
 min_time = 1
 show_milliseconds = true
+format = '[ $duration](#87875F)'
 
 [time]
 disabled = false
-format = '[$time]($style)'
+format = '[$time](#5F8787) '
 
-[username]
-format = '[$user]($style) '
 
 [sudo]
 disabled = false
@@ -37,6 +60,18 @@ format = '[$symbol]($style)'
 [directory]
 truncation_length = 5
 read_only = " "
+home_symbol = ' '
+
+[directory.substitutions]
+"Documents" = ""
+"Downloads" = ""
+"Music" = ""
+"Pictures" = ""
+# Keep in mind that the order matters. For example:
+# "Important Documents" = "  "
+# will not be replaced, because "Documents" was already substituted before.
+# So either put "Important Documents" before "Documents" or use the substituted version:
+# "Important  " = "  "
 
 [git_metrics]
 disabled = false
