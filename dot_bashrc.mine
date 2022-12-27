@@ -1,7 +1,7 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 export PATH="/opt/homebrew/bin:$PATH"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 alias cat="bat"
 alias dl="cd ~/Downloads"
@@ -11,5 +11,5 @@ alias h="cd ~"
 alias l="exa --git --icons -alh"
 alias vi="nvim"
 
-eval "$(starship init zsh)"
+eval "$(starship init bash)"
 
