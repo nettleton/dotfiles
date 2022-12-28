@@ -221,6 +221,8 @@ return packer.startup(function(use)
   use {
     'lewis6991/spaceless.nvim', config = [[require('spaceless').setup()]]}
 
+  -- ZK
+  use { 'mickael-menu/zk-nvim', config = [[require('zk').setup()]] }
 
   if PACKER_BOOTSTRAP then
     require('packer').sync()
