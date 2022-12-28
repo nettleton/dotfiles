@@ -12,6 +12,7 @@ set -g -x DOWNLOADS "$HOME/Downloads"
 
 # NOTES
 set -g -x NOTES "$HOME/Documents/notes/default"
+set -g -x ZK_NOTEBOOK_DIR "$HOME/Library/Mobile Documents/com~apple~CloudDocs/notes/zk/default"
 
 #JAVA
 switch (uname)
@@ -45,7 +46,7 @@ set -x -g WORK_LINUX {{ .work.hostnames.linux }}
 abbr h "cd ~"
 abbr dl "cd $DOWNLOADS"
 abbr doc "cd $HOME/Documents/"
-abbr icd "cd $HOME/Library/Mobile Documents/com~apple~CloudDocs"
+abbr icd "cd $HOME/Library/Mobile\ Documents/com~apple~CloudDocs"
 abbr od "cd $HOME/OneDrive\ -\ {{ .work.companyname }}"
 abbr n "cd $NOTES"
 
