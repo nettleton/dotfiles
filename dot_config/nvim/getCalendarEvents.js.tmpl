@@ -61,7 +61,7 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
   const events = JSON.parse(stdout).map(event => {
     // console.log("=============================")
 
-    event.title = event.title.replace(/ \(\w*\)$/i, '').trim()
+    event.title = event.title.replace(/ \(\w*\)$/i, '').replace(/[^A-Z0-9-]/ig, "-").trim()
     event.fullAttendeeList = [...new Set(event.attendees.concat(event.organizer))].filter(a => {
       return !a.includes('-FL') && !a.includes('Joshua Wang') && a.length > 0
     }).map(s => s.trim())

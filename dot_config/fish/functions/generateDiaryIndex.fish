@@ -15,7 +15,8 @@ function generateDiaryIndex -d "generate diary index"
 
   for fn in (find $NOTES/diary -name "[0-9]*\.md" | sort -r);
     set bn (basename "$fn")
-    set YMD (string split -f1 _ "$bn" | string split -)
+    set bn_noExt (basename "$fn" ".md")
+    set YMD (string split - "$bn")
 
     set yearHeader "## $YMD[1]"
     set monthHeader "### $MONTHS[$YMD[2]] $YMD[1]"
@@ -33,6 +34,6 @@ function generateDiaryIndex -d "generate diary index"
       set writtenHeaders $writtenHeaders "$monthHeader"
     end
 
-    echo "- [$bn](./$bn)" >> "$INDEX"
+    echo "- [$bn](./$bn_noExt)" >> "$INDEX"
   end
 end
