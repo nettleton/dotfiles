@@ -6,16 +6,32 @@ const https = require('https')
 
 const args = process.argv.slice(2)
 
-const today = new Date().toISOString().replace(/T.*/, '')
-const daystr = args.length > 0 ? args[0] : `${today}`
-console.log(`Getting calendar events for ${daystr}`)
+const isoNow = new Date().toISOString()
+const iso1D = new Date(new Date().getTime() + 60*60*24*1000).toISOString()
+
+const startDate = args.length > 0 ? args[0] : isoNow
+const endDate = args.length > 1 ? args[1] : iso1D
+
+console.log(`Getting calendar events for duration ${startDate} - ${endDate}`)
+
+const lightsOnByDefault = os.hostname() === "starship"
+const alfredScriptFilterMods = {
+  cmd: {
+    subtitle: "Note Only",
+    variables: {lightsOn: false, joinVideo: false}
+  },
+  alt: {
+    subtitle: lightsOnByDefault ? "Note & Video Only" : "Force Lights On",
+    variables: {lightsOn: !lightsOnByDefault, joinVideo: true}
+  }
+}
 
 async function getJoke () {
   const url = 'https://icanhazdadjoke.com'
   const opts = {
     headers: {
       Accept: 'text/plain',
-      'User-Agent': 'vimwiki helper (https://gitlab.com/nettleton/dotfiles)'
+      'User-Agent': 'vimwiki helper (https://github.com/nettleton/dotfiles)'
     }
   }
 
@@ -29,7 +45,7 @@ async function getJoke () {
 }
 
 // exec(`/usr/local/bin/icalBuddy -ic "Calendar" -ea -npn -stda -ss "##EVENT_DELIMITER##" -b "" -po "title,datetime,attendees,notes" -iep "title,datetime,attendees,notes" -df "%Y-%m-%d" -tf "%H:%M:%S" -ps "|!!PROP_SEPARATOR!!|" -nnr "##NEWLINE##" eventsFrom:"${daystr} 00:00:00 -0500" to:"${daystr} 23:59:59 -0500"`, { shell: '/bin/bash' }, (error, stdout, stderr) => {
-exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses canceled -nrd -df "YYYY-MM-dd" -tf "HH:mm" -ea -fj -ic "Calendar" --referenceUrlExcludedPaths ".one,Using a Microsoft Teams Room.aspx" --excludeTitles "OOO,^(?:CNCF |ET )?work[ ]*$,CNCF End User,Commute"', (error, stdout, stderr) => {
+exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses canceled -nrd -df "YYYY-MM-dd" -tf "HH:mm" -ea -fj -ic "Calendar" --referenceUrlExcludedPaths ".one,Using a Microsoft Teams Room.aspx" --excludeTitles "OOO,^(?:CNCF |ET |Observability )?work[ ]*\$,CNCF End User,Commute,SGD update,Backlog grooming,Sprint planning,scrum,CR 1-on-1,Online Learning Architecture Meeting,OPDRx,Dashboard review,RTM,golf,busy,^Placeholder*,D&A Core" eventsFrom ${startDate} ${endDate}`, (error, stdout, stderr) => {
   if (error) {
     console.error(`stderr: ${stderr}`)
     console.error(`exec error: ${error}`)
@@ -40,46 +56,29 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
     // console.log("=============================")
 
     event.title = event.title.replace(/ \(\w*\)$/i, '').trim()
-    event.fullAttendeeList = event.attendees.concat(event.organizer).filter(a => {
+    event.fullAttendeeList = [...new Set(event.attendees.concat(event.organizer))].filter(a => {
       return !a.includes('-FL') && !a.includes('Joshua Wang') && a.length > 0
-    }).map(s => s.trim().replace(/\s/g, '_'))
+    }).map(s => s.trim())
 
     var trimmedNotes = event.notes.replace(/[\r\n]+/g, '##NL##') // replace newline characters in notes field with placeholder
 
-    const teamsUrlMatch = trimmedNotes.match(/https:\/\/teams.microsoft.com\/l\/meetup-join[^\s>]*/)
-    event.teamsUrl = teamsUrlMatch ? teamsUrlMatch[0] : ''
-    const oneNoteUrlMatch = trimmedNotes.match(/https:\/\/{{ .work.companyname }}-my.sharepoint.com[^>#]*/)
-    let oneNoteUrl = oneNoteUrlMatch ? oneNoteUrlMatch[0] : ''
-    if (oneNoteUrl.includes('Christina')) {
-      oneNoteUrl = "{{ (index (onepassword "fcww6q4a5bhnff4zcw7biwfvj4").fields 4).value }}"
-    }
-    event.oneNoteUrl = oneNoteUrl
-
-    const confluenceUrlMatch = trimmedNotes.match(/https:\/\/confluence[^\s>#]*/)
-    event.confluenceUrl = confluenceUrlMatch ? confluenceUrlMatch[0] : ''
-
     // trim remainder of unnecessary text from notes frontmatter
-    trimmedNotes = trimmedNotes.replace(/##NL##_+.*/g,'')        // videoconference invites are at the end of the notes and start with \n__..._\nJoin Teams Meeting
+    trimmedNotes = trimmedNotes.replace(/_____+.*/g,'')        // videoconference invites are at the end of the notes and start with \n__..._\nJoin Teams Meeting
     trimmedNotes = trimmedNotes.replace(/\[https:\/\/.*.cdn.office.net.*\.png\]/g,'') //Outlook inserts images for office docs
+    trimmedNotes = trimmedNotes.replace(/\[.* icon\]/g, '') //images for office docs
+    trimmedNotes = trimmedNotes.replace(/<.*>/g, '') // some url hyperlinks
     trimmedNotes = trimmedNotes.replace(/##NL##Thanks,.*/g,'')   // signature lines
     trimmedNotes = trimmedNotes.replace(/##NL##https:\/\/{{ .work.companyname }}-my.sharepoint.com\/:o:\/[p|r][\/personal]*\/{{ .work.user }}.*/g,'') // my 1:1s have a personal onedrive link
+    trimmedNotes = trimmedNotes.replace(/Instructions for 1:1 Notes.*/g,'')
+    trimmedNotes = trimmedNotes.replace(/Join Zoom Meeting.*/g, '')
     event.shortNotes = trimmedNotes
 
     return event
   })
 
-  const eventsToCreateNotesFrom = events.filter(calendarEvent => {
-    const invalidTitles = [/.*OOO.*/, /Canceled:.*/i, /.*Backlog grooming/i, /.*Sprint planning.*/i, /.*scrum.*/i, /CR 1-on-1/, /YL 1:1/, /Gremlin Customer Office Hours/, /^work$/, /Observability work$/, /CNCF work/, /Online Learning Architecture Meeting/, /OPDRx/, /Dashboard review/i, /reminder/i, /RTM/, /golf/i, /busy/]
-
-    const invalidTitleMatches = invalidTitles.filter(rex => calendarEvent.title.match(rex))
-    const anyInvalidTitles = invalidTitleMatches && invalidTitleMatches.length > 0
-
-    return !anyInvalidTitles
-  })
-
-  const eventsAndFileNames = eventsToCreateNotesFrom.map(nEvent => {
-    const startTimeHM = nEvent.startDate.split(':').slice(0, 2).join('').split(' ').join('_')
-    const shortfn = `${startTimeHM}_${nEvent.title.replace(/\s|#/g, '_').replace(/\//g, '-').replace(/"/g, '').replace(/:/g, '-').replace(/\(|\)/g, '')}`
+  const eventsAndFileNames = events.map(nEvent => {
+    const startTimeHM = nEvent.startDate.split(':').slice(0, 2).join('').split(' ').join('-')
+    const shortfn = `${startTimeHM}-${nEvent.title.replace(/\s|#/g, '-').replace(/\//g, '-').replace(/"/g, '').replace(/:/g, '-').replace(/\(|\)/g, '')}`
     nEvent.shortfn = shortfn
     const filename = `~/Documents/notes/default/diary/${shortfn}.md`
     nEvent.diaryFilename = filename
@@ -90,28 +89,49 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
     nEvent.arg = filename
     nEvent.icon = { path: 'calendar.png' }
 
-    nEvent.variables = { teamsUrl: nEvent.teamsUrl.replace(/https:/, 'msteams:'), oneNoteUrl: nEvent.oneNoteUrl, noteType: 'existing', noteFilename: filename, confluenceUrl: nEvent.confluenceUrl }
-
-    if (nEvent.fullAttendeeList.length === 1) {
-      nEvent.variables.attendees = `~/Documents/notes/default/${nEvent.fullAttendeeList[0]}.md`
-    }
+    const protocolConvertedVideoUrls = nEvent.videoconferenceUrls.map(vcUrl => {
+      // can't use URL because https is a 'Special' protocol according to the WHATWG URL Standard
+      if (vcUrl.startsWith("https://teams.microsoft.com")) {
+        return vcUrl.replace(/https:/, 'msteams:')
+      }
+      return vcUrl
+    })
+    nEvent.variables = { videoconferenceUrls: protocolConvertedVideoUrls, referenceUrls: nEvent.referenceUrls, noteType: 'existing', noteFilename: filename, lightsOn: lightsOnByDefault, joinVideo: true }
+    nEvent.mods = alfredScriptFilterMods
 
     nEvent.match = shortfn.replace(/[^a-z0-9]/gi, ' ')
     return nEvent
   })
 
   eventsAndFileNames.forEach(noteEvent => {
-    // TODO: fix tags
-    const teamsUrlLink = noteEvent.teamsUrl.length > 0 ? `[Join Teams Meeting](${noteEvent.teamsUrl})` : ''
-    const oneNoteUrlLink = noteEvent.oneNoteUrl.length > 0 ? `[Open Notebook](${noteEvent.oneNoteUrl})` : ''
-    const confluenceUrlLink = noteEvent.confluenceUrl.length > 0 ? `[Open Confluence Page](${noteEvent.confluenceUrl})` : ''
-    const noteAttendeesLinks = noteEvent.fullAttendeeList.map(a => `[${a}](../${a}.md)`)
+    const noteAttendeesLinks = noteEvent.fullAttendeeList.map(a => `[${a}](../${a.replace(/\s/g,'-')})`)
 
     getJoke().then(joke => {
       // console.log(joke)
 
-      const body = `---\nTitle:        diary/${noteEvent.shortfn}\nAuthor:       Joshua Wang\nDate:         ${noteEvent.startDate} - ${noteEvent.endDate}\nComment:      \nTags:         \nAttendees:    ${noteAttendeesLinks.join(', ')}\nInvite Notes: ${noteEvent.shortNotes}\nTeams URL:    ${teamsUrlLink}\nOneNote URL:  ${oneNoteUrlLink}\nConfluence URL: ${confluenceUrlLink}\nWords of Wisdom: ${joke}\n---\n\n`
-      // console.log(body)
+      var body = `---\nTitle:        diary/${noteEvent.shortfn}\nAuthor:       Joshua Wang\nDate:         ${noteEvent.startDate} - ${noteEvent.endDate}\nComment:      \nTags:         \nSnippet:   \nAttendees:    ${noteAttendeesLinks.join(', ')}\nInvite: ${noteEvent.shortNotes}\nVideoconference:    \n`
+      for (const videoconferenceUrl of noteEvent.videoconferenceUrls) {
+        const parsedUrl = new URL(videoconferenceUrl)
+        const host = parsedUrl.host
+        body += `    - [${host}](${videoconferenceUrl})\n`
+      }
+      body += `Resources:\n`
+      for (const referenceUrl of noteEvent.referenceUrls) {
+        const parsedUrl = new URL(referenceUrl)
+        const pathParts = parsedUrl.pathname.split('/')
+        const lastPath = pathParts[pathParts.length - 1]
+
+        const queryParams = parsedUrl.searchParams
+
+        if (parsedUrl.host.startsWith("komodo") && queryParams.get('Record').length > 0) { // gecko
+          body += `    - [g${queryParams.get('Record')}](${referenceUrl})\n`
+        } else if (lastPath.includes("viewpage.action") && queryParams.get('pageId')) { // some confluence links
+          body += `    - [${queryParams.get('pageId')}](${referenceUrl})\n`
+        } else {
+          body += `    - [${lastPath}](${referenceUrl})\n`
+        }
+      }
+      body += `Wisdom: ${joke}\n---\n\n`
       fs.stat(noteEvent.diaryFilename, (err, stat) => {
         if (err == null) {
           console.log(`${noteEvent.diaryFilename} exists, not recreating`)
@@ -132,10 +152,19 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
   })
 
   // map into Alfred JSON object
-  const newNonDiary = { uid: 'new', title: 'Create new note', type: 'default', subtitle: 'Create a new non-diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'new', noteFilename: `~/Documents/notes/default/` } }
-  const newDiary = { uid: 'new', title: 'Create new diary note', type: 'default', subtitle: 'Create a new diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'newDiary', noteFilename: `~/Documents/notes/default/diary/${daystr}_` } }
-  const generateDaysNotes = { uid: 'generateToday', title: 'Generate today\'s notes', type: 'default', subtitle: 'Generate placeholders for today\'s meetings', arg: '', icon: { type: 'fileicon', path: '~/sandbox/dotfiles/vim/vimwiki-helpers/getCalendarEvents.js' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'genToday', noteFilename: '' } }
-  const cleanupOldNotes = { uid: 'cleanup', title: 'Cleanup', type: 'default', subtitle: 'Cleanup old and empty notes', arg: '', icon: { type: 'fileicon', path: '~/sandbox/dotfiles/vim/vimwiki-helpers/cleanOldNotes.sh' }, variables: { teamsUrl: '', oneNoteUrl: '', noteType: 'cleanup', noteFilename: '' } }
+  const newNonDiary = { uid: 'new', title: 'Create new note', type: 'default', subtitle: 'Create a new non-diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'new', noteFilename: `~/Documents/notes/default/`, lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
+
+  const today = new Date()
+
+  const month = `${today.getMonth()}`.padStart(2,'0')
+  const day = `${today.getDate()}`.padStart(2,'0')
+  const hour = `${today.getHours()}`.padStart(2,'0')
+  const min = `${today.getMinutes()}`.padStart(2,'0')
+  const daystr = `${today.getFullYear()}-${month}-${day}-${hour}${min}`
+
+  const newDiary = { uid: 'new', title: 'Create new diary note', type: 'default', subtitle: 'Create a new diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'newDiary', noteFilename: `~/Documents/notes/default/diary/${daystr}-`, lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
+  const generateDaysNotes = { uid: 'generateToday', title: 'Generate today\'s notes', type: 'default', subtitle: 'Generate placeholders for today\'s meetings', arg: '', icon: { type: 'fileicon', path: '~/.config/nvim/getCalendarEvents.js' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'genToday', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
+  const cleanupOldNotes = { uid: 'cleanup', title: 'Cleanup', type: 'default', subtitle: 'Cleanup old and empty notes', arg: '', icon: { type: 'fileicon', path: '~/.config/fish/functions/cleanOldNotes.fish' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'cleanup', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
 
   eventsAndFileNames.push(newNonDiary)
   eventsAndFileNames.push(newDiary)
@@ -150,7 +179,6 @@ exec('~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
       console.log(`Wrote alfred script filter to ${os.homedir}/Documents/notes/default/diary/alfred.json`)
     }
   })
-
 
   exec('fish -c "generateDiaryIndex"', (error, stdout, stderr) => {
     if (error) {

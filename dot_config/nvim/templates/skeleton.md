@@ -6,9 +6,8 @@ Comment:
 Tags:  
 Snippet:      
 Attendees:
-Invite Notes:
-Teams URL: 
-OneNote URL: 
-Confluence URL:
-Words of Wisdom: 
+Invite:
+Videoconference:
+Resources:
+Wisdom:
 ---
