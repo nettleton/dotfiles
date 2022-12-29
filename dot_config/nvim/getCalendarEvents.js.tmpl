@@ -87,7 +87,7 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
     nEvent.type = 'file'
     nEvent.subtitle = filename
     nEvent.arg = filename
-    nEvent.icon = { path: 'calendar.png' }
+    nEvent.icon = { type: 'fileicon', path: '/System/Applications/Calendar.app' }
 
     const protocolConvertedVideoUrls = nEvent.videoconferenceUrls.map(vcUrl => {
       // can't use URL because https is a 'Special' protocol according to the WHATWG URL Standard
@@ -163,8 +163,8 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
   const daystr = `${today.getFullYear()}-${month}-${day}-${hour}${min}`
 
   const newDiary = { uid: 'new', title: 'Create new diary note', type: 'default', subtitle: 'Create a new diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'newDiary', noteFilename: `~/Documents/notes/default/diary/${daystr}-`, lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
-  const generateDaysNotes = { uid: 'generateToday', title: 'Generate today\'s notes', type: 'default', subtitle: 'Generate placeholders for today\'s meetings', arg: '', icon: { type: 'fileicon', path: '~/.config/nvim/getCalendarEvents.js' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'genToday', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
-  const cleanupOldNotes = { uid: 'cleanup', title: 'Cleanup', type: 'default', subtitle: 'Cleanup old and empty notes', arg: '', icon: { type: 'fileicon', path: '~/.config/fish/functions/cleanOldNotes.fish' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'cleanup', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
+  const generateDaysNotes = { uid: 'generateToday', title: 'Generate today\'s notes', type: 'default', subtitle: 'Generate placeholders for today\'s meetings', arg: '', icon: { type: 'fileicon', path: '/Applications/Kitty.app' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'genToday', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
+  const cleanupOldNotes = { uid: 'cleanup', title: 'Cleanup', type: 'default', subtitle: 'Cleanup old and empty notes', arg: '', icon: { type: 'fileicon', path: '/Applications/Kitty.app' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'cleanup', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
 
   eventsAndFileNames.push(newNonDiary)
   eventsAndFileNames.push(newDiary)
