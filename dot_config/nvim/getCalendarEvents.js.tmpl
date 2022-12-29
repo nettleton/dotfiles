@@ -15,16 +15,22 @@ const endDate = args.length > 1 ? args[1] : iso1D
 console.log(`Getting calendar events for duration ${startDate} - ${endDate}`)
 
 const lightsOnByDefault = os.hostname() === "starship"
-const alfredScriptFilterMods = {
-  cmd: {
-    subtitle: "Note Only",
-    variables: {lightsOn: false, joinVideo: false}
-  },
-  alt: {
-    subtitle: lightsOnByDefault ? "Note & Video Only" : "Force Lights On",
-    variables: {lightsOn: !lightsOnByDefault, joinVideo: true}
+
+function alfredScriptFilterMods(vars) {
+
+  var mods = {
+    cmd: {
+      subtitle: "Note Only",
+      variables: {lightsOn: false, joinVideo: false, noteType: vars.noteType, videoconferenceUrls: vars.videoconferenceUrls, referenceUrls: vars.referenceUrls, noteFilename: vars.noteFilename}
+    },
+    alt: {
+      subtitle: lightsOnByDefault ? "Note & Video Only" : "Force Lights On",
+      variables: {lightsOn: !lightsOnByDefault, joinVideo: true, noteType: vars.noteType, videoconferenceUrls: vars.videoconferenceUrls, referenceUrls: vars.referenceUrls, noteFilename: vars.noteFilename}
+    }
   }
+  return mods
 }
+
 
 async function getJoke () {
   const url = 'https://icanhazdadjoke.com'
@@ -96,8 +102,8 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
       }
       return vcUrl
     })
-    nEvent.variables = { videoconferenceUrls: protocolConvertedVideoUrls, referenceUrls: nEvent.referenceUrls, noteType: 'existing', noteFilename: filename, lightsOn: lightsOnByDefault, joinVideo: true }
-    nEvent.mods = alfredScriptFilterMods
+    nEvent.variables = { videoconferenceUrls: protocolConvertedVideoUrls.join("!"), referenceUrls: nEvent.referenceUrls.join("!"), noteType: 'existing', noteFilename: filename, lightsOn: lightsOnByDefault, joinVideo: true }
+    nEvent.mods = alfredScriptFilterMods(nEvent.variables)
 
     nEvent.match = shortfn.replace(/[^a-z0-9]/gi, ' ')
     return nEvent
@@ -107,8 +113,6 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
     const noteAttendeesLinks = noteEvent.fullAttendeeList.map(a => `[${a}](../${a.replace(/\s/g,'-')})`)
 
     getJoke().then(joke => {
-      // console.log(joke)
-
       var body = `---\nTitle:        diary/${noteEvent.shortfn}\nAuthor:       Joshua Wang\nDate:         ${noteEvent.startDate} - ${noteEvent.endDate}\nComment:      \nTags:         \nSnippet:   \nAttendees:    ${noteAttendeesLinks.join(', ')}\nInvite: ${noteEvent.shortNotes}\nVideoconference:    \n`
       for (const videoconferenceUrl of noteEvent.videoconferenceUrls) {
         const parsedUrl = new URL(videoconferenceUrl)
@@ -123,10 +127,12 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
 
         const queryParams = parsedUrl.searchParams
 
-        if (parsedUrl.host.startsWith("komodo") && queryParams.get('Record').length > 0) { // gecko
+        if (parsedUrl.host.startsWith("komodo") && queryParams.get('Record')) { // gecko
           body += `    - [g${queryParams.get('Record')}](${referenceUrl})\n`
         } else if (lastPath.includes("viewpage.action") && queryParams.get('pageId')) { // some confluence links
           body += `    - [${queryParams.get('pageId')}](${referenceUrl})\n`
+        } else if (!lastPath) {
+          body += `    - [${parsedUrl.host}](${referenceUrl})\n`
         } else {
           body += `    - [${lastPath}](${referenceUrl})\n`
         }
@@ -152,7 +158,8 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
   })
 
   // map into Alfred JSON object
-  const newNonDiary = { uid: 'new', title: 'Create new note', type: 'default', subtitle: 'Create a new non-diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'new', noteFilename: `~/Documents/notes/default/`, lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
+  var newNonDiary = { uid: 'new', title: 'Create new note', type: 'default', subtitle: 'Create a new non-diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'new', noteFilename: `~/Documents/notes/default/`, lightsOn: lightsOnByDefault, joinVideo: true }}
+  newNonDiary.mods = alfredScriptFilterMods(newNonDiary.variables)
 
   const today = new Date()
 
@@ -162,9 +169,12 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
   const min = `${today.getMinutes()}`.padStart(2,'0')
   const daystr = `${today.getFullYear()}-${month}-${day}-${hour}${min}`
 
-  const newDiary = { uid: 'new', title: 'Create new diary note', type: 'default', subtitle: 'Create a new diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'newDiary', noteFilename: `~/Documents/notes/default/diary/${daystr}-`, lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
-  const generateDaysNotes = { uid: 'generateToday', title: 'Generate today\'s notes', type: 'default', subtitle: 'Generate placeholders for today\'s meetings', arg: '', icon: { type: 'fileicon', path: '/Applications/Kitty.app' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'genToday', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
-  const cleanupOldNotes = { uid: 'cleanup', title: 'Cleanup', type: 'default', subtitle: 'Cleanup old and empty notes', arg: '', icon: { type: 'fileicon', path: '/Applications/Kitty.app' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'cleanup', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }, mods: alfredScriptFilterMods }
+  var newDiary = { uid: 'new', title: 'Create new diary note', type: 'default', subtitle: 'Create a new diary note', arg: '', icon: { type: 'fileicon', path: '~/Documents/notes/default/index.md' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'newDiary', noteFilename: `~/Documents/notes/default/diary/${daystr}-`, lightsOn: lightsOnByDefault, joinVideo: true }}
+  newDiary.mods = alfredScriptFilterMods(newDiary.variables)
+  var generateDaysNotes = { uid: 'generateToday', title: 'Generate today\'s notes', type: 'default', subtitle: 'Generate placeholders for today\'s meetings', arg: '', icon: { type: 'fileicon', path: '/Applications/Kitty.app' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'genToday', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }}
+  generateDaysNotes.mods = alfredScriptFilterMods(generateDaysNotes.variables)
+  var cleanupOldNotes = { uid: 'cleanup', title: 'Cleanup', type: 'default', subtitle: 'Cleanup old and empty notes', arg: '', icon: { type: 'fileicon', path: '/Applications/Kitty.app' }, variables: { videoconferenceUrls: [], referenceUrls: [], noteType: 'cleanup', noteFilename: '', lightsOn: lightsOnByDefault, joinVideo: true }}
+  cleanupOldNotes.mods = alfredScriptFilterMods(cleanupOldNotes.variables)
 
   eventsAndFileNames.push(newNonDiary)
   eventsAndFileNames.push(newDiary)
