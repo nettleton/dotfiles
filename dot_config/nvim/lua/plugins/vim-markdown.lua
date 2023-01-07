@@ -28,3 +28,18 @@ vim.api.nvim_create_autocmd({"FileType"}, {
   pattern = {"markdown"},
   command = "lua vim.opt.conceallevel = 2",
 })
+
+-- Extract reminders from markdown files
+vim.api.nvim_create_user_command("ExtractReminders", function()
+  local filenameExpanded = vim.fn.expand('%:p')
+  if string.find(filenameExpanded, "notes") then
+    vim.fn.system("extractReminders \"" .. filenameExpanded .. "\"")
+    vim.api.nvim_command("checktime")
+  end
+end, { nargs = 0 })
+
+-- Map ExtractReminders to file write events
+vim.api.nvim_create_autocmd({"BufWritePost"}, {
+  pattern = {"*.md"},
+  command = "lua vim.api.nvim_command('ExtractReminders')"
+})
