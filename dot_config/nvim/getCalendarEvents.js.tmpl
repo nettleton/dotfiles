@@ -84,7 +84,7 @@ exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses can
 
   const eventsAndFileNames = events.map(nEvent => {
     const startTimeHM = nEvent.startDate.split(':').slice(0, 2).join('').split(' ').join('-')
-    const shortfn = `${startTimeHM}-${nEvent.title.replace(/\s|#/g, '-').replace(/\//g, '-').replace(/"/g, '').replace(/:/g, '-').replace(/\(|\)/g, '')}`
+    const shortfn = `${startTimeHM}-${nEvent.title.replace(/\s|#/g, '-').replace(/\//g, '-').replace(/"/g, '').replace(/:/g, '-').replace(/\(|\)/g, '').replace(/--+/g,'-')}`
     nEvent.shortfn = shortfn
     const filename = `~/Documents/notes/default/diary/${shortfn}.md`
     nEvent.diaryFilename = filename
