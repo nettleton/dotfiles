@@ -1,0 +1,14 @@
+{
+  "todo": {
+    "prefix": "@todo",
+    "body": [
+      "@todo ${1:title} ${0}"
+    ]
+  },
+  "todo with duedate": {
+    "prefix": "@todod",
+    "body": [
+      "@todo ${1:title} @due(${2:duedate}) ${0}"
+    ]
+  }
+}

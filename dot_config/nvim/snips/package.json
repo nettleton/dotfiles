@@ -5,6 +5,10 @@
       {
         "language": [ "all" ],
         "path": "./extracted-from-notes.json"
+      },
+      {
+        "language": [ "all" ],
+        "path": "./global.json"
       }
     ]
   }
