@@ -58,24 +58,28 @@ return packer.startup(function(use)
       }
   use { 'gaoDean/autolist.nvim',
         after = { 'vim-markdown', 'nvim-autopairs' },
+        commit = "aaadfa9a0d4de1c7628eb3cb7ee811dc94872ef8",
         config = function()
           local autolist = require("autolist")
-          autolist.setup()
-          autolist.create_mapping_hook("i", "<CR>", autolist.new)
-          autolist.create_mapping_hook("i", "<Tab>", autolist.indent)
-          autolist.create_mapping_hook("i", "<S-Tab>", autolist.indent, "<C-D>")
-          autolist.create_mapping_hook("n", "o", autolist.new)
-          autolist.create_mapping_hook("n", "O", autolist.new_before)
-          autolist.create_mapping_hook("n", ">>", autolist.indent)
-          autolist.create_mapping_hook("n", "<<", autolist.indent)
-          autolist.create_mapping_hook("n", "<C-r>", autolist.force_recalculate)
-          autolist.create_mapping_hook("n", "<leader>x", autolist.invert_entry, "")
-          vim.api.nvim_create_autocmd("TextChanged", {
-            pattern = "*",
-            callback = function()
-              vim.cmd.normal({autolist.force_recalculate(nil, nil), bang = false})
-            end
-          })
+          autolist.setup({})
+          -- below is for newer versions of autolist
+          --   pinned to older commit because newer ones with these mapping hooks introduced
+          --   lots of highlighting noise and erratic insert mode behavior, like <Tab> not working
+          -- autolist.create_mapping_hook("i", "<CR>", autolist.new)
+          -- autolist.create_mapping_hook("i", "<Tab>", autolist.indent)
+          -- autolist.create_mapping_hook("i", "<S-Tab>", autolist.indent, "<C-D>")
+          -- autolist.create_mapping_hook("n", "o", autolist.new)
+          -- autolist.create_mapping_hook("n", "O", autolist.new_before)
+          -- autolist.create_mapping_hook("n", ">>", autolist.indent)
+          -- autolist.create_mapping_hook("n", "<<", autolist.indent)
+          -- autolist.create_mapping_hook("n", "<C-r>", autolist.force_recalculate)
+          -- autolist.create_mapping_hook("n", "<leader>x", autolist.invert_entry, "")
+          -- vim.api.nvim_create_autocmd("TextChanged", {
+          --   pattern = "*",
+          --   callback = function()
+          --     vim.cmd.normal({autolist.force_recalculate(nil, nil), bang = false})
+          --   end
+          -- })
         end,
       }
 
