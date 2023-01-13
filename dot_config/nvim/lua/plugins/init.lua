@@ -291,6 +291,11 @@ return packer.startup(function(use)
           require('plugins.which-key')
         end,
       } -- key bindings
+  use { 'AckslD/messages.nvim',
+        config = function()
+          require("messages").setup()
+        end,
+      }
 
   -- strip trailing whitespace from edited lines
   use { 'lewis6991/spaceless.nvim',

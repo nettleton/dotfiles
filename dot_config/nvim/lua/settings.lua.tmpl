@@ -93,6 +93,11 @@ exec([[
 :augroup END
 ]], false)
 
+-- Convenience wrapper around Messages capture
+Msg = function(...)
+  require('messages.api').capture_thing(...)
+end
+
 -- REFERENCES
 -- https://github.com/ayoisaiah/dotfiles/blob/master/private_dot_config/nvim/lua/settings.lua
 -- https://github.com/airblade/vim-gitgutter#when-are-the-signs-updated
