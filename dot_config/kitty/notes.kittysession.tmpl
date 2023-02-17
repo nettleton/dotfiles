@@ -1,7 +1,7 @@
 layout vertical
 {{ if (not (contains "nessie" .chezmoi.hostname)) -}}
 new_tab notes
-launch --title notes fish -c "vim ~/Documents/notes/default/diary/diary.md"
+launch --title notes fish -c "nvim --listen /tmp/notes_spacevim_nvim_server ~/Documents/notes/default/diary/diary.md"
 {{ if (contains .work.user .chezmoi.hostname) -}}
 os_window_size 35c 143c
 {{- else -}}
@@ -12,7 +12,7 @@ launch --title notes_terminal fish
 resize_window shorter 20
 {{ end -}}
 new_tab scratch
-launch --title scratch fish -c "nvr -s --servername /tmp/scratch_editor"
+launch --title scratch fish -c "nvim --listen /tmp/scratch_editor"
 {{ if (not (contains (printf "-%s-" .work.user) .chezmoi.hostname)) -}}
 launch --title scratch_terminal fish
 resize_window shorter 20
