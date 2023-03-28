@@ -50,7 +50,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "sumneko_lua", "jsonls", "bashls", "dockerls", "gopls", "golangci_lint_ls", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
+  ensure_installed = { "lua_ls", "jsonls", "bashls", "dockerls", "gopls", "golangci_lint_ls", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
   automatic_installation = true,
 })
 
@@ -119,7 +119,7 @@ lspconfig.tsserver.setup {
 }
 
 -- Lua
-lspconfig.sumneko_lua.setup {
+lspconfig.lua_ls.setup {
   on_attach = lsp_handlers.on_attach,
   settings = {
     Lua = {
