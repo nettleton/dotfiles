@@ -50,7 +50,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "lua_ls", "jsonls", "bashls", "dockerls", "gopls", "golangci_lint_ls", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
+  ensure_installed = { "lua_ls", "jsonls", "bashls", "dockerls", "gopls", "golangci_lint_ls", "tsserver", "marksman", "lemminx", "yamlls", "html", "sqlls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
   automatic_installation = true,
 })
 
@@ -176,7 +176,7 @@ lspconfig.yamlls.setup {
 }
 
 -- SQL
-lspconfig.sqls.setup {
+lspconfig.sqlls.setup {
   on_attach = lsp_handlers.on_attach
 }
 
