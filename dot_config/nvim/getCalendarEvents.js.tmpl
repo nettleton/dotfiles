@@ -51,7 +51,7 @@ async function getJoke () {
 }
 
 // exec(`/usr/local/bin/icalBuddy -ic "Calendar" -ea -npn -stda -ss "##EVENT_DELIMITER##" -b "" -po "title,datetime,attendees,notes" -iep "title,datetime,attendees,notes" -df "%Y-%m-%d" -tf "%H:%M:%S" -ps "|!!PROP_SEPARATOR!!|" -nnr "##NEWLINE##" eventsFrom:"${daystr} 00:00:00 -0500" to:"${daystr} 23:59:59 -0500"`, { shell: '/bin/bash' }, (error, stdout, stderr) => {
-exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses canceled -nrd -df "YYYY-MM-dd" -tf "HH:mm" -ea -fj -ic "Calendar" --referenceUrlExcludedPaths ".one,Using a Microsoft Teams Room.aspx" --excludeTitles "OOO,^(?:CNCF |ET |Observability )?work[ ]*\$,CNCF End User,Commute,SGD update,Backlog grooming,Sprint planning,scrum,CR 1-on-1,Online Learning Architecture Meeting,OPDRx,Dashboard review,RTM,golf,busy,^Placeholder*,D&A Core" eventsFrom ${startDate} ${endDate}`, (error, stdout, stderr) => {
+exec(`~/sandbox/swiftCalBuddy/.build/release/swiftCalBuddy --excludeStatuses canceled -nrd -df "YYYY-MM-dd" -tf "HH:mm" -ea -fj -ic "Calendar" --referenceUrlExcludedPaths ".one,Using a Microsoft Teams Room.aspx" --excludeTitles "OOO,^(?:CNCF |ET |Observability )?work[ ]*\$,CNCF End User,Commute,SGD update,Backlog grooming,Sprint planning,OPDRx,Dashboard review,RTM,golf,busy,^Placeholder*" eventsFrom ${startDate} ${endDate}`, (error, stdout, stderr) => {
   if (error) {
     console.error(`stderr: ${stderr}`)
     console.error(`exec error: ${error}`)
