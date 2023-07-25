@@ -34,8 +34,9 @@ if test (podman machine list --noheading | wc -l) -eq 1
   echo "podman machine installed; not reinstalling"
 else
   podman machine init
-  podman machine start
 end
+
+sudo podman-mac-helper install
 
 defaults write com.ameba.SwiftBar StealthMode -bool NO
 defaults write com.ameba.SwiftBar DisableBashWrapper -bool NO
