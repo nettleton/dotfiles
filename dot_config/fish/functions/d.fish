@@ -6,6 +6,8 @@ function d
       podman rmi (podman images | grep "^<none>" | tr -s " " | cut -d' ' -f3)
     case psa
       podman ps -a
+    case compose
+      podman-compose $argv[2..]
     case '*'
       podman $argv
   end
