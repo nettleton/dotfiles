@@ -7,7 +7,7 @@ function d
     case psa
       podman ps -a
     case compose
-      podman-compose $argv[2..]
+      docker compose $argv[2..]
     case '*'
       podman $argv
   end

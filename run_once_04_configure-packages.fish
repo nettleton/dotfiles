@@ -25,7 +25,7 @@ set pipbin "$HOME/.local/bin"
 mkdir -p "$pipbin"
 echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_paths "$pipbin"
 
-pip3 install --user --upgrade neovim pynvim podman-compose
+pip3 install --user --upgrade neovim pynvim
 
 set sysPy3bin "$HOME/Library/Python/3.9/bin"
 echo $fish_user_paths | grep -q "$sysPy3bin"; or set -U fish_user_paths $fish_user_paths "$sysPy3bin"
@@ -33,10 +33,16 @@ echo $fish_user_paths | grep -q "$sysPy3bin"; or set -U fish_user_paths $fish_us
 if test (podman machine list --noheading | wc -l) -eq 1
   echo "podman machine installed; not reinstalling"
 else
-  podman machine init
+  podman machine init --cpus 6 --disk-size 3072 --memory 8192
 end
 
 sudo podman-mac-helper install
+
+# symlink docker-compose as docker plugin - podman-compose isn't feature for feature compatible
+#    example: https://github.com/containers/podman-compose/issues/610
+mkdir -p "$HOME/.docker/cli-plugins"
+set HOMEBREW_PREFIX (brew --prefix)
+ln -sfn "$HOMEBREW_PREFIX/opt/docker-compose/bin/docker-compose" "$HOME/.docker/cli-plugins/docker-compose"
 
 defaults write com.ameba.SwiftBar StealthMode -bool NO
 defaults write com.ameba.SwiftBar DisableBashWrapper -bool NO
