@@ -35,6 +35,9 @@ sudo nvram SystemAudioVolume=" "
 # Disable transparency in the menu bar and elsewhere on Yosemite
 # defaults write com.apple.universalaccess reduceTransparency -bool true
 
+# Disable "Click wallpaper to reveal desktop"
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
 # Dark mode
 # https://www.simonewebdesign.it/how-to-enable-dark-mode-macos-command-line/
 osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to true'
