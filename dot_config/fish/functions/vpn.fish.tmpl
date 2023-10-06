@@ -32,7 +32,7 @@ function vpn
         end
         echo "sudo successful, starting connect"
 
-        op item get {{ .work.companyname }} --fields password | sudo openconnect --user (op item get {{ .work.companyname }} --field username) --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --passwd-on-stdin "$VPN_HOST"
+        op item get {{ .work.companyname }} --fields password | sudo openconnect --user (op item get {{ .work.companyname }} --field username) --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --token-mode totp --token-secret sha1:base32:(op item get {{ .work.companyname }} --fields OTP | pcregrep -o1 'secret=(.*)&issuer') --passwd-on-stdin "$VPN_HOST"
       else
         echo "already connected, disconnect first"
       end
