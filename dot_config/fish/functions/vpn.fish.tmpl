@@ -25,10 +25,10 @@ function vpn
         echo "openconnect requires sudo access to connect, prompting now..."
         if ioreg -r -k AppleClamshellState -d 4 | grep AppleClamshellState | head -1 | grep -iq "No"
           echo "Clamshell state is open, should prompt for biometric"
-          sudo -v
+          /usr/bin/sudo -v
         else
           echo "Clamshell state is closed, using password manager"
-          op item get "{{ .op.sudoItem }}" --fields password | sudo -S -v
+          op item get "{{ .op.sudoItem }}" --fields password | /usr/bin/sudo -S -v
         end
         echo "sudo successful, starting connect"
 
