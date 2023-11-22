@@ -11,20 +11,35 @@ go install github.com/rhysd/vim-startuptime@latest
 
 vale sync
 
-npm outdated -g neovim; or npm install -g neovim
+for npmPkg in npm neovim yo generator-op-sdk
+  echo "checking $npmPkg"
+  if not npm list -g "$npmPkg" > /dev/null
+    echo "  $npmPkg not installed, installing"
+    npm install -g "$npmPkg"
+  else
+    if not npm outdated -g "$npmPkg" > /dev/null
+      echo "  $npmPkg outdated, upgrading"
+      npm install -g "$npmPkg"
+    end
+  end
+  echo "  $npmPkg up-to-date"
+end
 
 set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1 | string trim)
-pyenv install "$pylatest"
-pyenv global "$pylatest"
+if not test -d "$HOME/.pyenv/versions/$pylatest"
+  pyenv install "$pylatest"
+  pyenv global "$pylatest"
 
-set -Ux PYENV_ROOT $HOME/.pyenv
-set -Ux PYENV_VERSION "$pylatest"
-echo $fish_user_paths | grep -q "$PYENV_ROOT/bin"; or set -U fish_user_paths $fish_user_paths "$PYENV_ROOT/bin"
+  set -Ux PYENV_ROOT $HOME/.pyenv
+  set -Ux PYENV_VERSION "$pylatest"
+  echo $fish_user_paths | grep -q "$PYENV_ROOT/bin"; or set -U fish_user_paths $fish_user_paths "$PYENV_ROOT/bin"
+end
 
 set pipbin "$HOME/.local/bin"
 mkdir -p "$pipbin"
 echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_paths "$pipbin"
 
+pip install --upgrade pip
 pip3 install --user --upgrade neovim pynvim
 
 set sysPy3bin "$HOME/Library/Python/3.9/bin"
@@ -36,6 +51,9 @@ else
   podman machine init --cpus 6 --disk-size 3072 --memory 8192
 end
 
+echo "elevating to sudo to check podman-mac-helper"
+op item get "{{ .op.sudoItem }}" --fields password | /usr/bin/sudo -S -v
+echo "sudo check complete"
 sudo podman-mac-helper install
 
 # symlink docker-compose as docker plugin - podman-compose isn't feature for feature compatible
@@ -52,7 +70,7 @@ defaults write com.ameba.SwiftBar Terminal -string "iTerm"
 defaults write com.ameba.SwiftBar PluginDirectory -string "$HOME/.config/swiftbar"
 defaults write com.ameba.SwiftBar Shell -string "zsh"
 
-gh auth login
+gh auth status > /dev/null; or gh auth login
 
 echo "execute 'loaddb' in a new shell"
 echo "execute ':GoInstallBinaries in nvim"

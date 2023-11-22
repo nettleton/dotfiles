@@ -1,0 +1,7 @@
+# scoped dependency overrides
+@types:registry=https://registry.npmjs.org
+@webassemblyjs:registry=https://registry.npmjs.org
+@babel:registry=https://registry.npmjs.org
+@xtuc:registry=https://registry.npmjs.org
+
+registry=http://mw-npm-repository/artifactory/api/npm/npm-repos
