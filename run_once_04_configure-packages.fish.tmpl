@@ -11,7 +11,7 @@ go install github.com/rhysd/vim-startuptime@latest
 
 vale sync
 
-for npmPkg in npm neovim yo generator-op-sdk
+for npmPkg in npm neovim yo@^4 generator-op-sdk
   echo "checking $npmPkg"
   if not npm list -g "$npmPkg" > /dev/null
     echo "  $npmPkg not installed, installing"
