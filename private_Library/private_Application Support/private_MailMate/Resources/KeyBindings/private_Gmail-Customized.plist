@@ -40,7 +40,7 @@
 
   // Quick responses
   "q" =  {
-    "t" = ( "replyAll:", "insertFormatString:", "Thanks!", "showSignatures:");
+    "t" = ( "replyAll:", "insertFormatString:", "Thanks!", "selectSignatureWithUUID:", "52D01B6E-A42E-4E88-912D-B219A1717A62", "sendAndArchiveParent:");
   };
 
 	// Combo keys

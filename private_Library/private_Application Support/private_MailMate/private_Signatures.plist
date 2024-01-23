@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>signatures</key>
+	<array>
+		<dict>
+			<key>html</key>
+			<string></string>
+			<key>htmlEnabled</key>
+			<false/>
+			<key>name</key>
+			<string>Default</string>
+			<key>string</key>
+			<string>Thanks,
+Josh
+</string>
+			<key>uuid</key>
+			<string>E8AFBA11-8658-4357-8C80-A489F72A2121</string>
+		</dict>
+		<dict>
+			<key>html</key>
+			<string></string>
+			<key>htmlEnabled</key>
+			<false/>
+			<key>name</key>
+			<string>Empty</string>
+			<key>string</key>
+			<string></string>
+			<key>uuid</key>
+			<string>52D01B6E-A42E-4E88-912D-B219A1717A62</string>
+		</dict>
+	</array>
+</dict>
+</plist>
