@@ -27,7 +27,9 @@ set -g -x MATLAB_JAVA "$JAVA_1_8_HOME/jre"
 
 # GO
 set -x GOROOT (go env GOROOT)
+{{- if (not (eq .targetname "nessie")) }}
 set -x GOPROXY http://iat-go-proxy-prod-01.{{ .work.domain }}:7000/go-proxy
+{{- end }}
 set -x GOPRIVATE golang.dhcp,github.{{ .work.domain }}
 set -x GONOPROXY github.{{ .work.domain }}
 set -x MW_USE_LOCAL_GO true
