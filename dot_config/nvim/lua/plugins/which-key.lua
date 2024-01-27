@@ -149,7 +149,7 @@ which_key.register({
 which_key.register({
   v = {
     name = "View",
-    s = { ':SymbolsOutline<CR>', "Toggle Symbols Outline" }
+    s = { '<cmd>AerialToggle!<CR>', "Toggle Aerial" }
   }
 }, { prefix = "<leader>", noremap = true, silent = true})
 

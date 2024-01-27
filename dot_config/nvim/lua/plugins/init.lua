@@ -28,31 +28,39 @@ require("lazy").setup({
         end,
     },
     { 'gaoDean/autolist.nvim',
-        -- after = { 'vim-markdown', 'nvim-autopairs' },
-        commit = "aaadfa9a0d4de1c7628eb3cb7ee811dc94872ef8",
-        config = function()
-          local autolist = require("autolist")
-          autolist.setup({})
-          -- below is for newer versions of autolist
-          --   pinned to older commit because newer ones with these mapping hooks introduced
-          --   lots of highlighting noise and erratic insert mode behavior, like <Tab> not working
-          -- autolist.create_mapping_hook("i", "<CR>", autolist.new)
-          -- autolist.create_mapping_hook("i", "<Tab>", autolist.indent)
-          -- autolist.create_mapping_hook("i", "<S-Tab>", autolist.indent, "<C-D>")
-          -- autolist.create_mapping_hook("n", "o", autolist.new)
-          -- autolist.create_mapping_hook("n", "O", autolist.new_before)
-          -- autolist.create_mapping_hook("n", ">>", autolist.indent)
-          -- autolist.create_mapping_hook("n", "<<", autolist.indent)
-          -- autolist.create_mapping_hook("n", "<C-r>", autolist.force_recalculate)
-          -- autolist.create_mapping_hook("n", "<leader>x", autolist.invert_entry, "")
-          -- vim.api.nvim_create_autocmd("TextChanged", {
-          --   pattern = "*",
-          --   callback = function()
-          --     vim.cmd.normal({autolist.force_recalculate(nil, nil), bang = false})
-          --   end
-          -- })
-        end,
+      ft = {
+        "markdown",
+        "text",
+        "tex",
+        "plaintex",
+        "norg",
       },
+      config = function()
+        require("autolist").setup()
+        vim.keymap.set("i", "<tab>", "<cmd>AutolistTab<cr>")
+        vim.keymap.set("i", "<s-tab>", "<cmd>AutolistShiftTab<cr>")
+        -- vim.keymap.set("i", "<c-t>", "<c-t><cmd>AutolistRecalculate<cr>") -- an example of using <c-t> to indent
+        vim.keymap.set("i", "<CR>", "<CR><cmd>AutolistNewBullet<cr>")
+        vim.keymap.set("n", "o", "o<cmd>AutolistNewBullet<cr>")
+        vim.keymap.set("n", "O", "O<cmd>AutolistNewBulletBefore<cr>")
+        vim.keymap.set("n", "<CR>", "<cmd>AutolistToggleCheckbox<cr><CR>")
+        vim.keymap.set("n", "<C-r>", "<cmd>AutolistRecalculate<cr>")
+
+        -- cycle list types with dot-repeat
+        vim.keymap.set("n", "<leader>cn", require("autolist").cycle_next_dr, { expr = true })
+        vim.keymap.set("n", "<leader>cp", require("autolist").cycle_prev_dr, { expr = true })
+
+        -- if you don't want dot-repeat
+        -- vim.keymap.set("n", "<leader>cn", "<cmd>AutolistCycleNext<cr>")
+        -- vim.keymap.set("n", "<leader>cp", "<cmd>AutolistCycleNext<cr>")
+
+        -- functions to recalculate list on edit
+        vim.keymap.set("n", ">>", ">><cmd>AutolistRecalculate<cr>")
+        vim.keymap.set("n", "<<", "<<<cmd>AutolistRecalculate<cr>")
+        vim.keymap.set("n", "dd", "dd<cmd>AutolistRecalculate<cr>")
+        vim.keymap.set("v", "d", "d<cmd>AutolistRecalculate<cr>")
+      end,
+    },
 
   -- Telescope
     { 'nvim-telescope/telescope.nvim',
@@ -91,7 +99,13 @@ require("lazy").setup({
         end,
     },
     { "benfowler/telescope-luasnip.nvim" },
-    { 'nvim-telescope/telescope-file-browser.nvim' },
+    { "nvim-telescope/telescope-file-browser.nvim",
+      dependencies = {
+        "nvim-telescope/telescope.nvim",
+        "nvim-lua/plenary.nvim",
+        "nvim-tree/nvim-web-devicons"
+      }
+    },
     { 'LukasPietzschmann/telescope-tabs',
       dependencies = { 'nvim-telescope/telescope.nvim' },
       config = function()
@@ -116,22 +130,31 @@ require("lazy").setup({
 
   -- Golang
     { 'ray-x/go.nvim',
-        config = function()
-          require('go').setup({
-            gofmt = 'gofmt',
-            max_line_len = 999,
-          })
-          -- Run gofmt + goimport on save
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            pattern = "*.go",
-            callback = function()
-             require('go.format').goimport()
-            end,
-            group = format_sync_grp,
-          })
-        end,
+      dependencies = {
+        "ray-x/guihua.lua",
+        "neovim/nvim-lspconfig",
+        "nvim-treesitter/nvim-treesitter"
       },
-    {'ray-x/guihua.lua', build = 'cd lua/fzy && make'},
+      config = function()
+        require('go').setup({
+          gofmt = 'gofmt',
+          max_line_len = 999,
+        })
+        -- Run gofmt + goimport on save
+        local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          pattern = "*.go",
+          callback = function()
+           require('go.format').goimport()
+          end,
+          group = format_sync_grp,
+        })
+      end,
+      event = {"CmdlineEnter"},
+      ft = {"go", "gomod"},
+      build = ':lua require("go.install").update_all_sync()'
+    },
+    { 'ray-x/guihua.lua', build = 'cd lua/fzy && make'},
     { 'leoluz/nvim-dap-go',
       config = function()
         require('dap-go').setup()
@@ -164,12 +187,13 @@ require("lazy").setup({
 
   -- Statusline
     { 'nvim-lualine/lualine.nvim',
-      dependencies = { 'kyazdani42/nvim-web-devicons' },
+      dependencies = { 'nvim-tree/nvim-web-devicons' },
       config = function()
         require('plugins.lualine')
       end,
     },
     { 'akinsho/nvim-bufferline.lua',
+      dependencies = { 'nvim-tree/nvim-web-devicons' },
       config = function()
         require('plugins.nvim-bufferline')
       end,
@@ -178,7 +202,7 @@ require("lazy").setup({
   -- Autocompletion, formatting, linting & intellisense
   -- cmp plugins
     { 'hrsh7th/nvim-cmp',
-      config = function() -- FIXME: "fun(LazyPlugin) instead"
+      config = function()
         require('plugins.cmp')
       end,
     }, -- The completion plugin
@@ -195,6 +219,8 @@ require("lazy").setup({
 
   -- cmp snippets
     { 'L3MON4D3/LuaSnip',
+      version = "v2.*",
+      build = "make install_jsregexp",
       config = function()
         require('luasnip.loaders.from_vscode').lazy_load({paths="~/.config/nvim/snips"})
       end,
@@ -208,9 +234,10 @@ require("lazy").setup({
       dependencies = { 'williamboman/mason.nvim' } },
     { 'neovim/nvim-lspconfig' },
     { 'b0o/schemastore.nvim' },
-    { 'jose-elias-alvarez/null-ls.nvim' },
+    { 'nvimtools/none-ls.nvim',
+      dependencies = { 'nvim-lua/plenary.nvim' } },
     { "folke/trouble.nvim",
-      dependencies = "kyazdani42/nvim-web-devicons",
+      dependencies = { "nvim-tree/nvim-web-devicons" },
       config = function()
         require("trouble").setup {
           -- your configuration comes here
@@ -225,26 +252,32 @@ require("lazy").setup({
       config = function()
         require('plugins.treesitter')
       end,
+      dependencies = {
+        { 'nvim-treesitter/nvim-treesitter-textobjects' },
+      }
     },
-    { 'nvim-treesitter/nvim-treesitter-textobjects' },
-    { 'p00f/nvim-ts-rainbow' },
-    { 'simrat39/symbols-outline.nvim',
-      config = function()
-        require('symbols-outline').setup()
-      end,
+    { 'HiPhish/rainbow-delimiters.nvim' },
+    { 'stevearc/aerial.nvim',
+      opts = {},
+      -- Optional dependencies
+      dependencies = {
+         "nvim-treesitter/nvim-treesitter",
+         "nvim-tree/nvim-web-devicons"
+      },
     },
 
   -- Utilities
     { 'windwp/nvim-autopairs',
-          config = function()
-            require('plugins.nvim-autopairs')
-          end
-        }, -- Insert or delete brackets, parens, quotes in pair.
+      config = function()
+        require('plugins.nvim-autopairs')
+      end
+    }, -- Insert or delete brackets, parens, quotes in pair.
     { 'numtostr/comment.nvim',
-          config = function()
-            require('plugins.comment')
-          end,
-        }, -- Comment stuff out easily
+      config = function()
+        require('plugins.comment')
+      end,
+      lazy = false,
+    }, -- Comment stuff out easily
     { 'miyakogi/conoline.vim',
           config = function()
             require('plugins.conoline')
@@ -259,10 +292,10 @@ require("lazy").setup({
     { 'alker0/chezmoi.vim' }, -- highlighting support for chezmoi templates
 
     { 'folke/which-key.nvim',
-        config = function()
-          require('plugins.which-key')
-        end,
-      }, -- key bindings
+      config = function()
+        require('plugins.which-key')
+      end,
+    }, -- key bindings
     { 'AckslD/messages.nvim',
       config = function()
         require("messages").setup()
@@ -277,7 +310,7 @@ require("lazy").setup({
     },
 
   -- ZK
-    { 'mickael-menu/zk-nvim',
+    { 'zk-org/zk-nvim',
       config = function()
         require('zk').setup()
       end,
