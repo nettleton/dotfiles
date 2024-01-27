@@ -47,7 +47,7 @@ which_key.register({
     g = { '<cmd>lua require("telescope.builtin").live_grep()<CR>', "Grep" },
     h = "History",
     l = { '<cmd>lua require("telescope").extensions.luasnip.luasnip{}<CR>', "Snippets" },
-    p = { '<cmd>:Telescope packer<CR>', "Packer" },
+    p = { '<cmd>:Telescope lazy<CR>', "Lazy" },
     r = { '<cmd>lua require("telescope").extensions.repo.list{fd_opts=[[--ignore-file=~/.config/nvim/lua/plugins/telescope_fdignore]]}<CR>',
       "Repos" },
     s = { '<cmd>lua require("telescope.builtin").spell_suggest()<CR>', "Spelling" },

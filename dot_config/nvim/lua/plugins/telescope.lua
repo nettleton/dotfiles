@@ -48,6 +48,7 @@ telescope.setup{
     file_browser = {
       files = false,
     },
+    lazy = {},
   },
 }
 
@@ -55,7 +56,7 @@ telescope.load_extension('fzf')
 telescope.load_extension('repo')
 telescope.load_extension('luasnip')
 telescope.load_extension('file_browser')
-telescope.load_extension('packer')
+telescope.load_extension('lazy')
 telescope.load_extension('dap')
 
 -- map('n', '<leader>f', '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>', { noremap = true, silent = true })
@@ -81,7 +82,6 @@ telescope.load_extension('dap')
 -- map('n', '<leader>tch', '<cmd>:Cheatsheet<CR>', { noremap = true, silent = true })
 -- map('n', '<leader>tsn', '<cmd>lua require("telescope").extensions.luasnip.luasnip{}<CR>', { noremap = true, silent = true })
 -- map('n', '<leader>fb', '<cmd>:Telescope file_browser<CR>', { noremap = true, silent = true })
--- map('n', '<leader>tp', '<cmd>:Telescope packer<CR>', { noremap = true, silent = true })
 -- map('n', '<leader>tcd', ':Telescope coc diagnostics<CR>', { noremap = true, silent = true })
 -- map('n', '<leader>tcr', ':Telescope coc references<CR>', { noremap = true, silent = true })
 -- map('n', '<leader>tu', ':Telescope ultisnips<CR>', { noremap = true, silent = true })
