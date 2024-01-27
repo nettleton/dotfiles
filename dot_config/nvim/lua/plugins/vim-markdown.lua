@@ -43,3 +43,18 @@ vim.api.nvim_create_autocmd({"BufWritePost"}, {
   pattern = {"*.md"},
   command = "lua vim.api.nvim_command('ExtractReminders')"
 })
+
+vim.api.nvim_create_user_command("PublishPrayer", function()
+  -- local messages = require('messages.api')
+  local filenameExpanded = vim.fn.expand('%')
+  local date = filenameExpanded:match('%d+-%d+-%d+')
+  local cmd = "zk pp " .. date
+  -- messages.capture_thing(cmd)
+  vim.fn.system(cmd)
+  vim.api.nvim_command("checktime")
+end, { nargs = 0 })
+
+vim.api.nvim_create_autocmd({"BufWritePost"}, {
+  pattern = {"*/zk/elder/prayers/*.md"},
+  command = "lua vim.api.nvim_command('PublishPrayer')"
+})
