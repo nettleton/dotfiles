@@ -41,9 +41,14 @@ telescope.setup{
   extensions = {
     fzf = {},
     repo = {
-      search_dirs = {
-        "~/sandbox"
-      }
+      list = {
+        fd_opts = {
+          "--no-ignore-vcs",
+        },
+        search_dirs = {
+          "~/sandbox",
+        },
+      },
     },
     file_browser = {
       files = false,
