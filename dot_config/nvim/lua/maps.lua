@@ -37,6 +37,13 @@ map("x", "K", ":move '<-2<CR>gv-gv", opts)
 map("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
 map("x", "<A-k>", ":move '<-2<CR>gv-gv", opts)
 
+vim.keymap.set("n", "dd", function ()
+	if vim.fn.getline(".") == "" then return '"_dd' end
+	return "dd"
+end, {expr = true})
+
 -- REFERENCES
 -- https://github.com/ayoisaiah/dotfiles/blob/master/private_dot_config/nvim/lua/maps.lua
 -- https://github.com/LunarVim/Neovim-from-scratch
+-- https://www.reddit.com/r/neovim/comments/1abd2cq/what_are_your_favorite_tricks_using_neovim/
+-- https://nanotipsforvim.prose.sh/keeping-your-register-clean-from-dd

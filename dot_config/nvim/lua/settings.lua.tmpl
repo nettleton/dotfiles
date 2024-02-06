@@ -98,6 +98,16 @@ Msg = function(...)
   require('messages.api').capture_thing(...)
 end
 
+-- open file at the last position it was edited earlier
+vim.api.nvim_create_autocmd("BufReadPost", {
+    callback = function()
+        local mark = vim.api.nvim_buf_get_mark(0, '"')
+        if mark[1] > 1 and mark[1] <= vim.api.nvim_buf_line_count(0) then
+            vim.api.nvim_win_set_cursor(0, mark)
+        end
+    end,
+})
+
 -- REFERENCES
 -- https://github.com/ayoisaiah/dotfiles/blob/master/private_dot_config/nvim/lua/settings.lua
 -- https://github.com/airblade/vim-gitgutter#when-are-the-signs-updated
