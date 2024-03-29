@@ -137,7 +137,8 @@ require("lazy").setup({
       },
       config = function()
         require('go').setup({
-          gofmt = 'gofmt',
+          gofmt = 'golines',
+          goimports = 'golines',
           max_line_len = 999,
         })
         -- Run gofmt + goimport on save
@@ -164,7 +165,10 @@ require("lazy").setup({
   -- DAP / debugging
     { 'mfussenegger/nvim-dap' },
     { 'rcarriga/nvim-dap-ui',
-      dependencies = { 'mfussenegger/nvim-dap' },
+      dependencies = {
+        'mfussenegger/nvim-dap',
+        'nvim-neotest/nvim-nio'
+      },
       config = function()
         require('dapui').setup()
       end,
@@ -235,7 +239,13 @@ require("lazy").setup({
     { 'neovim/nvim-lspconfig' },
     { 'b0o/schemastore.nvim' },
     { 'nvimtools/none-ls.nvim',
-      dependencies = { 'nvim-lua/plenary.nvim' } },
+      dependencies = {
+        'nvim-lua/plenary.nvim',
+        'nvimtools/none-ls-extras.nvim',
+        'gbprod/none-ls-shellcheck.nvim',
+        'gbprod/none-ls-luacheck.nvim',
+      }
+    },
     { "folke/trouble.nvim",
       dependencies = { "nvim-tree/nvim-web-devicons" },
       config = function()
