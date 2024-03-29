@@ -1,0 +1,27 @@
+# MD007/ul-indent : Unordered list indentation : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md007.md
+# some combination of my markdown plugins always indents 4, disable until i figure out the root cause
+MD007: false
+
+# MD012/no-multiple-blanks : Multiple consecutive blank lines : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md012.md
+MD012:
+  # Consecutive blank lines
+  maximum: 5
+
+# MD013/line-length : Line length : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md013.md
+MD013:
+  # Number of characters
+  line_length: 500
+  # Number of characters for headings
+  heading_line_length: 250
+  # Number of characters for code blocks
+  code_block_line_length: 500
+  # Include code blocks
+  code_blocks: true
+  # Include tables
+  tables: true
+  # Include headings
+  headings: true
+  # Strict length checking
+  strict: false
+  # Stern length checking
+  stern: false

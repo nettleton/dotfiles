@@ -23,6 +23,9 @@ vim.g.vim_markdown_edit_url_in = 'tab'
 -- follow named anchors
 vim.g.vim_markdown_follow_anchor = 1
 
+-- indent size
+vim.g.vim_markdown_new_list_item_indent = 2
+
 -- set conceallevel for markdown files
 vim.api.nvim_create_autocmd({"FileType"}, {
   pattern = {"markdown"},
