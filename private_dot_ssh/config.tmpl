@@ -24,6 +24,11 @@ Host {{ .work.hostnames.mac_desktop }}
   IdentityFile ~/.ssh/work_desktop.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+Host {{ .work.hostnames.mac_studio }}
+  User {{ .work.user }}
+  IdentityFile ~/.ssh/work_mac_studio.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host {{ .work.hostnames.mac_laptop }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/work_laptop.pub

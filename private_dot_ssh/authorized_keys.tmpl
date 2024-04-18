@@ -6,6 +6,10 @@
 {{ onepasswordRead .op.urls.wl_starship }}
 {{ onepasswordRead .op.urls.wl_wd }}
 {{- end -}}
+{{- if contains .chezmoi.hostname .work.hostnames.mac_studio -}}
+{{ onepasswordRead .op.urls.wms_starship }}
+{{ onepasswordRead .op.urls.wms_wl }}
+{{- end -}}
 {{- if eq .targetname "starship" -}}
 {{ onepasswordRead .op.urls.starship_nessie }}
 {{- end -}}

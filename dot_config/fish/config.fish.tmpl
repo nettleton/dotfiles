@@ -45,6 +45,7 @@ set -g -x ALTERNATE_EDITOR "/usr/bin/vim"
 
 set -x -g WORK_USER {{ .work.user }}
 set -x -g WORK_MAC_DESKTOP {{ .work.hostnames.mac_desktop }}
+set -x -g WORK_MAC_STUDIO {{ .work.hostnames.mac_studio }}
 set -x -g WORK_MAC_SCREENS_ALIAS {{ .work.user }}-maci
 set -x -g WORK_LINUX {{ .work.hostnames.linux }}
 
@@ -88,6 +89,7 @@ abbr diffk "kitty +kitten diff"
 
 abbr sshk "kitty +kitten ssh"
 abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_DESKTOP 'exec fish'"
+abbr wms "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO 'exec fish'"
 abbr wmv "open screens://$WORK_MAC_SCREENS_ALIAS"
 abbr wl "sshf $WORK_KEY $WORK_USER $WORK_LINUX"
 
