@@ -33,6 +33,7 @@
   wms_wl          = "op://personal/ah-{{- $workuser -}}-m ah-{{- $workuser -}}1-m SSH key/public key"
   starship_nessie = "op://personal/starship nessie SSH key/public key"
   nessie_starship = "op://personal/nessie starship SSH key/public key"
+  awssaml         = "op://personal/{{- $sudoItem -}}/.awssaml.yaml"
 
 [data.work]
   user = {{ $workuser | quote }}

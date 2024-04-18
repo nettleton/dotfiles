@@ -1,0 +1,3 @@
+{{- if (not (eq .targetname "nessie")) -}}
+{{ onepasswordRead .op.urls.awssaml }}
+{{- end -}}
