@@ -1,0 +1,65 @@
+#!/usr/bin/env fish
+
+
+function checkAndAddGitHubKeys -a ghHost -a ghUser -a ghTokenUrl
+  echo ""
+  echo "=========================="
+  echo "adding ssh keys to $ghHost"
+  if not gh auth status -h "$ghHost"
+    echo "not logged in to $ghHost; logging in"
+    op read --no-newline "$ghTokenUrl" | gh auth login --with-token -h "$ghHost" -p ssh --skip-ssh-key
+  end
+
+  if gh auth status -h "$ghHost" | grep "Logged in" | grep -q "admin:ssh_signing_key"
+    echo "logged in, but missing admin:ssh_signing_key scope; refreshing token"
+    gh auth refresh -h "$ghHost" -s admin:ssh_signing_key
+  end
+
+  gh auth switch -h "$ghHost" -u "$ghUser"
+
+  echo "$ghHost: checking for authentication key"
+  if gh ssh-key list | grep {{ .targetname }} | grep -q authentication
+    echo "    authentication key already exists"
+  else
+    echo "    authentication key missing; adding"
+    gh ssh-key add -t {{ .targetname }} --type "authentication"
+  end
+
+  echo "$ghHost: checking for signing key"
+  if gh ssh-key list | grep {{ .targetname }} | grep -q signing
+    echo "    signing key already exists"
+  else
+    echo "    signing key missing; adding"
+    gh ssh-key add -t {{ .targetname }} --type "signing"
+  end
+
+end
+
+function checkAndAddGitlabKeys -a glHost -a glUser -a glTokenUrl -a keyPath
+  echo ""
+  echo "=========================="
+  echo "adding ssh keys to $glHost"
+
+  set -x GITLAB_URI "https://$glHost"
+  echo "$GITLAB_URI: checking for key"
+  set targetKey (glab ssh-key list --show-id | grep {{ .targetname }})
+  if test -n "$targetKey"
+    set keyId (echo "$targetKey" | cut -f1)
+    echo "    key already exists; id: $keyId"
+  else
+    echo "    key missing; adding"
+    glab ssh-key add  -t {{ .targetname }} "$keyPath"
+  end
+end
+
+# internal github
+checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .op.sudoItem -}}/chezmoi_token
+
+# public github
+checkAndAddGitHubKeys github.com nettleton op://Personal/GitHub - Josh/chezmoi_token
+
+# internal gitlab
+checkAndAddGitlabKeys insidelabs-git.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .op.sudoItem -}}/chezmoi_token_gitlab_internal "$HOME/.ssh/gitlab_internal.pub"
+
+# public gitlab
+checkAndAddGitlabKeys gitlab.com nettleton op://Personal/Gitlab/chezmoi_token "$HOME/.ssh/gitlab_com.pub"

@@ -70,7 +70,9 @@ defaults write com.ameba.SwiftBar Terminal -string "iTerm"
 defaults write com.ameba.SwiftBar PluginDirectory -string "$HOME/.config/swiftbar"
 defaults write com.ameba.SwiftBar Shell -string "zsh"
 
-gh auth status > /dev/null; or gh auth login
+
+gh auth status -h github.{{ .work.domain }} > /dev/null; or gh auth login -h github.{{ .work.domain }} -u {{ .work.user }} -p ssh --skip-ssh-key -w
+gh auth status -h github.com > /dev/null; or gh auth login -h github.com -u nettleton -p ssh --skip-ssh-key -w
 
 echo "execute 'loaddb' in a new shell"
 echo "execute ':GoInstallBinaries in nvim"
