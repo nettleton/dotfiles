@@ -1,4 +1,14 @@
 [user]
   name = "Joshua Wang"
   email = {{ .work.email }}
+  signingkey = {{ onepasswordRead .op.urls.github_internal }}
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+  gpgsign = true
 
