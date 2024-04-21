@@ -1,7 +1,7 @@
 #!/usr/bin/env fish
 
 
-function checkAndAddGitHubKeys -a ghHost -a ghUser -a ghTokenUrl
+function checkAndAddGitHubKeys -a ghHost -a ghUser -a ghTokenUrl -a keyPath
   echo ""
   echo "=========================="
   echo "adding ssh keys to $ghHost"
@@ -17,12 +17,14 @@ function checkAndAddGitHubKeys -a ghHost -a ghUser -a ghTokenUrl
 
   gh auth switch -h "$ghHost" -u "$ghUser"
 
+  set -x GH_HOST "$ghHost"
+  set -x GH_ENTERPRISE_TOKEN (op read -n "$ghTokenUrl")
   echo "$ghHost: checking for authentication key"
   if gh ssh-key list | grep {{ .targetname }} | grep -q authentication
     echo "    authentication key already exists"
   else
     echo "    authentication key missing; adding"
-    gh ssh-key add -t {{ .targetname }} --type "authentication"
+    gh ssh-key add "$keyPath" -t {{ .targetname }} --type "authentication"
   end
 
   echo "$ghHost: checking for signing key"
@@ -30,7 +32,7 @@ function checkAndAddGitHubKeys -a ghHost -a ghUser -a ghTokenUrl
     echo "    signing key already exists"
   else
     echo "    signing key missing; adding"
-    gh ssh-key add -t {{ .targetname }} --type "signing"
+    gh ssh-key add "$keyPath" -t {{ .targetname }} --type "signing"
   end
 
 end
@@ -53,10 +55,10 @@ function checkAndAddGitlabKeys -a glHost -a glUser -a glTokenUrl -a keyPath
 end
 
 # internal github
-checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .op.sudoItem -}}/chezmoi_token
+checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .op.sudoItem -}}/chezmoi_token "$HOME/.ssh/github_internal.pub"
 
 # public github
-checkAndAddGitHubKeys github.com nettleton op://Personal/GitHub - Josh/chezmoi_token
+checkAndAddGitHubKeys github.com nettleton "op://Personal/GitHub - Josh/chezmoi_token" "$HOME/.ssh/github_com.pub"
 
 # internal gitlab
 checkAndAddGitlabKeys insidelabs-git.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .op.sudoItem -}}/chezmoi_token_gitlab_internal "$HOME/.ssh/gitlab_internal.pub"
