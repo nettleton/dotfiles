@@ -1,7 +1,3 @@
-{{- if contains .chezmoi.hostname .work.hostnames.mac_desktop -}}
-{{ onepasswordRead .op.urls.wd_starship }}
-{{ onepasswordRead .op.urls.wd_wl }}
-{{- end -}}
 {{- if contains .chezmoi.hostname .work.hostnames.mac_laptop -}}
 {{ onepasswordRead .op.urls.wl_starship }}
 {{ onepasswordRead .op.urls.wl_wd }}
