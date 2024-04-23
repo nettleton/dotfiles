@@ -9,6 +9,16 @@ echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_
 
 go install github.com/rhysd/vim-startuptime@latest
 
+# internal dev tools are at /usr/local/netbin 
+{{ if (contains .chezmoi.username .targetname) }}
+if contains /usr/local/netbin $fish_user_paths
+  echo "/usr/local/netbin already on path, not adding"
+else
+  echo "/usr/local/netbin not on path, adding"
+  fish_add_path /usr/local/netbin 
+end
+{{ end }}
+
 vale sync
 
 for npmPkg in npm neovim yo@^4 generator-op-sdk
@@ -41,9 +51,6 @@ echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_
 
 pip install --upgrade pip
 pip3 install --user --upgrade neovim pynvim
-
-set sysPy3bin "$HOME/Library/Python/3.9/bin"
-echo $fish_user_paths | grep -q "$sysPy3bin"; or set -U fish_user_paths $fish_user_paths "$sysPy3bin"
 
 if test (podman machine list --noheading | wc -l) -eq 1
   echo "podman machine installed; not reinstalling"
