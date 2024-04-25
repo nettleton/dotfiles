@@ -32,7 +32,11 @@ function vpn
         end
         echo "sudo successful, starting connect"
 
-        op item get {{ .work.companyname }} --fields password | sudo openconnect --user (op item get {{ .work.companyname }} --field username) --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --token-mode totp --token-secret sha1:base32:(op item get {{ .work.companyname }} --fields OTP | pcregrep -o1 'secret=(.*)&issuer') --passwd-on-stdin "$VPN_HOST"
+        # Useragent is important, if it doesn't start with AnyConnect it falls back to legacy post mechanisms and can't seem to send the TOTP
+        # Related/helpful issues:
+        #    - https://gitlab.com/openconnect/openconnect/-/issues/489 (got the useragent trick)
+        #    - https://gitlab.com/openconnect/openconnect/-/merge_requests/409 (tried the form-entry arg but that did not work)
+        op item get {{ .work.companyname }} --fields password | sudo openconnect --user (op item get {{ .work.companyname }} --field username) --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --token-mode totp --token-secret sha1:base32:(op item get {{ .work.companyname }} --fields OTP | pcregrep -o1 'secret=(.*)&issuer') --useragent 'AnyConnect' --passwd-on-stdin "$VPN_HOST"
       else
         echo "already connected, disconnect first"
       end
