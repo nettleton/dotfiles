@@ -81,5 +81,18 @@ defaults write com.ameba.SwiftBar Shell -string "zsh"
 gh auth status -h github.{{ .work.domain }} > /dev/null; or gh auth login -h github.{{ .work.domain }} -u {{ .work.user }} -p ssh --skip-ssh-key -w
 gh auth status -h github.com > /dev/null; or gh auth login -h github.com -u nettleton -p ssh --skip-ssh-key -w
 
+mkdir -p "$HOME/.cache/whisper"
+set WHISPER_GGML_LARGE "$HOME/.cache/whisper/ggml-large-v3-q5_0.bin"
+test -f "$WHISPER_GGML_LARGE"; or curl -o "$WHISPER_GGML_LARGE" -L 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-q5_0.bin?download=true'
+set GGML_METAL_LOCATION (find (brew --cellar -q whisper-cpp) -name "ggml-metal.metal")
+if test (echo "$GGML_METAL_LOCATION" | wc -l) -eq 1
+  set -Ux GGML_METAL_PATH_RESOURCES (dirname "$GGML_METAL_LOCATION")
+  echo "Set GGML_METAL_PATH_RESOURCES to $GGML_METAL_PATH_RESOURCES"
+else
+  echo "Multiple GGML Metal drivers found; not setting"
+  echo "$GGML_METAL_LOCATION"
+end
+
+
 echo "execute 'loaddb' in a new shell"
 echo "execute ':GoInstallBinaries in nvim"
