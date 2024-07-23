@@ -29,4 +29,4 @@ hosts:
         # Configure host for API endpoint. Defaults to the host itself.
         api_host: insidelabs-git.{{ .work.domain }}
         # Your GitLab access token. To get one, read https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
-        token:  {{ $url := print "op://Personal/" .op.sudoItem "/chezmoi_token_gitlab_internal" }}{{ onepasswordRead $url }}
+        token:  {{ $url := print "op://Personal/" .work.companyname "/chezmoi_token_gitlab_internal" }}{{ onepasswordRead $url }}

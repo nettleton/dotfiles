@@ -302,6 +302,10 @@ require("lazy").setup({
     { 'alker0/chezmoi.vim' }, -- highlighting support for chezmoi templates
 
     { 'folke/which-key.nvim',
+      dependencies = {
+        "echasnovski/mini.icons",
+        "nvim-tree/nvim-web-devicons"
+      },
       config = function()
         require('plugins.which-key')
       end,
