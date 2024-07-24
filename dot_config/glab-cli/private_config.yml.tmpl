@@ -1,3 +1,4 @@
+{{- if (not (eq .targetname "nessie") ) -}}
 # What protocol to use when performing Git operations. Supported values: ssh, https.
 git_protocol: ssh
 # What editor glab should run when creating issues, merge requests, etc. This global config cannot be overridden by hostname.
@@ -30,3 +31,4 @@ hosts:
         api_host: insidelabs-git.{{ .work.domain }}
         # Your GitLab access token. To get one, read https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
         token:  {{ $url := print "op://Personal/" .work.companyname "/chezmoi_token_gitlab_internal" }}{{ onepasswordRead $url }}
+{{- end -}}

@@ -1,3 +1,4 @@
+{{- if (not (eq .targetname "nessie") ) -}}
 [user]
   name = "Joshua Wang"
   email = {{ .work.email }}
@@ -11,4 +12,4 @@
 
 [commit]
   gpgsign = true
-
+{{- end -}}

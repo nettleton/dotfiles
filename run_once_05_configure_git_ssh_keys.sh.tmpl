@@ -54,6 +54,7 @@ function checkAndAddGitlabKeys -a glHost -a glUser -a glTokenUrl -a keyPath
   end
 end
 
+{{ if (not (eq .targetname "nessie") ) -}}
 # internal github
 checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token "$HOME/.ssh/github_internal.pub"
 
@@ -62,6 +63,7 @@ checkAndAddGitHubKeys github.com nettleton "op://Personal/GitHub - Josh/chezmoi_
 
 # internal gitlab
 checkAndAddGitlabKeys insidelabs-git.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token_gitlab_internal "$HOME/.ssh/gitlab_internal.pub"
-
 # public gitlab
 checkAndAddGitlabKeys gitlab.com nettleton op://Personal/Gitlab/chezmoi_token "$HOME/.ssh/gitlab_com.pub"
+{{- end -}}
+

@@ -21,7 +21,11 @@ end
 
 vale sync
 
+{{ if (not (eq .targetname "nessie") ) }}
 for npmPkg in npm neovim yo@^4 generator-op-sdk
+{{- else -}}
+for npmPkg in npm neovim
+{{- end }}
   echo "checking $npmPkg"
   if not npm list -g "$npmPkg" > /dev/null
     echo "  $npmPkg not installed, installing"
