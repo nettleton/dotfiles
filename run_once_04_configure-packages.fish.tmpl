@@ -7,6 +7,16 @@ set -x -U GOPATH "$HOME/sandbox/go"
 set -x -U GOBIN "$GOPATH/bin"
 echo $fish_user_paths | grep -q "$GOPATH"; or set -U fish_user_paths $fish_user_paths "$GOPATH/bin"
 
+if which rustup > /dev/null
+  echo "rustup installed; updating"
+  rustup update
+else
+  echo "installing rustup and rust"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+end
+set -x -U CARGO_HOME "$HOME/.cargo"
+echo $fish_user_paths | grep -q "$CARGO_HOME/bin"; or set -U fish_user_paths $fish_user_paths "$CARGO_HOME/bin"
+
 go install github.com/rhysd/vim-startuptime@latest
 
 # internal dev tools are at /usr/local/netbin 

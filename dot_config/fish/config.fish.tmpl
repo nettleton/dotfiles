@@ -116,6 +116,7 @@ function sourceIfNecessary
 end
 
 test -s $HOME/.nvm-fish/nvm.fish; and source $HOME/.nvm-fish/nvm.fish
+test -s "$CARGO_HOME/env.fish"; and source "$CARGO_HOME/env.fish"
 
 # pyenv init
 if command -v pyenv 1>/dev/null 2>&1

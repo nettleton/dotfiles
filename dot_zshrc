@@ -2,6 +2,7 @@
 export PATH="/opt/homebrew/bin:$PATH"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.cargo/env ] && source ~/.cargo/env
 
 alias cat="bat"
 alias dl="cd ~/Downloads"
