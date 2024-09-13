@@ -22,21 +22,12 @@ function vpn
           set VPN_HOST "zakim.{{ .work.domain }}"
         end
 
-        echo "openconnect requires sudo access to connect, prompting now..."
-        if ioreg -r -k AppleClamshellState -d 4 | grep AppleClamshellState | head -1 | grep -iq "No"
-          echo "Clamshell state is open, should prompt for biometric"
-          /usr/bin/sudo -v
-        else
-          echo "Clamshell state is closed, using password manager"
-          op item get "{{ .op.sudoItem }}" --fields password | /usr/bin/sudo -S -v
-        end
-        echo "sudo successful, starting connect"
-
         # Useragent is important, if it doesn't start with AnyConnect it falls back to legacy post mechanisms and can't seem to send the TOTP
         # Related/helpful issues:
         #    - https://gitlab.com/openconnect/openconnect/-/issues/489 (got the useragent trick)
         #    - https://gitlab.com/openconnect/openconnect/-/merge_requests/409 (tried the form-entry arg but that did not work)
-        op item get {{ .work.companyname }} --fields password | sudo openconnect --user (op item get {{ .work.companyname }} --field username) --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --token-mode totp --token-secret sha1:base32:(op item get {{ .work.companyname }} --fields OTP | pcregrep -o1 'secret=(.*)&issuer') --useragent 'AnyConnect' --passwd-on-stdin "$VPN_HOST"
+        #    - https://gitlab.com/openconnect/openconnect/-/issues/270 (echo | cat - /dev/tty | sudo openconnect ... works around errors when specifying both --passwd-on-stdin and totp)
+        echo (op item get {{ .work.companyname }} --fields password --reveal) | /bin/cat - /dev/stdin | sudo -A openconnect --user {{ .work.user }} --setuid (id -u) -b --pid-file "$PIDFILE" --authgroup MFA --token-mode totp --token-secret sha1:base32:(op item get {{ .work.companyname }} --fields OTP --reveal | pcregrep -o1 'secret=(.*)&issuer') --useragent 'AnyConnect' --passwd-on-stdin "$VPN_HOST" &
       else
         echo "already connected, disconnect first"
       end

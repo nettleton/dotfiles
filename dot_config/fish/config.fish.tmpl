@@ -1,6 +1,9 @@
 set FISH_CONFIG_DIR "$HOME/.config/fish"
 
 # ENV
+# SUDO
+set -x SUDO_ASKPASS "$HOME/.local/bin/pw.fish"
+
 #SANDBOX
 set -g -x SANDBOX "$HOME/sandbox"
 
