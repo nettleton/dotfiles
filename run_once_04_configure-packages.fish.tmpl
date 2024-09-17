@@ -1,4 +1,7 @@
 #!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
 mkdir -p "$HOME/.cache"
 touch "$HOME/.cache/locatedb"
 
@@ -73,9 +76,9 @@ else
 end
 
 echo "elevating to sudo to check podman-mac-helper"
-op item get "{{ .op.sudoItem }}" --fields password | /usr/bin/sudo -S -v
+/usr/bin/sudo -A -v
 echo "sudo check complete"
-sudo podman-mac-helper install
+sudo -A podman-mac-helper install
 
 # symlink docker-compose as docker plugin - podman-compose isn't feature for feature compatible
 #    example: https://github.com/containers/podman-compose/issues/610
@@ -91,8 +94,11 @@ defaults write com.ameba.SwiftBar Terminal -string "iTerm"
 defaults write com.ameba.SwiftBar PluginDirectory -string "$HOME/.config/swiftbar"
 defaults write com.ameba.SwiftBar Shell -string "zsh"
 
-
-gh auth status -h github.{{ .work.domain }} > /dev/null; or gh auth login -h github.{{ .work.domain }} -u {{ .work.user }} -p ssh --skip-ssh-key -w
+if test (doggo -J github.{{ .work.domain }} | jq '[ .responses[] | select(.answers) ] | length') -gt 0
+  gh auth status -h github.{{ .work.domain }} > /dev/null; or gh auth login -h github.{{ .work.domain }} -u {{ .work.user }} -p ssh --skip-ssh-key -w
+else
+  echo "cannot find github.{{ .work.domain }}, skipping gh auth"
+end
 gh auth status -h github.com > /dev/null; or gh auth login -h github.com -u nettleton -p ssh --skip-ssh-key -w
 
 mkdir -p "$HOME/.cache/whisper"

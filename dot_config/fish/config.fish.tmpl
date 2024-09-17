@@ -20,13 +20,12 @@ set -g -x ZK_NOTEBOOK_DIR "$HOME/Library/Mobile Documents/com~apple~CloudDocs/no
 #JAVA
 switch (uname)
   case Darwin
-    set -g -x JAVA_1_8_HOME (/usr/libexec/java_home -v 1.8)
+    set -g -x JAVA_HOME (/usr/libexec/java_home)
   case  Linux
-    set -g -x JAVA_1_8_HOME (update-alternatives --list javac | grep "8" | sed -e "s:/bin/javac::g")
+    set -g -x JAVA_HOME (update-alternatives --list javac | grep "2[0-9]" | sed -e "s:/bin/javac::g")
   case '*'
 end
-set -g -x JAVA_HOME $JAVA_1_8_HOME
-set -g -x MATLAB_JAVA "$JAVA_1_8_HOME/jre"
+set -g -x MATLAB_JAVA "$JAVA_HOME/jre"
 
 # GO
 set -x GOROOT (go env GOROOT)
