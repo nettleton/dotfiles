@@ -25,7 +25,7 @@ switch (uname)
     set -g -x JAVA_HOME (update-alternatives --list javac | grep "2[0-9]" | sed -e "s:/bin/javac::g")
   case '*'
 end
-set -g -x MATLAB_JAVA "$JAVA_HOME/jre"
+set -g -x MATLAB_JAVA (/usr/libexec/java_home -v 11)
 
 # GO
 set -x GOROOT (go env GOROOT)
