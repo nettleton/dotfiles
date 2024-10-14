@@ -15,6 +15,8 @@ treesitter_configs.setup {
       'gitignore',
       'go',
       'gomod',
+      'gosum',
+      'gotmpl',
       'gowork',
       'graphql',
       'hcl',
