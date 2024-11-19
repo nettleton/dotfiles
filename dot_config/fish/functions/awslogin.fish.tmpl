@@ -4,6 +4,6 @@ function awslogin
   if set -ql _flag_remote
     awssaml eks login
   else
-    op item get {{ .work.companyname }} --fields password | awssaml --password-stdin eks login
+    op item get {{ .work.companyname }} --fields password --reveal | awssaml --password-stdin eks login
   end
 end
