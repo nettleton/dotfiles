@@ -1,14 +1,18 @@
 {{- if contains .chezmoi.hostname .work.hostnames.mac_laptop -}}
 {{ onepasswordRead .op.urls.wl_starship }}
 {{ onepasswordRead .op.urls.wl_wd }}
+{{ onepasswordRead .op.urls.wl_endurance }}
 {{- end -}}
 {{- if contains .chezmoi.hostname .work.hostnames.mac_studio -}}
 {{ onepasswordRead .op.urls.wms_starship }}
 {{ onepasswordRead .op.urls.wms_wl }}
+{{ onepasswordRead .op.urls.wms_endurance }}
 {{- end -}}
 {{- if eq .targetname "starship" -}}
 {{ onepasswordRead .op.urls.starship_nessie }}
+{{ onepasswordRead .op.urls.starship_endurance }}
 {{- end -}}
 {{- if eq .targetname "nessie" -}}
 {{ onepasswordRead .op.urls.nessie_starship }}
+{{ onepasswordRead .op.urls.nessie_endurance }}
 {{- end -}}
