@@ -29,7 +29,7 @@
 
 	"I"	= ( "setTag:", "\\Seen", "nextMessage:");
 	"U"	= ( "removeTag:", "\\Seen");
-  "~@i" = "markAllAsRead:";
+  "@i" = "markAllAsRead:";
 
 	// Only in MailMate
  	"N"	= "moveDownAndModifySelection:";
