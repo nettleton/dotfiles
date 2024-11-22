@@ -1,6 +1,11 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/bin/bash
 
+existing_sudo_askpass="$SUDO_ASKPASS"
+echo "existing_sudo_askpass: $existing_sudo_askpass"
+unset SUDO_ASKPASS
+echo "SUDO_ASKPASS: $SUDO_ASKPASS"
+
 {{ if eq .chezmoi.arch "arm64" -}}
 find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-rosetta
 {{ end -}}
@@ -177,4 +182,7 @@ cask "{{ . }}"
 {{ end -}}
 EOF
 
+export SUDO_ASKPASS="$existing_sudo_askpass"
+echo "SUDO_ASKPASS: $SUDO_ASKPASS"
 {{ end -}}
+
