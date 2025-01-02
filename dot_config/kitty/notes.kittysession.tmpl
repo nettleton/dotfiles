@@ -1,12 +1,8 @@
-layout vertical
+layout horizontal
 {{ if (not (contains "nessie" .chezmoi.hostname)) -}}
 new_tab notes
 launch --title notes /opt/homebrew/bin/fish -c "nvim --listen /tmp/notes_spacevim_nvim_server ~/Documents/notes/default/diary/diary.md"
-os_window_size 89c 120c
+new_tab notes_terminal
 launch --title notes_terminal /opt/homebrew/bin/fish
-resize_window shorter 20
-new_tab scratch
-launch --title scratch /opt/homebrew/bin/fish -c "nvim --listen /tmp/scratch_editor"
-launch --title scratch_terminal /opt/homebrew/bin/fish
 resize_window shorter 20
 {{ end -}}
