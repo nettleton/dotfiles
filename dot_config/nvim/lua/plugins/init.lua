@@ -67,6 +67,7 @@ require("lazy").setup({
       dependencies = {
         {"nvim-lua/plenary.nvim"},
         {"tsakirist/telescope-lazy.nvim"},
+        {"fdschmidt93/telescope-egrepify.nvim"},
       },
       config = function()
         require('plugins.telescope')
