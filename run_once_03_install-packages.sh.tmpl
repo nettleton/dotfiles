@@ -106,8 +106,6 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "microsoft-edge"
       "microsoft-teams"
       "netnewswire"
-      "postman"
-      "rapidapi"
       "podman-desktop"
       "screens"
       "sf-symbols"
@@ -159,7 +157,8 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
 {{  $casks = concat $casks (list
       "arq"
       "banktivity"
-      "handbrake"
+      "caldigit-docking-utility"
+      "handbrake-app"
       "hazel"
       "makemkv"
       "moneydance"
@@ -172,7 +171,7 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "xquartz") -}}
 {{ end -}}
 
-brew bundle --no-lock --file=/dev/stdin <<EOF
+brew bundle --file=/dev/stdin <<EOF
 {{ range ($taps | sortAlpha | uniq) -}}
 tap "{{ . }}"
 {{ end -}}

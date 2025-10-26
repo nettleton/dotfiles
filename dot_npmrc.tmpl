@@ -4,7 +4,7 @@
 @babel:registry=https://registry.npmjs.org
 @xtuc:registry=https://registry.npmjs.org
 
-{{- if (not (eq .targetname "nessie")) }}
+{{ if contains .chezmoi.username .targetname }}
 registry=http://mw-npm-repository/artifactory/api/npm/npm-repos
 {{ end -}}
 

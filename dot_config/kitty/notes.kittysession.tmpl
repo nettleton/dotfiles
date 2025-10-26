@@ -1,7 +1,6 @@
 layout horizontal
 {{ if (not (contains "nessie" .chezmoi.hostname)) -}}
 new_tab notes
-launch --title notes /opt/homebrew/bin/fish -c "nvim --listen /tmp/notes_spacevim_nvim_server ~/Documents/notes/default/diary/diary.md"
 new_tab notes_terminal
 launch --title notes_terminal /opt/homebrew/bin/fish
 resize_window shorter 20

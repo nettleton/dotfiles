@@ -29,9 +29,8 @@ set -g -x MATLAB_JAVA (/usr/libexec/java_home -v 11)
 
 # GO
 set -x GOROOT (go env GOROOT)
-{{- if (not (eq .targetname "nessie")) }}
+{{ if contains .chezmoi.username .targetname }}
 set -x GOPROXY http://iat-go-proxy-prod-01.{{ .work.domain }}:7000/go-proxy
-{{- end }}
 set -x GOPRIVATE golang.dhcp,github.{{ .work.domain }}
 set -x GONOPROXY github.{{ .work.domain }}
 set -x MW_USE_LOCAL_GO true
@@ -40,6 +39,7 @@ set -x GOLANGCILINTLOCATION (dirname (which golangci-lint))
 {{ if and (eq .chezmoi.os "darwin") (eq .chezmoi.arch "arm64") }}
 set -x MW_ARCH "maca64"
 {{ end }}
+{{- end }}
 
 set -g -x EDITOR "nvim"
 
