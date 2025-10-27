@@ -4,6 +4,7 @@
 {{ $mases := list
       "\"1Blocker\", id: 1365531024"
       "\"1Password for Safari\", id: 1569813296"
+      "\"Folder Quick Look\", id: 6753110395"
       "\"GarageBand\", id: 682658836"
       "\"iMovie\", id: 408981434"
       "\"Keynote\", id: 409183694"
@@ -30,12 +31,11 @@
       "\"OneDrive\", id: 823766827"
       "\"Paprika Recipe Manager 3\", id: 1303222628"
       "\"Parcel - Delivery Tracking\", id: 639968404"
-      "\"Slack\", id: 803453959"
       "\"Travel Planner Guide: Tripsy\", id: 1429967544"
       "\"Xcode\", id: 497799835") -}}
 {{ end -}}
 
-brew bundle --no-lock --file=/dev/stdin <<EOF
+brew bundle --file=/dev/stdin <<EOF
 {{ range ($mases | sortAlpha | uniq) -}}
 mas {{ . }}
 {{ end -}}
