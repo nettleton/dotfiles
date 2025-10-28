@@ -1,0 +1,5 @@
+{{ if contains .chezmoi.username .targetname }}
+[index]
+url = https://mw-python-repository.{{ .work.domain }}/artifactory/api/pypi/pypi-repos/simple
+default = true
+{{ end -}}
