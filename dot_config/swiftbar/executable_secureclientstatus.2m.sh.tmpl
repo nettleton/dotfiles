@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# <bitbar.title>Cisco Secure Client VPN status</bitbar.title>
+# <bitbar.version>v1.0</bitbar.version>
+# <bitbar.author>Joshua Wang</bitbar.author>
+# <bitbar.author.github>nettleton</bitbar.author.github>
+# <bitbar.desc>Displays VPN status</bitbar.desc>
+# <bitbar.dependencies>/opt/cisco/secureclient/bin/vpn</bitbar.dependencies>
+
+VPN="/opt/cisco/secureclient/bin/vpn"
+
+if [ $VPN state | grep -iq "state: connected" ]; then
+  echo ":lock.fill:"
+  echo "---"
+  VPN_SESSION_END_DURATION=$($VPN stats | grep -oEi "([0-9]+) Hours ([0-9]+)" | sed 's/ Hours /:/')
+
+  echo "Connected (Expires in $VPN_SESSION_END_DURATION) | refresh=false"
+else
+  echo ":lock.open.fill:"
+  echo "---"
+  echo "Disconnected | refresh=false"
+fi
+
+echo "Refresh | refresh=true"
+echo "Connect to Zakim 1 | bash=vpn param0=connect param1=zakim.{{ .work.domain }} terminal=true"
+echo "Connect to Zakim 2 | bash=vpn param0=connect param2=zakim2.{{ .work.domain }} terminal=true"
+echo "Disconnect | bash=vpn params=disconnect terminal=true"

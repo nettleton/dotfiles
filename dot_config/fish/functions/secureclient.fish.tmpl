@@ -1,0 +1,18 @@
+function secureclient
+  set VPN "/opt/cisco/secureclient/bin/vpn"
+  switch $argv[1]
+    case status
+      $VPN state | grep -iq "state: connected" ; and echo "connected"; or echo "disconnected"
+    case connect
+      if test -n "$argv[2]"
+        set VPN_HOST "$argv[2]"
+      else
+        set VPN_HOST "zakim.{{ .work.domain }}"
+      end
+      printf %s\n%s\n $WORK_USER (op item get {{ .work.companyname }} --fields password --reveal) | $VPN -s connect "$VPN_HOST"
+    case disconnect
+      $VPN disconnect
+    case '*'
+      echo "Unrecognized option $argv[1]"
+  end
+end

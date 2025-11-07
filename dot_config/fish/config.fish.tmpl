@@ -48,7 +48,12 @@ set -g -x ALTERNATE_EDITOR "/usr/bin/vim"
 set -x -g WORK_USER {{ .work.user }}
 set -x -g WORK_MAC_DESKTOP {{ .work.hostnames.mac_desktop }}
 set -x -g WORK_MAC_STUDIO {{ .work.hostnames.mac_studio }}
+{{ if contains .chezmoi.username .targetname -}}
 set -x -g WORK_MAC_LAPTOP {{ .work.hostnames.mac_laptop }}
+{{- end -}}
+{{- if eq .targetname "starship" -}}
+set -x -g WORK_MAC_LAPTOP {{ onepasswordRead .op.urls.wl_home_ip }}
+{{- end }}
 set -x -g WORK_MAC_SCREENS_ALIAS ah-{{ .work.user }}-m
 set -x -g WORK_LINUX {{ .work.hostnames.linux }}
 set -x -g LOCATION AH
@@ -91,9 +96,18 @@ abbr e "code"
 abbr icat "kitty +kitten icat"
 abbr diffk "kitty +kitten diff"
 
+abbr k kubectl
+
+abbr vpn secureclient
 abbr sshk "kitty +kitten ssh"
-abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO 'exec fish'"
+{{ if eq .targetname "starship" -}}
+abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO ''exec fish'''"
+abbr wms "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec ssh -t p 22 $WORK_USER@$WORK_MAC_STUDIO ''exec fish'''"
+{{- end }}
+{{ if contains .chezmoi.username .targetname -}}
+abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_STUDIO 'exec fish'"
 abbr wms "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO 'exec fish'"
+{{- end }}
 abbr wml "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec fish'"
 abbr wmv "open screens://$WORK_MAC_SCREENS_ALIAS"
 abbr wl "sshf $WORK_KEY $WORK_USER $WORK_LINUX"

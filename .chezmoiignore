@@ -9,5 +9,10 @@ Library/LaunchAgents/io.nettleton.calendar.poller.plist
 .config/swiftbar/solaredge.15m.py
 {{- end }}
 {{- if contains (printf "-%s-" .work.user) .targetname }}
-.config/swiftbar/vpnstatus.2m.sh
+.config/swiftbar/openconnectstatus.2m.sh
+.config/swiftbar/secureclientstatus.2m.sh
+{{- end }}
+{{- if (not (contains .chezmoi.username .targetname)) }}
+.config/swiftbar/openconnectstatus.2m.sh
+.config/swiftbar/secureclientstatus.2m.sh
 {{- end }}
