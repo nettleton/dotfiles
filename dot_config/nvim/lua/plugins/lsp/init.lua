@@ -8,11 +8,6 @@ if not mason_lspconfig_ok then
   vim.notify("require('mason-lspconfig') failed")
   return
 end
-local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
-if not lspconfig_ok then
-  vim.notify("require('lspconfig') failed")
-  return
-end
 local cmp_nvim_lsp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 if not cmp_nvim_lsp_ok then
   vim.notify("require('cmp_nvim_lsp') failed")
@@ -101,25 +96,21 @@ local lsp_defaults = {
   },
   capabilities = cmp_nvim_lsp.default_capabilities(),
 }
-
-lspconfig.util.default_config = vim.tbl_deep_extend(
-  'force',
-  lspconfig.util.default_config,
-  lsp_defaults
-)
+vim.lsp.config('*',lsp_defaults)
 
 -- marksman
-lspconfig.marksman.setup {
+vim.lsp.config('marksman', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('marksman')
 
 -- JS
-lspconfig.ts_ls.setup {
+vim.lsp.config('ts_ls', {
   on_attach = lsp_handlers.on_attach
-}
-
+})
+vim.lsp.enable('ts_ls')
 -- Lua
-lspconfig.lua_ls.setup {
+vim.lsp.config('lua_ls', {
   on_attach = lsp_handlers.on_attach,
   settings = {
     Lua = {
@@ -141,79 +132,93 @@ lspconfig.lua_ls.setup {
       },
     },
   },
-}
+})
+vim.lsp.enable('lua_ls')
 
 -- golangci-lint-langserver
-lspconfig.golangci_lint_ls.setup{
+vim.lsp.config('golangci_lint_ls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('golangci_lint_ls')
 
 -- Gopls
-lspconfig.gopls.setup {
+vim.lsp.config('gopls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('gopls')
 
 -- Docker
-lspconfig.dockerls.setup {
+vim.lsp.config('dockerls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('dockerls')
 
 -- Bash
-lspconfig.bashls.setup {
+vim.lsp.config('bashls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('bashls')
 
 -- XML
-lspconfig.lemminx.setup {
+vim.lsp.config('lemminx', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('lemminx')
 
 -- YAML
 -- You can add/overwrite schema as described here:
 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#yamlls
-lspconfig.yamlls.setup {
+vim.lsp.config('yamlls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('yamlls')
 
 -- SQL
-lspconfig.sqlls.setup {
+vim.lsp.config('sqlls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('sqlls')
 
 -- Rust
-lspconfig.rust_analyzer.setup {
+vim.lsp.config('rust_analyzer', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('rust_analyzer')
 
 -- Terraform
-lspconfig.terraformls.setup {
+vim.lsp.config('terraformls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('terraformls')
 
 -- Python
-lspconfig.pyright.setup {
+vim.lsp.config('pyright', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('pyright')
 
 -- Java
-lspconfig.jdtls.setup {
+vim.lsp.config('jdtls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('jdtls')
 
 -- C++
-lspconfig.clangd.setup {
+vim.lsp.config('clangd', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('clangd')
 
 -- VimL
-lspconfig.vimls.setup {
+vim.lsp.config('vimls', {
   on_attach = lsp_handlers.on_attach
-}
+})
+vim.lsp.enable('vimls')
 
 -- JSON
 lsp_defaults.capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-lspconfig.jsonls.setup {
+vim.lsp.config('jsonls', {
   on_attach = lsp_handlers.on_attach,
   capabilities = lsp_defaults.capabilities,
   settings = {
@@ -222,19 +227,22 @@ lspconfig.jsonls.setup {
       validate = { enable = true },
     },
   },
-}
+})
+vim.lsp.enable('jsonls')
 
 -- HTML also supports snippets
-lspconfig.html.setup {
+vim.lsp.config('html', {
   on_attach = lsp_handlers.on_attach,
   capabilities = lsp_defaults.capabilities,
-}
+})
+vim.lsp.enable('html')
 
 -- CSS
-lspconfig.cssls.setup {
+vim.lsp.config('cssls', {
   on_attach = lsp_handlers.on_attach,
   capabilities = lsp_defaults.capabilities,
-}
+})
+vim.lsp.enable('cssls')
 
 lsp_handlers.setup()
 
