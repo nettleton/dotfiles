@@ -8,7 +8,7 @@
 
 VPN="/opt/cisco/secureclient/bin/vpn"
 
-if [ $VPN state | grep -iq "state: connected" ]; then
+if $VPN state | grep -iq "state: connected"; then
   echo ":lock.fill:"
   echo "---"
   VPN_SESSION_END_DURATION=$($VPN stats | grep -oEi "([0-9]+) Hours ([0-9]+)" | sed 's/ Hours /:/')
