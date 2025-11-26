@@ -105,7 +105,7 @@ abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec ssh -t -p 
 abbr wms "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec ssh -t p 22 $WORK_USER@$WORK_MAC_STUDIO ''exec fish'''"
 {{- end }}
 {{ if contains .chezmoi.username .targetname -}}
-abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_STUDIO 'exec fish'"
+abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO 'exec fish'"
 abbr wms "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO 'exec fish'"
 {{- end }}
 abbr wml "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec fish'"
