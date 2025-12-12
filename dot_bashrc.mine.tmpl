@@ -9,7 +9,7 @@ alias dl="cd ~/Downloads"
 alias doc="cd ~/Documents"
 alias e="code"
 alias h="cd ~"
-alias l="exa --git --icons -alh"
+alias l="eza --git --icons -alh"
 alias vi="nvim"
 
 export PYENV_ROOT="$HOME/.pyenv"
@@ -28,6 +28,8 @@ export GONOPROXY=github.{{ .work.domain }}
 export MW_USE_LOCAL_GO=true
 export MW_USE_LOCAL_GOLANGCI_LINT=true
 export GOLANGCILINTLOCATION=$(dirname $(which golangci-lint))
+
+export SUDO_ASKPASS "$HOME/.local/bin/pw.fish"
 
 eval "$(starship init bash)"
 

@@ -11,8 +11,6 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
 {{ end -}}
 
 {{ $taps := list
-      "homebrew/bundle"
-      "homebrew/services"
       "1password/tap"
       "buo/cask-upgrade"
       "keith/formulae" -}}
@@ -80,7 +78,6 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "vim"
       "wget"
       "whalebrew"
-      "zk"
       "keith/formulae/reminders-cli" -}}
 {{ $casks := list
       "1password"
@@ -158,7 +155,6 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
 {{  $casks = concat $casks (list
       "arq"
       "banktivity"
-      "caldigit-docking-utility"
       "handbrake-app"
       "hazel"
       "makemkv"

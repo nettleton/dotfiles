@@ -9,7 +9,7 @@ alias dl="cd ~/Downloads"
 alias doc="cd ~/Documents"
 alias e="code"
 alias h="cd ~"
-alias l="exa --git --icons -alh"
+alias l="eza --git --icons -alh"
 alias vi="nvim"
 
 eval "$(starship init zsh)"

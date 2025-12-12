@@ -1,5 +1,5 @@
 layout horizontal
-{{ if (not (contains "nessie" .chezmoi.hostname)) -}}
+{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) -}}
 new_tab notes
 new_tab notes_terminal
 launch --title notes_terminal /opt/homebrew/bin/fish

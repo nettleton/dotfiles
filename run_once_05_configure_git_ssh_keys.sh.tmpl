@@ -43,27 +43,26 @@ function checkAndAddGitlabKeys -a glHost -a glUser -a glTokenUrl -a keyPath
   echo "adding ssh keys to $glHost"
 
   set -x GITLAB_URI "https://$glHost"
-  echo "$GITLAB_URI: checking for key"
-  set targetKey (glab ssh-key list --show-id | grep {{ .targetname }})
-  if test -n "$targetKey"
-    set keyId (echo "$targetKey" | cut -f1)
-    echo "    key already exists; id: $keyId"
-  else
-    echo "    key missing; adding"
-    glab ssh-key add  -t {{ .targetname }} "$keyPath"
-  end
-end
 
-{{ if (not (eq .targetname "nessie") ) -}}
-# internal github
-checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token "$HOME/.ssh/github_internal.pub"
+  echo "$GITLAB_URI: checking for key"
+  if glab ssh-key list | grep {{ .targetname }} | grep -q authentication
+    echo "    authentication key already exists"
+  else 
+    echo "    authentication key missing; adding"
+    glab ssh-key add "$keyPath" -t {{ .targetname }} --usage-type "auth_and_signing"
+  end 
+end
 
 # public github
 checkAndAddGitHubKeys github.com nettleton "op://Personal/GitHub - Josh/chezmoi_token" "$HOME/.ssh/github_com.pub"
 
-# internal gitlab
-checkAndAddGitlabKeys insidelabs-git.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token_gitlab_internal "$HOME/.ssh/gitlab_internal.pub"
 # public gitlab
 checkAndAddGitlabKeys gitlab.com nettleton op://Personal/Gitlab/chezmoi_token "$HOME/.ssh/gitlab_com.pub"
+
+{{ if (contains .chezmoi.username .targetname) }}
+# internal github
+checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token "$HOME/.ssh/github_internal.pub"
+# internal gitlab
+checkAndAddGitlabKeys insidelabs-git.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token_gitlab_internal "$HOME/.ssh/gitlab_internal.pub"
 {{- end -}}
 

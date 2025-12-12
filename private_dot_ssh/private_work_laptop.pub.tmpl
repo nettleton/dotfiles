@@ -1,4 +1,4 @@
-{{- if (not (eq .targetname "nessie")) -}}
+{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) -}}
 {{- if (not (contains .chezmoi.hostname .work.hostnames.mac_laptop)) -}}
 {{ onepasswordRead .op.urls.work_laptop }}
 {{ end }}

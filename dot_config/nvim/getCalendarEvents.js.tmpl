@@ -1,4 +1,4 @@
-{{- if (not (eq .targetname "nessie") ) -}}
+{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) -}}
 const { exec } = require('child_process')
 const fs = require('fs')
 const os = require('os')
