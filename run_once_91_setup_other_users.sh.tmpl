@@ -1,0 +1,30 @@
+{{- if (and (eq .chezmoi.os "darwin") (eq .targetname "cooper")) -}}
+#!/usr/bin/env fish 
+
+function createNonAdminUser -a userId password realName uniqueId
+# https://apple.stackexchange.com/questions/4814/can-user-accounts-be-managed-via-the-command-line/4981#4981
+  sudo -A dscl . -create /Users/$userId
+  sudo -A dscl . -create /Users/$userId UserShell /opt/homebrew/bin/fish
+  sudo -A dscl . -create /Users/$userId RealName "$realName"
+  sudo -A dscl . -create /Users/$userId UniqueID $uniqueId # Any number unique among all the users on the installation
+  sudo -A dscl . -create /Users/$userId PrimaryGroupID 20 # group id of `staff`
+  sudo -A dscl . -create /Users/$userId NFSHomeDirectory /Users/$userId
+  sudo -A dscl . -passwd /Users/$userId $password
+
+  sudo -A mkdir /Users/$userId
+  sudo -A chown -R $userId:staff /Users/$userId
+end
+
+if test -d /Users/birdie
+  echo "user 'birdie' already exists, not doing anything"
+else 
+  createNonAdminUser {{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 0).value }} {{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 1).value }} '{{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 3).value }}' {{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 4).value }}
+end 
+
+if test -d /Users/bug
+  echo "user 'bug' already exists, not doing anything"
+else 
+  createNonAdminUser {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 0).value }} {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 1).value }} '{{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 3).value }}' {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 4).value }}
+end
+
+{{ end -}}
