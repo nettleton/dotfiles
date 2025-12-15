@@ -267,6 +267,9 @@ require("lazy").setup({
         { 'nvim-treesitter/nvim-treesitter-textobjects' },
       }
     },
+    { 'nvim-treesitter/nvim-treesitter-textobjects',
+      branch = "main"
+    },
     { 'HiPhish/rainbow-delimiters.nvim' },
     { 'stevearc/aerial.nvim',
       opts = {},

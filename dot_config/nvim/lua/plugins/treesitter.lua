@@ -1,6 +1,50 @@
-local treesitter_configs_ok, treesitter_configs = pcall(require, "nvim-treesitter.configs")
+-- require('nvim-treesitter').install {
+--   'bash',
+--   'c',
+--   'comment',
+--   'cpp',
+--   'css',
+--   'dockerfile',
+--   'fish',
+--   'gitignore',
+--   'go',
+--   'gomod',
+--   'gosum',
+--   'gotmpl',
+--   'gowork',
+--   'graphql',
+--   'hcl',
+--   'hocon',
+--   'html',
+--   'http',
+--   'java',
+--   'javascript',
+--   'jsdoc',
+--   'json',
+--   'kotlin',
+--   'latex',
+--   'lua',
+--   'make',
+--   'markdown',
+--   'regex',
+--   'rego',
+--   'ruby',
+--   'rust',
+--   'scala',
+--   'scss',
+--   'sql',
+--   'swift',
+--   'toml',
+--   'tsx',
+--   'typescript',
+--   'vim',
+--   'yaml'
+-- }
+--
+
+local treesitter_configs_ok, treesitter_configs = pcall(require, "nvim-treesitter.config")
 if not treesitter_configs_ok then
-  vim.notify("require('nvim-treesitter.configs') failed")
+  vim.notify("require('nvim-treesitter.config') failed")
   return
 end
 treesitter_configs.setup {
