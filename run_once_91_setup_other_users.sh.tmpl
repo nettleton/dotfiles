@@ -27,4 +27,8 @@ else
   createNonAdminUser {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 0).value }} {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 1).value }} '{{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 3).value }}' {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 4).value }}
 end
 
+# Enable fast user switching
+# https://discussions.apple.com/thread/256185662?sortBy=rank
+sudo -A defaults write /Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool true
+
 {{ end -}}
