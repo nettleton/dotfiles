@@ -45,7 +45,7 @@ function checkAndAddGitlabKeys -a glHost -a glUser -a glTokenUrl -a keyPath
   set -x GITLAB_URI "https://$glHost"
 
   echo "$GITLAB_URI: checking for key"
-  if glab ssh-key list | grep {{ .targetname }} | grep -q authentication
+  if glab ssh-key list | grep {{ .targetname }} | grep -q auth_and_signing
     echo "    authentication key already exists"
   else 
     echo "    authentication key missing; adding"
