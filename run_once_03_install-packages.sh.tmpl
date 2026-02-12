@@ -119,6 +119,7 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
 {{ if .personalpackages -}}
 {{  $brews = concat $brews (list
       "bison"
+      "beads"
       "bfg"
       "docutils"
       "libogg"

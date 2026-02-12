@@ -1,6 +1,4 @@
-layout horizontal
-{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) -}}
-new_tab notes
+{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) }}
 new_tab notes_terminal
 launch --title notes_terminal /opt/homebrew/bin/fish
 resize_window shorter 20
