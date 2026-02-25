@@ -1,11 +1,12 @@
+
+{{ if contains .chezmoi.username .targetname }}
+registry=http://mw-npm-repository/artifactory/api/npm/npm-repos
+{{ else }}
 # scoped dependency overrides
 @types:registry=https://registry.npmjs.org
 @webassemblyjs:registry=https://registry.npmjs.org
 @babel:registry=https://registry.npmjs.org
 @xtuc:registry=https://registry.npmjs.org
-
-{{ if contains .chezmoi.username .targetname }}
-registry=http://mw-npm-repository/artifactory/api/npm/npm-repos
 {{ end -}}
 
 ignore-scripts=true
