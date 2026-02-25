@@ -23,7 +23,7 @@ hosts:
         api_host: gitlab.com
         # Your GitLab access token. To get one, read https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
         token: {{ onepasswordRead "op://Personal/Gitlab/chezmoi_token" }}
-{{ if (contains .chezmoi.username .targetname) -}}
+{{- if (contains .chezmoi.username .targetname) }}
     insidelabs-git.{{ .work.domain }}:
         # What protocol to use to access the API endpoint. Supported values: http, https.
         api_protocol: https
