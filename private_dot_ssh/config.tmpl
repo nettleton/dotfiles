@@ -48,4 +48,9 @@ Host {{ onepasswordRead .op.urls.wl_home_ip }}
   IdentityFile ~/.ssh/work_laptop.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+Host {{ onepasswordRead .op.urls.wl_home_wifi }}
+  User {{ .work.user }}
+  IdentityFile ~/.ssh/work_laptop.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {{ end }}

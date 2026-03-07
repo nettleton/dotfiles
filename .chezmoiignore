@@ -1,6 +1,7 @@
 colorthemes
 styles.css
 README.md
+CLAUDE.md
 .luarc.json
 {{- if (not (eq "starship" .targetname)) }}
 Library/LaunchAgents/io.nettleton.calendar.poller.plist

@@ -1,0 +1,183 @@
+# calBuddy configuration
+#
+# ── Global configuration ────────────────────────────────────────────
+#
+# IANA timezone override (defaults to system timezone)
+# timezone = "America/New_York"
+#
+# Keychain service name for storing OAuth tokens
+# keychain_service = "io.nettleton.calBuddy"
+#
+# ── Per-Account configuration ───────────────────────────────────────
+#
+# Each account is a [accounts.<alias>] section.
+
+[accounts.local]
+# Calendar provider for this account.
+#   "eventkit"  — macOS calendars via EventKit (local, iCloud, CalDAV, etc.)
+#   "exchange"  — Microsoft Exchange via Graph API (requires login)
+provider = "eventkit"
+#
+# browser (exchange only)
+#   Command to open the OAuth device code URL. Example:
+#   browser = "open -a Firefox"
+#
+# exclude_source_types (eventkit only)
+#   Calendar sources to hide. By default all sources are shown.
+#   Valid values: exchange, local, caldav, mobileme, subscribed, birthdays
+exclude_source_types = ["exchange", "birthdays"]
+#
+# exclude_calendars (all providers)
+#   Calendar names to hide from events and calendars output.
+#   Names must match exactly as shown in 'calBuddy calendars'.
+exclude_calendars = ["2022 Europe Trip", "2024 Europe Trip", "2024 Aruba"]
+
+[accounts.work]
+provider = "exchange"
+exclude_calendars = ["Kevin Fisher", "United States holidays"]
+
+{{ if eq .targetname "starship" -}}
+[accounts.church]
+provider = "exchange"
+exclude_calendars = ["Birthdays", "United States holidays"]
+{{- end }}
+
+# ── Calendar mirroring ──────────────────────────────────────────────
+#
+# Mirror events from one account into a local/iCloud calendar.
+# Run with: calBuddy mirror run
+#
+[mirrors.work]
+source_account = "work"                # account alias to mirror from
+target_calendar = "MW"      # local calendar name (created if missing)
+target_account_type = "local"           # "local" (default) or "icloud"
+# # source_calendars = ["Calendar 1"]    # optional filter (default: all)
+# # sync_window_past_days = 7             # how far back to sync (default: 7)
+# # sync_window_future_days = 30          # how far ahead to sync (default: 30)
+
+{{ if eq .targetname "starship" -}}
+[mirrors.church]
+source_account = "church"
+target_calendar = "PSC"
+target_account_type = "local"
+{{- end }}
+
+# ── Scheduled services ─────────────────────────────────────────────
+#
+# Define launchd services to run calBuddy commands on a schedule.
+# Install with: calBuddy service install <name>
+#
+[services.mirror-sync]
+command = "mirror run"
+interval = 900  # seconds between runs (default: 900 = 15 min)
+
+# ── Persistent CLI defaults ──────────────────────────────────────────
+#
+# Uncomment keys below to set defaults for CLI flags.
+# CLI flags always override these values.
+#
+# [defaults]
+#
+# ── Accounts ──
+# accounts = "work,local"                # --accounts (defaults to all)
+#
+# ── Output format ──
+# json = false                          # --json
+# color = "auto"                        # --color (auto, always, never)
+#
+# ── Filtering ──
+# no_all_day = true                     # --no-all-day / -ea
+# from_now = false                      # --from-now / -n
+# limit = 10                            # --limit / -li
+# calendars = "Work,Personal"           # --calendars / -ic
+# exclude_calendars = "Birthdays"       # --exclude-calendars
+# include_cal_types = "exchange"         # --include-cal-types / -ict
+# exclude_cal_types = "eventkit"         # --exclude-cal-types / -ect
+# fields = "title,datetime,location"    # --fields / -iep
+# exclude_fields = "notes"              # --exclude-fields / -eep
+#
+# ── Grouping ──
+# separate_by_date = true               # --separate-by-date / -sd
+# separate_by_calendar = false           # --separate-by-calendar / -sc
+# show_empty_dates = false               # --show-empty-dates / -sed
+# show_todays_section = false            # --show-todays-section / -t
+#
+# ── Formatting ──
+# bullet = "- "                         # --bullet / -b
+# time_format = "HH:mm"                 # --time-format / -tf
+# date_format = "yyyy-MM-dd"             # --date-format / -df
+# no_end_date = false                    # --no-end-date / -eed
+# show_uid = false                       # --show-uid / -uid
+# no_calendar_names = true               # --no-calendar-names / -nc
+# section_separator = "---"              # --section-separator / -ss
+# property_order = "datetime,title"      # --property-order / -po
+# max_attendees = 5                      # --max-attendees / -na
+# max_note_chars = 200                   # --max-note-chars / -nnc
+# notes_newline_replacement = " | "      # --notes-newline-replacement / -nnr
+# relative_dates = false                 # --relative-dates
+# prop_names = false                     # --prop-names
+# now = false                            # --now (events happening right now)
+# theme = "default"                      # --theme (default, rich, minimal)
+# property_separator = "|\n    |"        # --property-separator / -ps (icalBuddy format)
+#
+# ── Sorting ──
+# sort = "start"                         # --sort (start, end, title, calendar)
+# order = "asc"                          # --order (asc, desc)
+#
+# ── Search ──
+# search_fields = "title,location"       # --search-fields (default: all except datetime)
+# target_account_type = "local"
+
+#
+# ── Behavior ──
+# quiet = false                          # --quiet / -q (suppress warnings)
+
+# ── Per-element formatting ──────────────────────────────────────────
+#
+# Customize colors and styles for each output element.
+# Themes (default, rich, minimal) provide a base; per-element
+# overrides below take priority.
+#
+# [formatting]
+# theme = "default"
+#
+# [formatting.title]
+# bold = true
+#
+# [formatting.url]
+# underline = true
+# color = "#5588FF"
+#
+# [formatting.section_title]
+# bold = true
+# color = "#AAAAAA"
+#
+# Available elements: title, calendar, datetime, location, notes,
+#   url, attendees, status, categories, recurrence, uid, cancelled,
+#   section_title, no_items, bullet, prop_label
+#
+# Style properties:
+#   color — hex "#RRGGBB", named color, or "calendar"
+#   bg_color — hex "#RRGGBB" or named color
+#   bold, dim, italic, underline, double_underline, blink
+#
+# Named colors: black, red, green, yellow, blue, magenta, cyan, white,
+#   bright-black, bright-red, bright-green, bright-yellow,
+#   bright-blue, bright-magenta, bright-cyan, bright-white
+#
+# ── Keyword highlighting ──
+#
+# Apply custom styles to arbitrary text patterns in the output.
+# Matching is case-insensitive. Quoted keys for spaces/special chars.
+#
+# [formatting.keywords.CANCELLED]
+# color = "#FF4444"
+# bold = true
+#
+# [formatting.keywords.zoom]
+# underline = true
+#
+# [formatting.keywords."Project Alpha"]
+# color = "#44AAFF"
+# italic = true
+

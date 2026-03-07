@@ -111,5 +111,36 @@ end
 
 defaults write /Users/(whoami)/Library/Preferences/io.tailscale.ipn.macsys.plist FileSharingConfiguration show
 
+if calBuddy accounts list | string match -q "$account: not authenticated"
+  echo "Logging in $account..."
+  calBuddy accounts login $account
+end
+
+{{- if eq .targetname "starship" }}
+if calBuddy accounts list | string match -q "church: not authenticated"
+  echo "calBuddy: Logging in church..."
+  calBuddy accounts login church
+else
+  echo "calBuddy: Already logged in church, skipping"
+end
+{{- end }}
+
+{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) }}
+if calBuddy accounts list | string match -q "work: not authenticated"
+  echo "calBuddy: Logging in work..."
+  calBuddy accounts login work
+else
+  echo "calBuddy: Already logged in work, skipping"
+end
+if test -f ~/Library/LaunchAgents/io.nettleton.calBuddy.mirror-sync.plist
+  echo "calBuddy: sync service installed, skipping"
+else
+  echo "calBuddy: installing mirror-sync service"
+  calbuddy service install mirror-sync
+end
+{{ end -}}
+
+calBuddy --generate-completion-script fish > ~/.config/fish/completions/calBuddy.fish
+
 echo "execute 'loaddb' in a new shell"
 echo "execute ':GoInstallBinaries in nvim"

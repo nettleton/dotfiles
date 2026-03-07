@@ -10,14 +10,16 @@ echo "SUDO_ASKPASS: $SUDO_ASKPASS"
 find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-rosetta
 {{ end -}}
 
+export HOMEBREW_GITHUB_API_TOKEN={{ onepasswordRead "op://Private/Github - Josh/chezmoi_token" }}
+
 {{ $taps := list
       "1password/tap"
-      "buo/cask-upgrade"
-      "keith/formulae" -}}
+      "buo/cask-upgrade" -}}
 {{ $brews := list
       "aws-sam-cli"
       "glib"
       "bat"
+      "nettleton/tap/calbuddy"
       "chezmoi"
       "cmake"
       "corepack"
@@ -79,8 +81,7 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
       "vale"
       "vim"
       "wget"
-      "whalebrew"
-      "keith/formulae/reminders-cli" -}}
+      "whalebrew" -}}
 {{ $casks := list
       "1password"
       "1password/tap/1password-cli"
@@ -178,6 +179,7 @@ brew bundle --file=/dev/stdin <<EOF
 {{ range ($taps | sortAlpha | uniq) -}}
 tap "{{ . }}"
 {{ end -}}
+tap "nettleton/tap", "git@github.com:nettleton/homebrew-tap.git"
 {{ range ($brews | sortAlpha | uniq) -}}
 brew "{{ . }}"
 {{ end -}}
