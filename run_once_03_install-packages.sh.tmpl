@@ -1,6 +1,7 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/bin/bash
 
+# Save and unset SUDO_ASKPASS so brew doesn't hang on custom askpass programs
 existing_sudo_askpass="$SUDO_ASKPASS"
 echo "existing_sudo_askpass: $existing_sudo_askpass"
 unset SUDO_ASKPASS
@@ -16,6 +17,7 @@ export HOMEBREW_GITHUB_API_TOKEN={{ onepasswordRead "op://Private/Github - Josh/
       "1password/tap"
       "buo/cask-upgrade" -}}
 {{ $brews := list
+      "awscli"
       "aws-sam-cli"
       "glib"
       "bat"
@@ -42,6 +44,7 @@ export HOMEBREW_GITHUB_API_TOKEN={{ onepasswordRead "op://Private/Github - Josh/
       "glow"
       "gnutls"
       "gofumpt"
+      "helm"
       "golangci-lint"
       "gopls"
       "gomodifytags"
@@ -57,6 +60,8 @@ export HOMEBREW_GITHUB_API_TOKEN={{ onepasswordRead "op://Private/Github - Josh/
       "whisper-cpp"
       "taglib"
       "ical-buddy"
+      "jq"
+      "kubernetes-cli"
       "libxml2"
       "luarocks"
       "luv"
@@ -81,7 +86,8 @@ export HOMEBREW_GITHUB_API_TOKEN={{ onepasswordRead "op://Private/Github - Josh/
       "vale"
       "vim"
       "wget"
-      "whalebrew" -}}
+      "whalebrew"
+      "yq" -}}
 {{ $casks := list
       "1password"
       "1password/tap/1password-cli"

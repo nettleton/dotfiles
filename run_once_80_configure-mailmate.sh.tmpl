@@ -1,9 +1,12 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/usr/bin/env fish
 
-echo "Download MailMate for Big Sur from https://freron.com/download/ - once installed, come back and continue"
-
-read -P "Continue? " ANSWER
+if not test -d /Applications/MailMate.app
+  echo "Download MailMate from https://freron.com/download/ - once installed, come back and continue"
+  read -P "Continue? " ANSWER
+else
+  echo "MailMate already installed, skipping download prompt"
+end
 
 defaults write com.freron.MailMate MmAutomaticallyExpandThreadsEnabled -bool YES
 defaults write com.freron.MailMate MmAutomaticallyExpandOnlyWhenCounted -bool YES

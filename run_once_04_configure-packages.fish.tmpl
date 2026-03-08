@@ -111,11 +111,6 @@ end
 
 defaults write /Users/(whoami)/Library/Preferences/io.tailscale.ipn.macsys.plist FileSharingConfiguration show
 
-if calBuddy accounts list | string match -q "$account: not authenticated"
-  echo "Logging in $account..."
-  calBuddy accounts login $account
-end
-
 {{- if .is_personal_machine }}
 if calBuddy accounts list | string match -q "church: not authenticated"
   echo "calBuddy: Logging in church..."

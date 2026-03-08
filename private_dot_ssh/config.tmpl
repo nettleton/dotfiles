@@ -1,56 +1,50 @@
+{{- define "1password" }}
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{- end }}
 Host github.com
   User nettleton
   IdentityFile ~/.ssh/github_com.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 Host gitlab.com
   User nettleton
   IdentityFile ~/.ssh/gitlab_com.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 {{ if .is_work_machine }}
 Host {{ .work.hostnames.mac_laptop }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/work_laptop.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 Host insidelabs-git.{{ .work.domain }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/gitlab_internal.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 Host github.{{ .work.domain }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/github_internal.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 Host {{ .work.hostnames.mac_studio }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/work_mac_studio.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 {{ end }}
 {{ if .is_wife_machine }}
 Host starship.local
   User {{ .starshipuser }}
   IdentityFile ~/.ssh/starship.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 {{ end }}
 {{ if .is_personal_machine }}
 Host nessie.local
   User {{ .nessieuser }}
   IdentityFile ~/.ssh/nessie.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 Host {{ onepasswordRead .op.urls.wl_home_ip }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/work_laptop.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 Host {{ onepasswordRead .op.urls.wl_home_wifi }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/work_laptop.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  {{- template "1password" }}
 {{ end }}

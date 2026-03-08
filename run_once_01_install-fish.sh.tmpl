@@ -6,7 +6,18 @@ brew install fish
 FISH_PATH=$(which fish)
 
 sudo -v
-echo "Open a new terminal and add $FISH_PATH to /etc/shells (sudo vi /etc/shells).  Press any key once complete."
-read ignored
-chsh -s "$FISH_PATH"
+
+# Add fish to /etc/shells if not already present
+if grep -q "$FISH_PATH" /etc/shells; then
+  echo "fish already in /etc/shells, skipping"
+else
+  echo "$FISH_PATH" | sudo tee -a /etc/shells
+fi
+
+# Set fish as the default shell
+if [ "$SHELL" = "$FISH_PATH" ]; then
+  echo "fish already the default shell, skipping"
+else
+  chsh -s "$FISH_PATH"
+fi
 {{ end -}}
