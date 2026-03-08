@@ -1,4 +1,4 @@
-{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) }}
+{{- if (or .is_work_machine .is_personal_machine) }}
 new_tab notes_terminal
 launch --title notes_terminal /opt/homebrew/bin/fish
 resize_window shorter 20

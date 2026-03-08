@@ -1,5 +1,5 @@
 
-{{ if contains .chezmoi.username .targetname }}
+{{ if .is_work_machine }}
 registry=http://mw-npm-repository/artifactory/api/npm/npm-repos
 {{ else }}
 # scoped dependency overrides

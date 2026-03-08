@@ -29,7 +29,7 @@ set -g -x MATLAB_JAVA (/usr/libexec/java_home -v 11)
 
 # GO
 set -x GOROOT (go env GOROOT)
-{{ if contains .chezmoi.username .targetname }}
+{{ if .is_work_machine }}
 set -x GOPROXY http://iat-go-proxy-prod-01.{{ .work.domain }}:7000/go-proxy
 set -x GOPRIVATE golang.dhcp,github.{{ .work.domain }}
 set -x GONOPROXY github.{{ .work.domain }}
@@ -48,10 +48,10 @@ set -g -x ALTERNATE_EDITOR "/usr/bin/vim"
 set -x -g WORK_USER {{ .work.user }}
 set -x -g WORK_MAC_DESKTOP {{ .work.hostnames.mac_desktop }}
 set -x -g WORK_MAC_STUDIO {{ .work.hostnames.mac_studio }}
-{{ if contains .chezmoi.username .targetname -}}
+{{ if .is_work_machine -}}
 set -x -g WORK_MAC_LAPTOP {{ .work.hostnames.mac_laptop }}
 {{- end -}}
-{{- if eq .targetname "starship" -}}
+{{- if .is_personal_machine -}}
 set -x -g WORK_MAC_LAPTOP {{ onepasswordRead .op.urls.wl_home_ip }}
 {{- end }}
 set -x -g WORK_MAC_SCREENS_ALIAS ah-{{ .work.user }}-m
@@ -100,17 +100,19 @@ abbr k kubectl
 
 abbr vpn secureclient
 abbr sshk "kitty +kitten ssh"
-{{ if eq .targetname "starship" -}}
+{{ if .is_personal_machine -}}
 abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO ''exec fish'''"
 abbr wms "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec ssh -t p 22 $WORK_USER@$WORK_MAC_STUDIO ''exec fish'''"
 {{- end }}
-{{ if contains .chezmoi.username .targetname -}}
+{{ if .is_work_machine -}}
 abbr wm "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO 'exec fish'"
 abbr wms "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_STUDIO 'exec fish'"
 {{- end }}
+{{ if (or .is_personal_machine .is_work_machine) -}}
 abbr wml "kitty +kitten ssh -t -p 22 $WORK_USER@$WORK_MAC_LAPTOP 'exec fish'"
 abbr wmv "open screens://$WORK_MAC_SCREENS_ALIAS"
 abbr wl "sshf $WORK_KEY $WORK_USER $WORK_LINUX"
+{{- end }}
 
 abbr nas "ssh $NAS_IP"
 

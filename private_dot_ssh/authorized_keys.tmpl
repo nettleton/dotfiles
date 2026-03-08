@@ -8,10 +8,10 @@
 {{ onepasswordRead .op.urls.wms_wl }}
 {{ onepasswordRead .op.urls.wms_endurance }}
 {{- end -}}
-{{- if eq .targetname "starship" -}}
+{{- if .is_personal_machine -}}
 {{ onepasswordRead .op.urls.starship_nessie }}
 {{ onepasswordRead .op.urls.starship_endurance }}
 {{- end -}}
-{{- if eq .targetname "nessie" -}}
+{{- if .is_wife_machine -}}
 {{ onepasswordRead .op.urls.nessie_starship }}
 {{- end -}}

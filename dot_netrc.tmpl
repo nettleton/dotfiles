@@ -1,3 +1,3 @@
-{{ if (contains .chezmoi.username .targetname) }}
+{{ if .is_work_machine }}
 machine github.{{ .work.domain }} login {{ .work.user }} password {{ onepasswordRead "op://personal/github enterprise pat/credential" }}
 {{ end }}

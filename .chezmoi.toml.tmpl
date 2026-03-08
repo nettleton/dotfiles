@@ -1,16 +1,32 @@
-{{- $workuser := promptString "workuser" -}}
-{{- $workname := promptString "company" -}}
-{{- $workdomain := promptString "workdomain" -}}
-{{- $ghemail := promptString "ghemail" -}}
-{{- $targetname := promptString "targetname" -}}
-{{- $personalpackages := promptBool "install personal packages" -}}
-{{- $sudoItem := promptString "sudoItem" -}}
-{{- $starshipuser := promptString "starship user" -}}
-{{- $nessieuser := promptString "nessie user" -}}
+{{- $opWork := onepassword "m52t7zda3dt6bodn2oqn7ugqqa" -}}
+{{- $opPersonal := onepassword "lijudxpzrfcopmw2ejdlv3kxgq" -}}
+{{- $opWife := onepassword "srjgyi5b6fzwsii5fchs6jgs5i" -}}
+{{- $workname := promptString "company" (index $opWork "title") -}}
+{{- $workuser := output "op" "read" (printf "op://personal/%s/username" $workname) "-n" | trim -}}
+{{- $workdomain := printf "%s.com" ($workname | lower) -}}
+{{- $targetname := promptString "targetname" .chezmoi.hostname -}}
+{{- $is_work_machine := contains $workuser $targetname -}}
+{{- $is_personal_machine := eq $targetname "starship" -}}
+{{- $is_wife_machine := eq $targetname "nessie" -}}
+{{- $is_child_machine := eq $targetname "cooper" -}}
+{{- $is_laptop := contains "Book" (output "sysctl" "-n" "hw.model" | trim) -}}
+{{- $sudoItem := "" -}}
+{{- if $is_work_machine -}}{{- $sudoItem = index $opWork "title" -}}
+{{- else if $is_personal_machine -}}{{- $sudoItem = index $opPersonal "title" -}}
+{{- else if $is_wife_machine -}}{{- $sudoItem = index $opWife "title" -}}
+{{- else if $is_child_machine -}}{{- $sudoItem = index $opPersonal "title" -}}
+{{- end -}}
+{{- $starshipuser := output "op" "item" "get" "lijudxpzrfcopmw2ejdlv3kxgq" "--fields" "username" | trim -}}
+{{- $nessieuser := output "op" "item" "get" "srjgyi5b6fzwsii5fchs6jgs5i" "--fields" "username" | trim -}}
 
 [data]
   targetname = {{ $targetname | quote }}
-  personalpackages = {{ $personalpackages }}
+  personalpackages = {{ not $is_work_machine }}
+  is_work_machine = {{ $is_work_machine }}
+  is_personal_machine = {{ $is_personal_machine }}
+  is_wife_machine = {{ $is_wife_machine }}
+  is_child_machine = {{ $is_child_machine }}
+  is_laptop = {{ $is_laptop }}
   starshipuser = {{ $starshipuser | quote }}
   nessieuser   = {{ $nessieuser | quote }}
 
@@ -49,10 +65,10 @@
   email = "{{- $workuser -}}@{{- $workdomain -}}"
 
 [data.work.hostnames]
-  mac_desktop = "ah-{{- $workuser -}}-mac.dhcp.{{- $workdomain -}}"
+  mac_desktop = "ah-{{- $workuser -}}-m.dhcp.{{- $workdomain -}}"
   mac_studio = "ah-{{- $workuser -}}-m.dhcp.{{- $workdomain -}}"
   mac_laptop = "ah-{{- $workuser -}}1-m.wifi.{{- $workdomain -}}"
   linux = "{{- $workuser -}}-deb10-64.dhcp.{{- $workdomain -}}"
 
 [data.github]
-  email = {{ $ghemail | quote }}
+  email = "github@nettleton.io"

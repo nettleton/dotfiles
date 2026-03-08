@@ -1056,7 +1056,7 @@ tab_powerline_style slanted
 
 #: Advanced
 
-{{ if contains .chezmoi.username .targetname }}
+{{ if .is_work_machine }}
 {{ if eq .chezmoi.arch "amd64" }}
 shell /usr/local/bin/fish --login --interactive
 {{ end }}

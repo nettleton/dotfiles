@@ -2,19 +2,20 @@ colorthemes
 styles.css
 README.md
 CLAUDE.md
+ROADMAP.md
 .luarc.json
-{{- if (not (eq "starship" .targetname)) }}
+{{- if (not .is_personal_machine) }}
 Library/LaunchAgents/io.nettleton.calendar.poller.plist
 {{- end }}
-{{- if contains .chezmoi.username .targetname }}
+{{- if .is_work_machine }}
 .config/swiftbar/solaredge.15m.py
 .config/swiftbar/openconnectstatus.2m.sh
 {{- end }}
-{{- if contains (printf "-%s-" .work.user) .targetname }}
+{{- if (and .is_work_machine (not .is_laptop)) }}
 .config/swiftbar/openconnectstatus.2m.sh
 .config/swiftbar/secureclientstatus.2m.sh
 {{- end }}
-{{- if (not (contains .chezmoi.username .targetname)) }}
+{{- if (not .is_work_machine) }}
 .config/swiftbar/openconnectstatus.2m.sh
 .config/swiftbar/secureclientstatus.2m.sh
 {{- end }}

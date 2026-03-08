@@ -59,7 +59,7 @@ checkAndAddGitHubKeys github.com nettleton "op://Personal/GitHub - Josh/chezmoi_
 # public gitlab
 checkAndAddGitlabKeys gitlab.com nettleton op://Personal/Gitlab/chezmoi_token "$HOME/.ssh/gitlab_com.pub"
 
-{{ if (contains .chezmoi.username .targetname) }}
+{{ if .is_work_machine }}
 # internal github
 checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token "$HOME/.ssh/github_internal.pub"
 # internal gitlab

@@ -8,7 +8,12 @@ Host gitlab.com
   IdentityFile ~/.ssh/gitlab_com.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-{{ if (not (eq .targetname "nessie")) }}
+{{ if .is_work_machine }}
+Host {{ .work.hostnames.mac_laptop }}
+  User {{ .work.user }}
+  IdentityFile ~/.ssh/work_laptop.pub
+  IdentitiesOnly yes
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 Host insidelabs-git.{{ .work.domain }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/gitlab_internal.pub
@@ -24,20 +29,15 @@ Host {{ .work.hostnames.mac_studio }}
   IdentityFile ~/.ssh/work_mac_studio.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-Host {{ .work.hostnames.mac_laptop }}
-  User {{ .work.user }}
-  IdentityFile ~/.ssh/work_laptop.pub
-  IdentitiesOnly yes
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {{ end }}
-{{ if (eq .targetname "nessie") }}
+{{ if .is_wife_machine }}
 Host starship.local
   User {{ .starshipuser }}
   IdentityFile ~/.ssh/starship.pub
   IdentitiesOnly yes
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {{ end }}
-{{ if (eq .targetname "starship") }}
+{{ if .is_personal_machine }}
 Host nessie.local
   User {{ .nessieuser }}
   IdentityFile ~/.ssh/nessie.pub

@@ -32,11 +32,13 @@ exclude_source_types = ["exchange", "birthdays"]
 #   Names must match exactly as shown in 'calBuddy calendars'.
 exclude_calendars = ["2022 Europe Trip", "2024 Europe Trip", "2024 Aruba"]
 
+{{ if (or .is_personal_machine .is_work_machine) -}}
 [accounts.work]
 provider = "exchange"
 exclude_calendars = ["Kevin Fisher", "United States holidays"]
+{{- end }}
 
-{{ if eq .targetname "starship" -}}
+{{ if .is_personal_machine -}}
 [accounts.church]
 provider = "exchange"
 exclude_calendars = ["Birthdays", "United States holidays"]
@@ -47,6 +49,7 @@ exclude_calendars = ["Birthdays", "United States holidays"]
 # Mirror events from one account into a local/iCloud calendar.
 # Run with: calBuddy mirror run
 #
+{{ if (or .is_personal_machine .is_work_machine) -}}
 [mirrors.work]
 source_account = "work"                # account alias to mirror from
 target_calendar = "MW"      # local calendar name (created if missing)
@@ -54,8 +57,9 @@ target_account_type = "local"           # "local" (default) or "icloud"
 # # source_calendars = ["Calendar 1"]    # optional filter (default: all)
 # # sync_window_past_days = 7             # how far back to sync (default: 7)
 # # sync_window_future_days = 30          # how far ahead to sync (default: 30)
+{{- end }}
 
-{{ if eq .targetname "starship" -}}
+{{ if .is_personal_machine -}}
 [mirrors.church]
 source_account = "church"
 target_calendar = "PSC"

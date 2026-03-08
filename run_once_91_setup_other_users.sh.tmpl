@@ -1,4 +1,4 @@
-{{- if (and (eq .chezmoi.os "darwin") (eq .targetname "cooper")) -}}
+{{- if (and (eq .chezmoi.os "darwin") .is_child_machine) -}}
 #!/usr/bin/env fish 
 
 function createNonAdminUser -a userId password realName uniqueId

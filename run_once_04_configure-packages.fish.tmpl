@@ -23,7 +23,7 @@ echo $fish_user_paths | grep -q "$CARGO_HOME/bin"; or set -U fish_user_paths $fi
 go install github.com/rhysd/vim-startuptime@latest
 
 # internal dev tools are at /usr/local/netbin 
-{{ if (contains .chezmoi.username .targetname) }}
+{{ if .is_work_machine }}
 if contains /usr/local/netbin $fish_user_paths
   echo "/usr/local/netbin already on path, not adding"
 else
@@ -116,7 +116,7 @@ if calBuddy accounts list | string match -q "$account: not authenticated"
   calBuddy accounts login $account
 end
 
-{{- if eq .targetname "starship" }}
+{{- if .is_personal_machine }}
 if calBuddy accounts list | string match -q "church: not authenticated"
   echo "calBuddy: Logging in church..."
   calBuddy accounts login church
@@ -125,7 +125,7 @@ else
 end
 {{- end }}
 
-{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) }}
+{{- if (or .is_work_machine .is_personal_machine) }}
 if calBuddy accounts list | string match -q "work: not authenticated"
   echo "calBuddy: Logging in work..."
   calBuddy accounts login work

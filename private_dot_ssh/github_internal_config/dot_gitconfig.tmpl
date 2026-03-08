@@ -1,4 +1,4 @@
-{{- if (not (or (eq .targetname "nessie") (eq .targetname "cooper"))) -}}
+{{- if .is_work_machine -}}
 [user]
   name = "Joshua Wang"
   email = {{ .work.email }}
