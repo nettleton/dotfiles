@@ -1,0 +1,20 @@
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+if test (podman machine list --noheading | wc -l) -eq 1
+  echo "podman machine installed; not reinstalling"
+else
+  podman machine init --cpus 6 --disk-size 3072 --memory 8192
+end
+
+echo "elevating to sudo to check podman-mac-helper"
+/usr/bin/sudo -A -v
+echo "sudo check complete"
+sudo -A podman-mac-helper install
+
+# symlink docker-compose as docker plugin - podman-compose isn't feature for feature compatible
+#    example: https://github.com/containers/podman-compose/issues/610
+mkdir -p "$HOME/.docker/cli-plugins"
+set HOMEBREW_PREFIX (brew --prefix)
+ln -sfn "$HOMEBREW_PREFIX/opt/docker-compose/bin/docker-compose" "$HOME/.docker/cli-plugins/docker-compose"

@@ -1,0 +1,254 @@
+packages:
+  brew:
+    taps:
+      - 1password/tap
+      - buo/cask-upgrade
+
+    brews:
+      - awscli
+      - aws-sam-cli
+      - bat
+      - chezmoi
+      - cmake
+      - corepack
+      - curl
+      - dasel
+      - delve
+      - dnscontrol
+      - docker
+      - docker-buildx
+      - docker-compose
+      - dockutil
+      - doggo
+      - eza
+      - fd
+      - ffmpeg
+      - fftw
+      - findutils
+      - fish
+      - fzf
+      - gh
+      - git
+      - glab
+      - glib
+      - glib-networking
+      - glow
+      - gnutls
+      - go
+      - gofumpt
+      - golangci-lint
+      - gomodifytags
+      - gopls
+      - gotests
+      - graphviz
+      - helm
+      - ical-buddy
+      - jq
+      - kind
+      - kubernetes-cli
+      - libxml2
+      - luarocks
+      - luv
+      - markdown
+      - mas
+      - maven
+      - mise
+      - neovim
+      - "nettleton/tap/calbuddy"
+      - nghttp2
+      - node
+      - openconnect
+      - pandoc
+      - pcre
+      - podman
+      - poppler
+      - pyenv
+      - rename
+      - ripgrep-all
+      - ruby
+      - starship
+      - taglib
+      - tmux
+      - tree-sitter-cli
+      - unbound
+      - vale
+      - vim
+      - wget
+      - whisper-cpp
+      - yq
+
+    casks:
+      - 1password
+      - 1password/tap/1password-cli
+      - alfred
+      - chrysalis
+      - corretto
+      - corretto@11
+      - devonthink
+      - firefox
+      - font-fira-code-nerd-font
+      - font-hack-nerd-font
+      - font-jetbrains-mono-nerd-font
+      - ghostty
+      - google-chrome
+      - intellij-idea
+      - istat-menus
+      - iterm2
+      - jordanbaird-ice
+      - karabiner-elements
+      - kitty
+      - mactex
+      - microsoft-auto-update
+      - microsoft-edge
+      - microsoft-teams
+      - netnewswire
+      - podman-desktop
+      - screens
+      - sf-symbols
+      - shortcat
+      - soundsource
+      - swiftbar
+      - timing
+      - transmit
+      - visual-studio-code
+      - vlc
+
+    personal_brews:
+      - bfg
+      - bison
+      - docutils
+      - fontforge
+      - gd
+      - gdk-pixbuf
+      - gobject-introspection
+      - gsettings-desktop-schemas
+      - gstreamer
+      - harfbuzz
+      - hugo
+      - imagemagick
+      - imagemagick@6
+      - leptonica
+      - libass
+      - libbluray
+      - libdvdcss
+      - libmms
+      - libogg
+      - libproxy
+      - libraqm
+      - mad
+      - media-info
+      - ocrmypdf
+      - pango
+      - pillow
+      - pybind11
+      - pygobject3
+      - qt
+      - sphinx-doc
+      - tesseract
+      - theora
+      - two-lame
+      - vala
+
+    personal_casks:
+      - arq
+      - claude
+      - claude-code
+      - handbrake-app
+      - hazel
+      - makemkv
+      - moneydance
+      - rancher
+      - receipts
+      - resilio-sync
+      - screens-connect
+      - signal
+      - tailscale-app
+      - xld
+      - xquartz
+
+  mas:
+    apps:
+      - name: 1Blocker
+        id: 1365531024
+      - name: 1Password for Safari
+        id: 1569813296
+      - name: Folder Quick Look
+        id: 6753110395
+      - name: GarageBand
+        id: 682658836
+      - name: iMovie
+        id: 408981434
+      - name: Keynote
+        id: 409183694
+      - name: NotePlan - To-Do List & Notes
+        id: 1505432629
+      - name: Numbers
+        id: 409203825
+      - name: Pages
+        id: 409201541
+      - name: PCalc
+        id: 403504866
+      - name: "Play: Save Videos Watch Later"
+        id: 1596506190
+      - name: StopTheFonts
+        id: 1671452642
+      - name: StopTheMadness Pro
+        id: 6471380298
+      - name: Today
+        id: 6443714928
+      - name: Vimari
+        id: 1480933944
+      - name: Vinegar - Tube Cleaner
+        id: 1591303229
+
+    personal_apps:
+      - name: FileBot
+        id: 905384638
+      - name: HomeControl
+        id: 1547121417
+      - name: Microsoft Excel
+        id: 462058435
+      - name: Microsoft OneNote
+        id: 784801555
+      - name: Microsoft Outlook
+        id: 985367838
+      - name: Microsoft PowerPoint
+        id: 462062816
+      - name: Microsoft Remote Desktop
+        id: 1295203466
+      - name: Microsoft Word
+        id: 462054704
+      - name: OneDrive
+        id: 823766827
+      - name: Paprika Recipe Manager 3
+        id: 1303222628
+      - name: Parcel - Delivery Tracking
+        id: 639968404
+      - name: "Travel Planner Guide: Tripsy"
+        id: 1429967544
+      - name: Xcode
+        id: 497799835
+
+  fisher:
+    - jorgebucaran/fisher
+    - IlanCosman/tide@v5
+    - jorgebucaran/autopair.fish
+    - evanlucas/fish-kubectl-completions
+    - 0rax/fish-bd
+    - PatrickF1/fzf.fish
+    - lewisacidic/fish-git-abbr
+    - lewisacidic/fish-scripting
+
+  fisher_darwin:
+    - oh-my-fish/plugin-osx
+
+  npm:
+    - npm
+    - neovim
+
+  pip3:
+    - neovim
+    - pynvim
+
+  go:
+    - github.com/rhysd/vim-startuptime@latest

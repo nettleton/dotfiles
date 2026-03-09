@@ -1,0 +1,47 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+
+FISH_PATH=$(which fish)
+
+sudo -v
+
+# Add fish to /etc/shells if not already present
+if grep -q "$FISH_PATH" /etc/shells; then
+  echo "fish already in /etc/shells, skipping"
+else
+  echo "$FISH_PATH" | sudo tee -a /etc/shells
+fi
+
+# Set fish as the default shell
+if [ "$SHELL" = "$FISH_PATH" ]; then
+  echo "fish already the default shell, skipping"
+else
+  chsh -s "$FISH_PATH"
+fi
+
+# Set up locatedb cache
+mkdir -p "$HOME/.cache"
+touch "$HOME/.cache/locatedb"
+
+# Configure fisher and plugins (run via fish)
+"$FISH_PATH" -c '
+fish_add_path (brew --prefix)/bin
+
+curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+{{ range .packages.fisher -}}
+fisher install {{ . }}
+{{ end -}}
+{{ if (eq .chezmoi.os "darwin") -}}
+{{ range .packages.fisher_darwin -}}
+fisher install {{ . }}
+{{ end -}}
+{{ end -}}
+
+set --universal tide_left_prompt_items os context pwd git go aws newline time cmd_duration status
+set --universal tide_cmd_duration_threshold 1
+set --universal tide_cmd_duration_decimals 3
+set --universal tide_status_always_display true
+set --universal tide_context_always_display false
+set --universal tide_right_prompt_items jobs
+'
+{{ end -}}

@@ -1,5 +1,6 @@
 #!/usr/bin/env fish
 
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
 
 function checkAndAddGitHubKeys -a ghHost -a ghUser -a ghTokenUrl -a keyPath
   echo ""
@@ -47,10 +48,10 @@ function checkAndAddGitlabKeys -a glHost -a glUser -a glTokenUrl -a keyPath
   echo "$GITLAB_URI: checking for key"
   if glab ssh-key list | grep {{ .targetname }} | grep -q auth_and_signing
     echo "    authentication key already exists"
-  else 
+  else
     echo "    authentication key missing; adding"
     glab ssh-key add "$keyPath" -t {{ .targetname }} --usage-type "auth_and_signing"
-  end 
+  end
 end
 
 # public github
@@ -64,5 +65,4 @@ checkAndAddGitlabKeys gitlab.com nettleton op://Personal/Gitlab/chezmoi_token "$
 checkAndAddGitHubKeys github.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token "$HOME/.ssh/github_internal.pub"
 # internal gitlab
 checkAndAddGitlabKeys insidelabs-git.{{ .work.domain }} {{ .work.user }} op://Personal/{{- .work.companyname -}}/chezmoi_token_gitlab_internal "$HOME/.ssh/gitlab_internal.pub"
-{{- end -}}
-
+{{- end }}

@@ -1,0 +1,29 @@
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+{{- if .is_personal_machine }}
+if calBuddy accounts list | string match -q "church: not authenticated"
+  echo "calBuddy: Logging in church..."
+  calBuddy accounts login church
+else
+  echo "calBuddy: Already logged in church, skipping"
+end
+{{- end }}
+
+{{- if (or .is_work_machine .is_personal_machine) }}
+if calBuddy accounts list | string match -q "work: not authenticated"
+  echo "calBuddy: Logging in work..."
+  calBuddy accounts login work
+else
+  echo "calBuddy: Already logged in work, skipping"
+end
+if test -f ~/Library/LaunchAgents/io.nettleton.calBuddy.mirror-sync.plist
+  echo "calBuddy: sync service installed, skipping"
+else
+  echo "calBuddy: installing mirror-sync service"
+  calbuddy service install mirror-sync
+end
+{{ end -}}
+
+calBuddy --generate-completion-script fish > ~/.config/fish/completions/calBuddy.fish

@@ -1,0 +1,38 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+
+# Save and unset SUDO_ASKPASS so brew doesn't hang on custom askpass programs
+existing_sudo_askpass="$SUDO_ASKPASS"
+unset SUDO_ASKPASS
+
+{{ if eq .chezmoi.arch "arm64" -}}
+find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-rosetta
+{{ end -}}
+
+export HOMEBREW_GITHUB_API_TOKEN={{ onepasswordRead "op://Private/Github - Josh/chezmoi_token" }}
+
+brew bundle --file=/dev/stdin <<EOF
+{{ range .packages.brew.taps | sortAlpha | uniq -}}
+tap "{{ . }}"
+{{ end -}}
+tap "nettleton/tap", "git@github.com:nettleton/homebrew-tap.git"
+{{ range .packages.brew.brews | sortAlpha | uniq -}}
+brew "{{ . }}"
+{{ end -}}
+{{ if .personalpackages -}}
+{{ range .packages.brew.personal_brews | sortAlpha | uniq -}}
+brew "{{ . }}"
+{{ end -}}
+{{ end -}}
+{{ range .packages.brew.casks | sortAlpha | uniq -}}
+cask "{{ . }}"
+{{ end -}}
+{{ if .personalpackages -}}
+{{ range .packages.brew.personal_casks | sortAlpha | uniq -}}
+cask "{{ . }}"
+{{ end -}}
+{{ end -}}
+EOF
+
+export SUDO_ASKPASS="$existing_sudo_askpass"
+{{ end -}}

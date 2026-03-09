@@ -1,0 +1,8 @@
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+{{ range .packages.go -}}
+echo "installing {{ . }}"
+go install {{ . }}
+{{ end -}}

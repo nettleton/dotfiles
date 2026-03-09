@@ -1,0 +1,18 @@
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+{{ range .packages.npm -}}
+echo "checking {{ . }}"
+if not npm list -g "{{ . }}" > /dev/null 2>&1
+  echo "  {{ . }} not installed, installing"
+  npm install -g "{{ . }}"
+else
+  if npm outdated -g "{{ . }}" 2>/dev/null | grep -q "{{ . }}"
+    echo "  {{ . }} outdated, upgrading"
+    npm install -g "{{ . }}"
+  else
+    echo "  {{ . }} up-to-date"
+  end
+end
+{{ end -}}

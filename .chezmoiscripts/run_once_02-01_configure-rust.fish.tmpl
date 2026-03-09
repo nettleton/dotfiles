@@ -1,0 +1,13 @@
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+if which rustup > /dev/null
+  echo "rustup installed; updating"
+  rustup update
+else
+  echo "installing rustup and rust"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+end
+set -x -U CARGO_HOME "$HOME/.cargo"
+echo $fish_user_paths | grep -q "$CARGO_HOME/bin"; or set -U fish_user_paths $fish_user_paths "$CARGO_HOME/bin"

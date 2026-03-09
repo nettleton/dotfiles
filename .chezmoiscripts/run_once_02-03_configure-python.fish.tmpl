@@ -1,0 +1,19 @@
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+set pipbin "$HOME/.local/bin"
+mkdir -p "$pipbin"
+echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_paths "$pipbin"
+
+set pylatest (pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*\$" | tail -1 | string trim)
+if not test -d "$HOME/.pyenv/versions/$pylatest"
+  pyenv install "$pylatest"
+  pyenv global "$pylatest"
+
+  set -Ux PYENV_ROOT $HOME/.pyenv
+  set -Ux PYENV_VERSION "$pylatest"
+  echo $fish_user_paths | grep -q "$PYENV_ROOT/bin"; or set -U fish_user_paths $fish_user_paths "$PYENV_ROOT/bin"
+else
+  echo "Python $pylatest already installed, skipping"
+end

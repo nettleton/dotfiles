@@ -1,0 +1,15 @@
+{{- if not .is_work_machine -}}
+#!/bin/bash
+# Configure SSH for key-only login and enable Remote Login
+
+if ! sudo systemsetup -getremotelogin 2>/dev/null | grep -q "On"; then
+  sudo sed -i '' \
+    -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
+    -e 's/^#\?ChallengeResponseAuthentication .*/ChallengeResponseAuthentication no/' \
+    /etc/ssh/sshd_config
+  sudo systemsetup -setremotelogin on
+  echo "Remote Login enabled with key-only auth"
+else
+  echo "Remote Login already enabled, skipping"
+fi
+{{- end }}
