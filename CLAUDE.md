@@ -27,6 +27,13 @@ Files use chezmoi's naming scheme to control behavior:
 - `run_onchange_` prefix → scripts that re-run whenever their rendered content changes (for package lists)
 - Scripts are ordered alphabetically across both types; numeric prefixes control execution order
 
+## Important Constraints
+
+- **Cannot call `chezmoi` from within a chezmoi script** — chezmoi holds a lock during apply, so `chezmoi source-path` etc. will timeout. Use hardcoded paths like `$HOME/.local/share/chezmoi`.
+- **Template whitespace**: `{{-` and `-}}` trim whitespace. Both are needed on guards before shebangs (e.g., `{{- if ... -}}`) to avoid blank lines before `#!/bin/bash`.
+- **`.chezmoiexternal.toml`** runs during the update phase alongside scripts (alphabetically by target path), so scripts cannot depend on externals being applied first. Use fallbacks.
+- **`brew bundle`** does not support `--no-lock`.
+
 ## Architecture
 
 ### Configuration Data (`.chezmoi.toml.tmpl`)
@@ -40,6 +47,11 @@ All template variables are defined here. Only 2 interactive prompts (company, ta
 ### Package Data (`.chezmoidata/packages.yaml`)
 Declarative package lists for brew (taps, brews, casks, personal variants), fisher, npm, pip3, go, and Mac App Store apps. Referenced in templates as `.packages.*`. Editing this file triggers `run_onchange_` scripts to re-run.
 
+Note: the `nettleton/tap` tap is hardcoded in the brew install script (not in YAML) because it needs a custom git URL.
+
+### External Downloads (`.chezmoiexternal.toml`)
+Manages `fisher.fish` with weekly refresh via chezmoi's native external file support.
+
 ### Scripts (`.chezmoiscripts/`)
 Organized by execution phase. Scripts are ordered alphabetically; `run_once_` and `run_onchange_` are interleaved by their numeric prefix.
 
@@ -52,6 +64,7 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 - Installs taps, brews, and casks from `.packages.brew.*`
 - Personal packages gated on `.personalpackages`
 - Re-runs automatically when `packages.yaml` brew lists change
+- Auth via 1Password shell plugin (no hardcoded tokens)
 
 **`02-*` Configure brew-installed packages** (`run_once_`)
 - `02-00` — Fish shell (/etc/shells, chsh, fisher plugins, tide settings)
@@ -61,10 +74,10 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 - `02-04` — Containers (podman machine, podman-mac-helper, docker-compose symlink)
 - `02-05` — SwiftBar defaults
 - `02-06` — Git auth (gh/glab login + SSH key upload to GitHub/GitLab)
-- `02-07` — Whisper.cpp (model download, GGML Metal path)
 - `02-08` — Tailscale defaults
 - `02-09` — calBuddy (account login, sync service)
 - `02-10` — Vale sync
+- `02-11` — 1Password shell plugins (op plugin init brew)
 
 **`03-*` Install packages via other managers** (`run_onchange_`)
 - `03-00` — npm packages from `.packages.npm`
@@ -72,21 +85,27 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 - `03-02` — Go binaries from `.packages.go`
 
 **`04-*` Install & configure apps** (mixed)
-- `04-00` — Configure MailMate (`run_once_`)
+- `04-00` — Configure MailMate (`run_once_`; installed via `mailmate@beta` cask)
 - `04-01` — Install Mac App Store apps (`run_onchange_`, from `.packages.mas.*`)
 
-**`05-*` System/app configuration via tools** (`run_once_`)
+**`05-*` macOS system configuration** (`run_once_`)
 - `05-00` — Setup other users
-- `05-01` — Configure macOS defaults (future: could split iTerm/Terminal color themes to `04-*`)
+- `05-01` — macOS UI/UX and input (computer name, dark mode, trackpad, keyboard, locale)
+- `05-02` — Energy saving (pmset, hibernation guarded by `is_laptop`)
+- `05-03` — Screen (screenshots, screensaver password)
+- `05-04` — Finder (views, sidebar, Library visibility)
+- `05-05` — Dock, Mission Control, hot corners (all disabled), dock item removal
+- `05-06` — App defaults (Safari, Mail, Spotlight, Terminal/iTerm, Chrome, Activity Monitor, TextEdit, etc.)
+- `05-07` — Conditional app restarts (Dock/Finder unconditional, others prompted)
 
 ### Conditional Targeting
 Templates use semantic boolean flags (`.is_work_machine`, `.is_personal_machine`, etc.) to conditionally include config per machine. The `.chezmoiignore` file also conditionally excludes files based on these flags.
 
 ### Secrets Management
-All secrets are fetched from 1Password via `op read` or chezmoi's `onepasswordRead` template function. SSH public keys are stored as `.tmpl` files that resolve 1Password references at apply time.
+All secrets are fetched from 1Password via `op read` or chezmoi's `onepasswordRead` template function. SSH public keys are stored as `.tmpl` files that resolve 1Password references at apply time. Homebrew auth uses the 1Password shell plugin (sourced in fish config).
 
 ### SSH Configuration (`private_dot_ssh/`)
-SSH config and keys are templated per-machine. The 1Password SSH agent is used for all hosts (`IdentityAgent` points to the 1Password agent socket).
+SSH config and keys are templated per-machine. The 1Password SSH agent is used for all hosts (`IdentityAgent` points to the 1Password agent socket). Config uses `{{ define "1password" }}` template to deduplicate agent settings.
 
 ### Managed Configs (`dot_config/`)
-Includes config for: fish shell, neovim (Lua-based with lazy.nvim), kitty, starship prompt, karabiner, gh/glab CLIs, SwiftBar plugins, fd, vale, zk, and others.
+Includes config for: fish shell, neovim (Lua-based with lazy.nvim), kitty, starship prompt, karabiner, gh/glab CLIs, SwiftBar plugins, fd, vale, zk, calBuddy, and others.
