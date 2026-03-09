@@ -55,6 +55,9 @@ Manages `fisher.fish` with weekly refresh via chezmoi's native external file sup
 ### Scripts (`.chezmoiscripts/`)
 Organized by execution phase. Scripts are ordered alphabetically; `run_once_` and `run_onchange_` are interleaved by their numeric prefix.
 
+**`00` Bootstrap** (`run_before_`)
+- `00` — Install Homebrew, 1Password, 1Password CLI if missing; prompt for sign-in
+
 **`00-*` System config** (`run_once_`)
 - `00-00` — Convert git origin to SSH
 - `00-01` — Configure sudo Touch ID

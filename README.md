@@ -1,8 +1,7 @@
 # dotfiles
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install chezmoi
-brew install --cask 1password 1password-cli
-chezmoi init --verbose --apply nettleton
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply nettleton
 ```
+
+This single command installs chezmoi and applies the dotfiles. A bootstrap script automatically installs Homebrew, 1Password, and 1Password CLI if needed, prompting you to sign in before continuing.
