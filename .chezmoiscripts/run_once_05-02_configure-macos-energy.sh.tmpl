@@ -1,0 +1,81 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/usr/bin/env bash
+
+sudo -v
+
+###############################################################################
+# Energy saving                                                               #
+###############################################################################
+
+# Helper: get a pmset value for a given key (optionally scoped to a power source)
+pmset_val() {
+  local key="$1" source="${2:-}"
+  if [ -n "$source" ]; then
+    pmset -g custom 2>/dev/null | sed -n "/^${source}/,/^[A-Z]/p" | grep -E "^ *${key} " | sed 's/.*[[:space:]]//'
+  else
+    pmset -g custom 2>/dev/null | grep -E "^ *${key} " | head -1 | sed 's/.*[[:space:]]//'
+  fi
+}
+
+# Enable lid wakeup
+if [ "$(pmset_val lidwake)" != "1" ]; then
+  sudo pmset -a lidwake 1
+else
+  echo "Lid wakeup already enabled, skipping"
+fi
+
+# Restart automatically if the computer freezes
+if ! sudo systemsetup -getrestartfreeze 2>/dev/null | grep -q "On"; then
+  sudo systemsetup -setrestartfreeze on
+else
+  echo "Restart on freeze already enabled, skipping"
+fi
+
+# Sleep the display after 30 minutes
+if [ "$(pmset_val displaysleep)" != "30" ]; then
+  sudo pmset -a displaysleep 30
+else
+  echo "Display sleep already set to 30 minutes, skipping"
+fi
+
+# Disable machine sleep while charging
+if [ "$(pmset_val sleep "AC Power")" != "0" ]; then
+  sudo pmset -c sleep 0
+else
+  echo "AC power sleep already disabled, skipping"
+fi
+
+# Set machine sleep to 5 minutes on battery
+if [ "$(pmset_val sleep "Battery Power")" != "5" ]; then
+  sudo pmset -b sleep 5 2>/dev/null
+else
+  echo "Battery sleep already set to 5 minutes, skipping"
+fi
+
+# Set standby delay to 24 hours (default is 1 hour)
+if [ "$(pmset_val standbydelay)" != "86400" ]; then
+  sudo pmset -a standbydelay 86400
+else
+  echo "Standby delay already set to 24 hours, skipping"
+fi
+
+# Never go into computer sleep mode
+if ! sudo systemsetup -getcomputersleep 2>/dev/null | grep -q "Never"; then
+  sudo systemsetup -setcomputersleep Off > /dev/null
+else
+  echo "Computer sleep already set to Never, skipping"
+fi
+
+# Disable hibernation on desktops (speeds up entering sleep mode)
+# On laptops, keep hibernation enabled so state is preserved on power loss
+{{ if not .is_laptop -}}
+if [ "$(pmset_val hibernatemode)" != "0" ]; then
+  sudo pmset -a hibernatemode 0
+else
+  echo "Hibernate mode already set to 0, skipping"
+fi
+{{ else -}}
+echo "Laptop detected, keeping default hibernation mode"
+{{ end }}
+echo "Done configuring macOS energy settings."
+{{ end -}}

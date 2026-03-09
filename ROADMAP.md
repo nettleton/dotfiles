@@ -71,15 +71,9 @@ This gives chezmoi native control over external downloads with refresh periods a
 
 **Recommendation (ADR-2c):** Convert `run_once_03_install-packages.sh.tmpl` and `run_once_98_install_mas_apps.sh.tmpl` to `run_onchange_` scripts. They already effectively behave this way (chezmoi hashes the rendered content), but the naming makes the intent clearer. `brew bundle` is already idempotent, so re-running on change is safe.
 
-### 2d. Chezmoi `scriptEnv` for shared environment variables
+### 2d. Chezmoi `scriptEnv` for shared environment variables — SKIPPED
 
-**Problem:** Multiple scripts set up `SUDO_ASKPASS`, `HOMEBREW_GITHUB_API_TOKEN`, etc. independently.
-
-**Recommendation (ADR-2d):** Use `[scriptEnv]` in `.chezmoi.toml.tmpl` for variables needed across scripts:
-```toml
-[scriptEnv]
-  HOMEBREW_GITHUB_API_TOKEN = "{{ onepasswordRead ... }}"
-```
+`[scriptEnv]` doesn't add value: `HOMEBREW_GITHUB_API_TOKEN` is only used in one script (now replaced by 1Password shell plugin), and `SUDO_ASKPASS` needs to be *unset* (opposite of what scriptEnv does).
 
 ### 2e. `.chezmoiignore` for machine-role exclusion
 
@@ -127,7 +121,7 @@ All issues from the original audit (sections 3, 4, and 5) have been addressed:
 6. ~~Add idempotency guards + diagnostic messages to run_once_90~~
 7. ~~Add domain-snapshot-based conditional app restarts~~
 
-### Phase 3: Script modularization (medium risk, medium value) — DONE
+### Phase 3: Script modularization (medium risk, medium value) — DONE (d8890d2)
 1. ~~Split `run_once_04` into focused per-tool scripts~~
 2. ~~Move all scripts into `.chezmoiscripts/`~~
 3. ~~Rename brew/MAS/npm/pip/go install scripts to `run_onchange_`~~
@@ -137,12 +131,32 @@ All issues from the original audit (sections 3, 4, and 5) have been addressed:
 7. ~~Merge `run_once_01` (install fish) into brew package list~~
 8. ~~Delete `run_once_95` (manual steps) and `run_once_99` (whalebrew)~~
 
-### Future: split `05-01_configure-macos.sh.tmpl`
-The macOS defaults script could be split by subsystem (UI, input, Finder, Dock, Safari, apps). The iTerm/Terminal color theme imports could move to `04-*`. Low priority since the script is mostly stable.
+### Phase 4: Modern chezmoi features (low risk, medium value) — DONE (5aef236)
+1. ~~Add `.chezmoiexternal.toml` for fisher (weekly refresh)~~
+2. ~~Update fisher bootstrap to use external file with curl fallback~~
+3. ~~Remove `whisper-cpp` from packages and delete config script~~
+4. ~~Add `mailmate@beta` cask; simplify mailmate config (no download prompt)~~
+5. ~~Replace `HOMEBREW_GITHUB_API_TOKEN` with 1Password shell plugin~~
+6. ~~Add `op plugin init brew` script and source `plugins.sh` in fish config~~
 
-### Phase 4: Modern chezmoi features (low risk, medium value)
-1. Add `[scriptEnv]` for shared env vars
-2. Add `.chezmoiexternal.toml` for fisher and other downloads
-
-### Phase 5: Cleanup (low risk, low value)
-1. Audit macOS defaults script for settings that no longer apply to current macOS versions
+### Phase 5: macOS defaults audit & split — DONE
+1. ~~Split `05-01_configure-macos.sh.tmpl` into 7 focused scripts by subsystem~~
+   - `05-01` UI/UX and input
+   - `05-02` Energy saving (hibernation guarded by `is_laptop`)
+   - `05-03` Screen (screenshots, screensaver)
+   - `05-04` Finder
+   - `05-05` Dock, Mission Control, hot corners
+   - `05-06` Apps (Safari, Mail, Spotlight, Terminal/iTerm, Chrome, etc.)
+   - `05-07` Conditional app restarts
+2. ~~Remove obsolete settings:~~
+   - Dashboard (removed in Catalina)
+   - iCal debug menu (pre-10.8)
+   - Subpixel font rendering (removed in Mojave)
+   - HiDPI display modes (native on Apple Silicon)
+   - Bluetooth Bitpool (deprecated)
+   - Safari Java, Top Sites settings
+   - Spotlight volume exclusion write (read-only system volume)
+   - Dead app sections: GPGMail, Opera, SizeUp, Sublime Text, Spectacle, Transmission, Twitter, Tweetbot
+3. ~~Remove all commented-out cruft (Dropbox, disk image verification, hot corner examples, icon size/spacing)~~
+4. ~~Add missing customizations: Safari extensions + JS from Apple Events, disable all hot corners~~
+5. ~~Simplify restart logic (Option D: unconditional Dock/Finder restart, prompt for others)~~

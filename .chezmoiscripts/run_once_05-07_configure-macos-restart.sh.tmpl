@@ -1,0 +1,35 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/usr/bin/env bash
+
+# Restart Dock and Finder to apply preference changes (instant, harmless)
+killall Dock 2>/dev/null
+killall Finder 2>/dev/null
+
+# Prompt to restart other apps if they're running
+prompt_restart() {
+  local app="$1"
+  if killall -0 "$app" 2>/dev/null; then
+    read -p "'$app' may have new preferences. Restart? [y/N] " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] && killall "$app" 2>/dev/null
+  fi
+}
+
+prompt_restart "Safari"
+prompt_restart "Mail"
+prompt_restart "Messages"
+prompt_restart "Google Chrome"
+prompt_restart "Terminal"
+prompt_restart "Activity Monitor"
+prompt_restart "Contacts"
+prompt_restart "Calendar"
+
+# Restart SystemUIServer for menu bar changes
+if killall -0 SystemUIServer 2>/dev/null; then
+  read -p "Restart SystemUIServer for menu bar changes? [y/N] " -n 1 -r
+  echo
+  [[ $REPLY =~ ^[Yy]$ ]] && killall SystemUIServer 2>/dev/null
+fi
+
+echo "Done. Some changes may require a logout/restart to take effect."
+{{ end -}}
