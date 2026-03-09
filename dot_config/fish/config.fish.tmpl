@@ -146,3 +146,6 @@ if command -v pyenv 1>/dev/null 2>&1
 end
 
 mise activate fish | source
+
+# 1Password shell plugins (brew, etc.)
+test -s "$HOME/.config/op/plugins.sh"; and source "$HOME/.config/op/plugins.sh"

@@ -1,0 +1,12 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+if not command -q op
+  echo "1Password CLI not found, skipping plugin setup"
+  exit 0
+end
+
+op plugin init brew
+{{ end -}}

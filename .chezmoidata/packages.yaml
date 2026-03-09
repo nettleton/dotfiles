@@ -74,7 +74,6 @@ packages:
       - vale
       - vim
       - wget
-      - whisper-cpp
       - yq
 
     casks:
@@ -98,6 +97,7 @@ packages:
       - karabiner-elements
       - kitty
       - mactex
+      - mailmate@beta
       - microsoft-auto-update
       - microsoft-edge
       - microsoft-teams

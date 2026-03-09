@@ -27,7 +27,12 @@ touch "$HOME/.cache/locatedb"
 "$FISH_PATH" -c '
 fish_add_path (brew --prefix)/bin
 
-curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+# fisher.fish is managed by .chezmoiexternal.toml but may not be applied yet
+if test -f "$HOME/.config/fish/functions/fisher.fish"
+  source "$HOME/.config/fish/functions/fisher.fish"
+else
+  curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+end
 {{ range .packages.fisher -}}
 fisher install {{ . }}
 {{ end -}}

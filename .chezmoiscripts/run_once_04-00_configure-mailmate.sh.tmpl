@@ -2,10 +2,8 @@
 #!/usr/bin/env fish
 
 if not test -d /Applications/MailMate.app
-  echo "Download MailMate from https://freron.com/download/ - once installed, come back and continue"
-  read -P "Continue? " ANSWER
-else
-  echo "MailMate already installed, skipping download prompt"
+  echo "MailMate not yet installed (will be installed via brew cask), skipping configuration"
+  exit 0
 end
 
 defaults write com.freron.MailMate MmAutomaticallyExpandThreadsEnabled -bool YES
@@ -22,8 +20,7 @@ defaults write com.freron.MailMate MmBundleCommandForDiagramGeneration -string "
 touch /Applications/MailMate.app/Contents/SharedSupport/Bundles/MailMate.mmbundle/Filters/Mermaid.mmFilter
 touch /Applications/MailMate.app/Contents/SharedSupport/Bundles/MailMate.mmbundle/Filters/Prism.mmFilter
 
-
 mkdir -p $HOME/.local/bin/
 test -L "$HOME/.local/bin/emate"; and echo "emate already exists"; or ln -s /Applications/MailMate.app/Contents/Resources/emate $HOME/.local/bin/emate
 
-{{ end }}
+{{ end -}}
