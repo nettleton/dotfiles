@@ -13,6 +13,7 @@ brew bundle --file=/dev/stdin <<EOF
 {{ range .packages.brew.taps | sortAlpha | uniq -}}
 tap "{{ . }}"
 {{ end -}}
+tap "nettleton/tap", "https://github.com/nettleton/homebrew-tap.git"
 {{ range .packages.brew.brews | sortAlpha | uniq -}}
 brew "{{ . }}"
 {{ end -}}
@@ -30,14 +31,6 @@ cask "{{ . }}"
 {{ end -}}
 {{ end -}}
 EOF
-
-# Install calbuddy from private tap separately so a tap failure
-# (e.g. SSH keys not yet available) doesn't block other packages.
-if brew tap nettleton/tap "git@github.com:nettleton/homebrew-tap.git" 2>/dev/null; then
-  brew install nettleton/tap/calbuddy
-else
-  echo "Warning: could not tap nettleton/tap — skipping calbuddy (re-run chezmoi apply after SSH keys are configured)"
-fi
 
 export SUDO_ASKPASS="$existing_sudo_askpass"
 {{ end -}}
