@@ -13,7 +13,7 @@ brew bundle --file=/dev/stdin <<EOF
 {{ range .packages.brew.taps | sortAlpha | uniq -}}
 tap "{{ . }}"
 {{ end -}}
-tap "nettleton/tap", "git@github.com:nettleton/homebrew-tap.git"
+tap "nettleton/tap", "https://github.com/nettleton/homebrew-tap.git"
 {{ range .packages.brew.brews | sortAlpha | uniq -}}
 brew "{{ . }}"
 {{ end -}}
