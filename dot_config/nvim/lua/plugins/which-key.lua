@@ -39,16 +39,14 @@ which_key.add({
   { "<leader>f/", '<cmd>lua require("telescope.builtin").current_buffer_fuzzy_find()<CR>', desc = "Buffer Grep", remap = false },
   { "<leader>fa", "<cmd>:Telescope telescope-tabs list_tab<CR>", desc = "Tabs", remap = false },
   { "<leader>fb", '<cmd>lua require("telescope.builtin").buffers()<CR>', desc = "Buffer", remap = false },
-  { "<leader>fc", "<cmd>:Cheatsheet<CR>", desc = "Cheatsheet", remap = false },
   { "<leader>fd", "<cmd>:Telescope lsp_document_symbols<CR>", desc = "Document Symbols", remap = false },
   { "<leader>ff", '<cmd>lua require("telescope.builtin").find_files({ hidden = true, find_command = { "rg", "--files", "--hidden", "--follow", "--ignore-file", "~/.vimignore" } })<CR>', desc = "File", remap = false },
   { "<leader>fg", '<cmd>lua require("telescope.builtin").live_grep()<CR>', desc = "Grep", remap = false },
   { "<leader>fl", '<cmd>lua require("telescope").extensions.luasnip.luasnip{}<CR>', desc = "Snippets", remap = false },
   { "<leader>fp", "<cmd>:Telescope lazy<CR>", desc = "Lazy", remap = false },
-  { "<leader>fr", '<cmd>lua require("telescope").extensions.repo.list{fd_opts=[[--ignore-file=~/.config/nvim/lua/plugins/telescope_fdignore]]}<CR>', desc = "Repos", remap = false },
   { "<leader>fs", '<cmd>lua require("telescope.builtin").spell_suggest()<CR>', desc = "Spelling", remap = false },
   { "<leader>ft", '<cmd>lua require("telescope.builtin").treesitter()<CR>', desc = "Treesitter", remap = false },
-  { "<leader>fy", '<cmd>lua require("telescope").extensions.neoclip.default()<CR>', desc = "Yank", remap = false },
+  { "<leader>fy", '<cmd>Telescope yank_history<CR>', desc = "Yank", remap = false },
 })
 
 which_key.add({

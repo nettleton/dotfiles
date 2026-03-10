@@ -38,16 +38,6 @@ telescope.setup{
   },
   extensions = {
     fzf = {},
-    repo = {
-      list = {
-        fd_opts = {
-          "--no-ignore-vcs",
-        },
-        search_dirs = {
-          "~/sandbox",
-        },
-      },
-    },
     file_browser = {
       files = false,
     },
@@ -56,7 +46,6 @@ telescope.setup{
 }
 
 telescope.load_extension('fzf')
-telescope.load_extension('repo')
 telescope.load_extension('luasnip')
 telescope.load_extension('file_browser')
 telescope.load_extension('lazy')

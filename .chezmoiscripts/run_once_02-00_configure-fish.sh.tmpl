@@ -19,10 +19,6 @@ else
   chsh -s "$FISH_PATH"
 fi
 
-# Set up locatedb cache
-mkdir -p "$HOME/.cache"
-touch "$HOME/.cache/locatedb"
-
 # Configure fisher and plugins (run via fish)
 "$FISH_PATH" -c '
 fish_add_path (brew --prefix)/bin
