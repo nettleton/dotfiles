@@ -9,13 +9,11 @@ unset SUDO_ASKPASS
 find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-rosetta
 {{ end -}}
 
-export HOMEBREW_GITHUB_API_TOKEN="$(op read 'op://Private/Github - Josh/homebrew-tap token')"
-
 brew bundle --file=/dev/stdin <<EOF
 {{ range .packages.brew.taps | sortAlpha | uniq -}}
 tap "{{ . }}"
 {{ end -}}
-tap "nettleton/tap", "https://github.com/nettleton/homebrew-tap.git"
+tap "nettleton/tap", "git@github.com:nettleton/homebrew-tap.git"
 {{ range .packages.brew.brews | sortAlpha | uniq -}}
 brew "{{ . }}"
 {{ end -}}
