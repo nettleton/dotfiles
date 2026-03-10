@@ -55,6 +55,9 @@ g['$SHELL'] = '/usr/local/bin/fish'
 g.loaded_python_provider = 0
 g.python_host_prog = ''
 
+-- Dedicated Python 3 provider virtualenv
+g.python3_host_prog = vim.fn.expand('~/.local/share/nvim/python-venv/bin/python3')
+
 -- Disable ruby provider
 g.loaded_ruby_provider = 0
 g.ruby_host_prog = ''

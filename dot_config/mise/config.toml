@@ -1,0 +1,7 @@
+[tools]
+java = "corretto-21"
+python = "latest"
+node = "latest"
+pipx = "latest"
+"npm:neovim" = "latest"
+"npm:npm" = "latest"

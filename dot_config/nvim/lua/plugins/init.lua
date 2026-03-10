@@ -327,12 +327,6 @@ require("lazy").setup({
       end,
     },
 
-  -- ZK
-    { 'zk-org/zk-nvim',
-      config = function()
-        require('zk').setup()
-      end,
-    },
   },
   defaults = {
      -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.

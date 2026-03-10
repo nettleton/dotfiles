@@ -17,15 +17,9 @@ set -g -x DOWNLOADS "$HOME/Downloads"
 set -g -x NOTES "$HOME/Documents/notes/default"
 set -g -x ZK_NOTEBOOK_DIR "$HOME/Library/Mobile Documents/com~apple~CloudDocs/notes/zk/default"
 
-#JAVA
-switch (uname)
-  case Darwin
-    set -g -x JAVA_HOME (/usr/libexec/java_home)
-  case  Linux
-    set -g -x JAVA_HOME (update-alternatives --list javac | grep "2[0-9]" | sed -e "s:/bin/javac::g")
-  case '*'
-end
-set -g -x MATLAB_JAVA (/usr/libexec/java_home -v 11)
+# JAVA (managed by mise)
+set -g -x JAVA_HOME (mise where java)
+set -g -x MATLAB_JAVA $JAVA_HOME
 
 # GO
 set -x GOROOT (go env GOROOT)
@@ -137,13 +131,7 @@ function sourceIfNecessary
   functions -q "$argv[2]"; or source "$argv[1]"
 end
 
-test -s $HOME/.nvm-fish/nvm.fish; and source $HOME/.nvm-fish/nvm.fish
 test -s "$CARGO_HOME/env.fish"; and source "$CARGO_HOME/env.fish"
-
-# pyenv init
-if command -v pyenv 1>/dev/null 2>&1
-  pyenv init - | source
-end
 
 mise activate fish | source
 

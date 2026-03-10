@@ -31,7 +31,7 @@ Files use chezmoi's naming scheme to control behavior:
 
 - **Cannot call `chezmoi` from within a chezmoi script** — chezmoi holds a lock during apply, so `chezmoi source-path` etc. will timeout. Use hardcoded paths like `$HOME/.local/share/chezmoi`.
 - **Template whitespace**: `{{-` and `-}}` trim whitespace. Both are needed on guards before shebangs (e.g., `{{- if ... -}}`) to avoid blank lines before `#!/bin/bash`.
-- **`.chezmoiexternal.toml`** runs during the update phase alongside scripts (alphabetically by target path), so scripts cannot depend on externals being applied first. Use fallbacks.
+- **Update phase ordering**: Scripts, externals, and files all run during the update phase in alphabetical order by target path. Scripts that depend on config files being placed first may need a second `chezmoi apply` on first run. Affects `.chezmoiexternal.toml` (fisher) and `dot_config/mise/config.toml` (mise install).
 - **`brew bundle`** does not support `--no-lock`.
 
 ## Architecture
@@ -45,7 +45,10 @@ All template variables are defined here. Only 2 interactive prompts (company, ta
 - `.op.*` — 1Password item references for secrets (SSH keys, tokens)
 
 ### Package Data (`.chezmoidata/packages.yaml`)
-Declarative package lists for brew (taps, brews, casks, personal variants), fisher, npm, pip3, go, and Mac App Store apps. Referenced in templates as `.packages.*`. Editing this file triggers `run_onchange_` scripts to re-run.
+Declarative package lists for brew (taps, brews, casks, personal variants), fisher, go, and Mac App Store apps. Referenced in templates as `.packages.*`. Editing this file triggers `run_onchange_` scripts to re-run.
+
+### Tool Versions (`dot_config/mise/config.toml`)
+Python, Node, and their global packages (npm, pip) are managed by mise. This replaces pyenv and brew-installed node.
 
 Note: the `nettleton/tap` tap is hardcoded in the brew install script (not in YAML) because it needs a custom git URL.
 
@@ -73,7 +76,7 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 - `02-00` — Fish shell (/etc/shells, chsh, fisher plugins, tide settings)
 - `02-01` — Rust (rustup, CARGO_HOME)
 - `02-02` — Go (GOPATH/GOBIN, /usr/local/netbin on work machines)
-- `02-03` — Python (pyenv, PYENV_ROOT, pipbin)
+- `02-03` — mise install (Python, Node, npm/pip packages; `run_onchange_`, re-runs when mise config changes)
 - `02-04` — Containers (podman machine, podman-mac-helper, docker-compose symlink)
 - `02-05` — SwiftBar defaults
 - `02-06` — Git auth (gh/glab login + SSH key upload to GitHub/GitLab)
@@ -83,8 +86,6 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 - `02-11` — 1Password shell plugins (op plugin init brew)
 
 **`03-*` Install packages via other managers** (`run_onchange_`)
-- `03-00` — npm packages from `.packages.npm`
-- `03-01` — pip packages from `.packages.pip3`
 - `03-02` — Go binaries from `.packages.go`
 
 **`04-*` Install & configure apps** (mixed)

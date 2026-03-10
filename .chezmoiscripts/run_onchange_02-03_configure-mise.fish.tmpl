@@ -1,0 +1,17 @@
+#!/usr/bin/env fish
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+# mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+mise install
+
+set pipbin "$HOME/.local/bin"
+mkdir -p "$pipbin"
+echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_paths "$pipbin"
+
+# Create dedicated neovim Python virtualenv
+set nvim_venv "$HOME/.local/share/nvim/python-venv"
+if not test -d "$nvim_venv"
+    python3 -m venv "$nvim_venv"
+end
+"$nvim_venv/bin/pip" install --quiet --upgrade pynvim

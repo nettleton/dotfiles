@@ -10,7 +10,6 @@ packages:
       - bat
       - chezmoi
       - cmake
-      - corepack
       - curl
       - dasel
       - delve
@@ -56,13 +55,11 @@ packages:
       - neovim
       - "nettleton/tap/calbuddy"
       - nghttp2
-      - node
       - openconnect
       - pandoc
       - pcre
       - podman
       - poppler
-      - pyenv
       - rename
       - ripgrep-all
       - ruby
@@ -75,14 +72,13 @@ packages:
       - vim
       - wget
       - yq
+      - yt-dlp
 
     casks:
       - 1password
       - 1password/tap/1password-cli
       - alfred
       - chrysalis
-      - corretto
-      - corretto@11
       - devonthink
       - firefox
       - font-fira-code-nerd-font
@@ -156,6 +152,7 @@ packages:
       - handbrake-app
       - hazel
       - makemkv
+      - openin
       - moneydance
       - rancher
       - receipts
@@ -241,14 +238,6 @@ packages:
 
   fisher_darwin:
     - oh-my-fish/plugin-osx
-
-  npm:
-    - npm
-    - neovim
-
-  pip3:
-    - neovim
-    - pynvim
 
   go:
     - github.com/rhysd/vim-startuptime@latest
