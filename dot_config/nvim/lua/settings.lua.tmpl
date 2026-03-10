@@ -80,12 +80,15 @@ augroup templates
 augroup END
 ]], false)
 
--- Strip trailing whitespace from all files
--- exec([[
--- autocmd BufWritePre * %s/\s\+$//e
--- autocmd BufWritePre * %s/\s\+$//e
--- autocmd BufWritePre * %s/\s\+$//e
--- ]], false)
+-- Strip trailing whitespace on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function()
+    local pos = vim.api.nvim_win_get_cursor(0)
+    vim.cmd([[%s/\s\+$//e]])
+    vim.api.nvim_win_set_cursor(0, pos)
+  end,
+})
 
 -- Toggle relative number mode
 exec([[
@@ -95,11 +98,6 @@ exec([[
 :  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
 :augroup END
 ]], false)
-
--- Convenience wrapper around Messages capture
-Msg = function(...)
-  require('messages.api').capture_thing(...)
-end
 
 -- open file at the last position it was edited earlier
 vim.api.nvim_create_autocmd("BufReadPost", {

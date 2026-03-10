@@ -112,13 +112,6 @@ abbr cat "bat --style header,header-filesize,grid"
 
 abbr gpom "git push origin main"
 
-# https://github.com/cljoly/telescope-repo.nvim/discussions/13
-if which glocate > /dev/null
-  alias locate="glocate -d $HOME/.cache/locatedb"
-  set -x LOCATE_PATH "$HOME/.cache/locatedb"
-end
-abbr loaddb "gupdatedb --localpaths=$HOME --prunepaths=/Volumes --output=$HOME/.cache/locatedb"
-
 # END ALIASES / ABBREVIATIONS
 
 function sourceIfNecessary

@@ -15,18 +15,9 @@ vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
 
 require("lazy").setup({
   spec = {
-    { 'nvim-lua/popup.nvim' },    -- An implementation of the Popup API from vim in Neovim
     { 'nvim-lua/plenary.nvim' },  -- Useful lua functions used by lots of plugins
 
   -- Markdown
-    { 'preservim/vim-markdown',
-        dependencies = {
-          { 'godlygeek/tabular' }
-        },
-        config = function()
-          require('plugins.vim-markdown')
-        end,
-    },
     { 'gaoDean/autolist.nvim',
       ft = {
         "markdown",
@@ -74,30 +65,21 @@ require("lazy").setup({
       end,
     },
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-    { 'cljoly/telescope-repo.nvim',
-        dependencies = {
-          { 'nvim-lua/plenary.nvim' }
-        }
-    },
-    { 'AckslD/nvim-neoclip.lua',
-        dependencies = {
-          {'kkharji/sqlite.lua'},
-          {'nvim-telescope/telescope.nvim'},
-        },
-        config = function()
-          require('neoclip').setup()
-        end,
-    },
-    { 'sudormrfbin/cheatsheet.nvim',
-        dependencies = {
-          {'nvim-telescope/telescope.nvim'},
-          {'nvim-lua/popup.nvim'},
-          {'nvim-lua/plenary.nvim'},
-        },
-
-        config = function()
-          require('cheatsheet').setup()
-        end,
+    { 'gbprod/yanky.nvim',
+      config = function()
+        require('yanky').setup({
+          ring = {
+            history_length = 100,
+            storage = "shada",
+          },
+          highlight = {
+            on_put = true,
+            on_yank = true,
+            timer = 200,
+          },
+        })
+        require('telescope').load_extension('yank_history')
+      end,
     },
     { "benfowler/telescope-luasnip.nvim" },
     { "nvim-telescope/telescope-file-browser.nvim",
@@ -286,17 +268,6 @@ require("lazy").setup({
         require('plugins.nvim-autopairs')
       end
     }, -- Insert or delete brackets, parens, quotes in pair.
-    { 'numtostr/comment.nvim',
-      config = function()
-        require('plugins.comment')
-      end,
-      lazy = false,
-    }, -- Comment stuff out easily
-    { 'miyakogi/conoline.vim',
-          config = function()
-            require('plugins.conoline')
-          end,
-        }, -- Highlight the line of the cursor in the current window
     { 'airblade/vim-rooter',
           config = function()
             require('plugins.vim-rooter')
@@ -314,18 +285,6 @@ require("lazy").setup({
         require('plugins.which-key')
       end,
     }, -- key bindings
-    { 'AckslD/messages.nvim',
-      config = function()
-        require("messages").setup()
-      end,
-    },
-
-  -- strip trailing whitespace from edited lines
-    { 'lewis6991/spaceless.nvim',
-      config = function()
-        require('spaceless').setup()
-      end,
-    },
 
   },
   defaults = {
