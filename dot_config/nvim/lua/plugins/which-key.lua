@@ -76,7 +76,7 @@ which_key.add({
 which_key.add({
   { "<leader>l", group = "Language / LSP", remap = false },
   { "<leader>ld", "<cmd>:Telescope lsp_document_symbols<CR>", desc = "Document Symbols", remap = false },
-  { "<leader>lf", "<cmd>lua vim.lsp.buf.formatting()<CR>", desc = "Format", remap = false },
+  { "<leader>lf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", desc = "Format", remap = false },
   { "<leader>lh", "<cmd>lua vim.lsp.buf.hover()<CR>", desc = "Hover", remap = false },
   { "<leader>lj", '<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>', desc = "GoTo Next", remap = false },
   { "<leader>lk", '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>', desc = "GoTo Previous", remap = false },

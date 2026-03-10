@@ -1,7 +1,6 @@
 -- # ALIASES
 local g = vim.g
 local o = vim.opt
-local exec = vim.api.nvim_exec
 
 local options = {
   splitbelow = true,                       -- force all horizontal splits to go below current window
@@ -39,8 +38,8 @@ for k, v in pairs(options) do
   o[k] = v
 end
 
-vim.cmd "set whichwrap+=<,>,[,],h,l"       -- allow h/l move lines when cursor is on first/last cursor
-vim.cmd [[set iskeyword+=-]]               -- include dash in words
+o.whichwrap:append "<,>,[,],h,l"            -- allow h/l move lines when cursor is on first/last cursor
+o.iskeyword:append "-"                      -- include dash in words
 
 -- set shell
 {{ if eq .chezmoi.arch "arm64" -}}
@@ -73,33 +72,35 @@ g.github_enterprise_urls = {'https://github.{{ .work.domain }}', 'git@github.{{ 
 -- Prefill new files created by vim with contents from the following templates
 --   https://shapeshed.com/vim-templates/
 --   https://github.com/IllyaStarikov/skeleton-files
-exec([[
-augroup templates
-  autocmd BufNewFile *.* silent! execute '0r ~/.config/nvim/templates/skeleton.'.expand("<afile>:e")
-  autocmd BufNewFile * %substitute#\[:VIM_EVAL:\]\(.\{-\}\)\[:END_EVAL:\]#\=eval(submatch(1))#ge
-augroup END
-]], false)
-
--- Strip trailing whitespace from all files
--- exec([[
--- autocmd BufWritePre * %s/\s\+$//e
--- autocmd BufWritePre * %s/\s\+$//e
--- autocmd BufWritePre * %s/\s\+$//e
--- ]], false)
+local templates_group = vim.api.nvim_create_augroup("templates", { clear = true })
+vim.api.nvim_create_autocmd("BufNewFile", {
+  group = templates_group,
+  pattern = "*.*",
+  callback = function()
+    local ext = vim.fn.expand("<afile>:e")
+    vim.cmd("silent! 0r ~/.config/nvim/templates/skeleton." .. ext)
+  end,
+})
+vim.api.nvim_create_autocmd("BufNewFile", {
+  group = templates_group,
+  pattern = "*",
+  callback = function()
+    vim.cmd([[%substitute#\[:VIM_EVAL:\]\(.\{-\}\)\[:END_EVAL:\]#\=eval(submatch(1))#ge]])
+  end,
+})
 
 -- Toggle relative number mode
-exec([[
-:augroup numbertoggle
-:  autocmd!
-:  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
-:  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
-:augroup END
-]], false)
-
--- Convenience wrapper around Messages capture
-Msg = function(...)
-  require('messages.api').capture_thing(...)
-end
+local number_group = vim.api.nvim_create_augroup("numbertoggle", { clear = true })
+vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave" }, {
+  group = number_group,
+  pattern = "*",
+  callback = function() vim.opt.relativenumber = true end,
+})
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter" }, {
+  group = number_group,
+  pattern = "*",
+  callback = function() vim.opt.relativenumber = false end,
+})
 
 -- open file at the last position it was edited earlier
 vim.api.nvim_create_autocmd("BufReadPost", {
