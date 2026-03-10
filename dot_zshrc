@@ -13,5 +13,8 @@ alias l="eza --git --icons -alh"
 alias vi="nvim"
 
 eval "$(mise activate zsh)"
+# 1Password shell plugins (brew, etc.)
+[ -s "$HOME/.config/op/plugins.sh" ] && source "$HOME/.config/op/plugins.sh"
+
 eval "$(starship init zsh)"
 

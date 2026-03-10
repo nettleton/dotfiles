@@ -29,5 +29,8 @@ export GOLANGCILINTLOCATION=$(dirname $(which golangci-lint))
 
 export SUDO_ASKPASS="$HOME/.local/bin/pw.fish"
 
+# 1Password shell plugins (brew, etc.)
+[ -s "$HOME/.config/op/plugins.sh" ] && source "$HOME/.config/op/plugins.sh"
+
 eval "$(starship init bash)"
 
