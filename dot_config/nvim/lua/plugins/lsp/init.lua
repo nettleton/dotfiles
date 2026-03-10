@@ -28,11 +28,6 @@ if not mason_tool_installer_ok then
   vim.notify("require('mason-tool-installer') failed")
   return
 end
-local null_ls_ok, null_ls = pcall(require, "null-ls")
-if not null_ls_ok then
-  vim.notify("require('null-ls') failed")
-  return
-end
 
 mason.setup({
     ui = {
@@ -45,7 +40,7 @@ mason.setup({
 })
 
 masonlspconfig.setup({
-  ensure_installed = { "lua_ls", "jsonls", "bashls", "dockerls", "gopls", "golangci_lint_ls", "ts_ls", "marksman", "lemminx", "yamlls", "html", "sqlls", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd", "vimls" },
+  ensure_installed = { "lua_ls", "jsonls", "bashls", "dockerls", "gopls", "golangci_lint_ls", "ts_ls", "marksman", "lemminx", "yamlls", "html", "rust_analyzer", "terraformls", "pyright", "jdtls", "cssls", "clangd" },
   automatic_installation = true,
 })
 
@@ -54,12 +49,10 @@ mason_tool_installer.setup {
     "actionlint",
     "buf",
     "buildifier",
-    "cbfmt",
     "cfn-lint",
     "clang-format",
     "codespell",
     "cpplint",
-    "fixjson",
     "gitlint",
     "goimports",
     "golangci-lint",
@@ -78,7 +71,6 @@ mason_tool_installer.setup {
     "sql-formatter",
     "staticcheck",
     "vale",
-    "vint",
     "xmlformatter",
     "yamlfmt",
     "yamllint"
@@ -173,12 +165,6 @@ vim.lsp.config('yamlls', {
 })
 vim.lsp.enable('yamlls')
 
--- SQL
-vim.lsp.config('sqlls', {
-  on_attach = lsp_handlers.on_attach
-})
-vim.lsp.enable('sqlls')
-
 -- Rust
 vim.lsp.config('rust_analyzer', {
   on_attach = lsp_handlers.on_attach
@@ -208,12 +194,6 @@ vim.lsp.config('clangd', {
   on_attach = lsp_handlers.on_attach
 })
 vim.lsp.enable('clangd')
-
--- VimL
-vim.lsp.config('vimls', {
-  on_attach = lsp_handlers.on_attach
-})
-vim.lsp.enable('vimls')
 
 -- JSON
 lsp_defaults.capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -245,53 +225,3 @@ vim.lsp.config('cssls', {
 vim.lsp.enable('cssls')
 
 lsp_handlers.setup()
-
--- null-ls
-local code_actions = null_ls.builtins.code_actions
-local diagnostics = null_ls.builtins.diagnostics
-local formatting = null_ls.builtins.formatting
-
--- Mason installs tools into ~/.local/share/nvim/mason/bin
--- Some of these tools may benefit from configurations
--- Some config can just be defined in files like .luacheckrc
--- You can test your config with commands like the following:
--- ~/.local/share/nvim/mason/bin/luacheck ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/init.lua
--- TODO: unclear if "vale sync needs to be run after Mason installs vale
-
-null_ls.setup {
-  debug = false,
-  sources = {
-    code_actions.gitsigns,
-    require("none-ls-shellcheck.code_actions"),
-    diagnostics.actionlint,
-    diagnostics.buf,
-    diagnostics.buildifier,
-    diagnostics.cfn_lint,
-    diagnostics.codespell,
-    diagnostics.fish,
-    diagnostics.gitlint,
-    diagnostics.golangci_lint,
-    require("none-ls-luacheck.diagnostics.luacheck"),
-    diagnostics.markdownlint,
-    diagnostics.pylint,
-    require("none-ls-shellcheck.diagnostics"),
-    diagnostics.staticcheck,
-    diagnostics.vale,
-    diagnostics.yamllint,
-    formatting.buf,
-    formatting.buildifier,
-    formatting.clang_format,
-    formatting.codespell,
-    formatting.fish_indent,
-    formatting.goimports,
-    formatting.golines.with({extra_args = {"-m", 999}}),
-    require("none-ls.formatting.jq"),
-    formatting.markdownlint,
-    formatting.shellharden,
-    formatting.sql_formatter,
-    formatting.yamlfmt,
-  }
-}
-
-
-
