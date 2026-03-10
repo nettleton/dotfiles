@@ -12,5 +12,6 @@ alias h="cd ~"
 alias l="eza --git --icons -alh"
 alias vi="nvim"
 
+eval "$(mise activate zsh)"
 eval "$(starship init zsh)"
 

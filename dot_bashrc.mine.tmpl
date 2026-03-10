@@ -29,7 +29,7 @@ export MW_USE_LOCAL_GOLANGCI_LINT=true
 export GOLANGCILINTLOCATION=$(dirname $(which golangci-lint))
 {{- end }}
 
-export SUDO_ASKPASS "$HOME/.local/bin/pw.fish"
+export SUDO_ASKPASS="$HOME/.local/bin/pw.fish"
 
 eval "$(starship init bash)"
 
