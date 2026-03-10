@@ -1,12 +1,12 @@
 {{- if (eq .chezmoi.os "darwin") -}}
-#!/usr/bin/env fish
+#!/bin/bash
 
-fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
-if not command -q op
+if ! command -v op &>/dev/null; then
   echo "1Password CLI not found, skipping plugin setup"
   exit 0
-end
+fi
 
 op plugin init brew
 {{ end -}}
