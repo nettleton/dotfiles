@@ -124,3 +124,11 @@ which_key.add({
   { "<leader>v", group = "View", remap = false },
   { "<leader>vs", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial", remap = false },
 })
+
+which_key.add({
+  { "<leader>a", group = "AI", remap = false },
+  { "<leader>aa", "<cmd>CodeCompanionActions<CR>", desc = "Actions", remap = false },
+  { "<leader>ac", "<cmd>CodeCompanionChat toggle<CR>", desc = "Chat", remap = false },
+  { "<leader>ai", "<cmd>CodeCompanionChat add<CR>", desc = "Add to Chat", remap = false, mode = "v" },
+  { "<leader>ap", "<cmd>CodeCompanion<CR>", desc = "Inline Prompt", remap = false, mode = { "n", "v" } },
+})

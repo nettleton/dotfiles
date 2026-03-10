@@ -327,6 +327,17 @@ require("lazy").setup({
       end,
     },
 
+    -- AI / Coding Assistant (ACP agents)
+    { 'olimorris/codecompanion.nvim',
+      dependencies = {
+        'nvim-lua/plenary.nvim',
+        'nvim-treesitter/nvim-treesitter',
+      },
+      config = function()
+        require('plugins.codecompanion')
+      end,
+    },
+
   },
   defaults = {
      -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
