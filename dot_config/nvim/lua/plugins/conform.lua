@@ -13,7 +13,6 @@ conform.setup({
     json = { "jq" },
     markdown = { "markdownlint" },
     proto = { "buf" },
-    python = { "autopep8" },
     sh = { "shellharden" },
     sql = { "sql_formatter" },
     yaml = { "yamlfmt" },
