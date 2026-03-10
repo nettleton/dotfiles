@@ -47,6 +47,11 @@ exclude_calendars = ["Birthdays", "United States holidays"]
 # ── Enrichment ──────────────────────────────────────────────
 [enrichment]
 
+
+[enrichment.attendees]
+exclude_patterns = ["-FL", "Room-", "Conf-", "Group"]
+exclude_response_status = ["declined"]
+
 # ── Calendar mirroring ──────────────────────────────────────────────
 #
 # Mirror events from one account into a local/iCloud calendar.
