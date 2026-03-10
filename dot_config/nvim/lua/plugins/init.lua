@@ -221,13 +221,18 @@ require("lazy").setup({
       dependencies = { 'williamboman/mason.nvim' } },
     { 'neovim/nvim-lspconfig' },
     { 'b0o/schemastore.nvim' },
-    { 'nvimtools/none-ls.nvim',
-      dependencies = {
-        'nvim-lua/plenary.nvim',
-        'nvimtools/none-ls-extras.nvim',
-        'gbprod/none-ls-shellcheck.nvim',
-        'gbprod/none-ls-luacheck.nvim',
-      }
+    -- Formatting (replaces none-ls formatting)
+    { 'stevearc/conform.nvim',
+      config = function()
+        require('plugins.conform')
+      end,
+    },
+
+    -- Linting (replaces none-ls diagnostics)
+    { 'mfussenegger/nvim-lint',
+      config = function()
+        require('plugins.nvim-lint')
+      end,
     },
     { "folke/trouble.nvim",
       dependencies = { "nvim-tree/nvim-web-devicons" },
