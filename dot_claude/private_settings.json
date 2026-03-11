@@ -1,0 +1,12 @@
+{
+  "hooks": {},
+  "permissions": {
+    "allow": [
+      "Bash(nvim --server *)",
+      "Bash(kitty @*)"
+    ]
+  },
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true
+  }
+}

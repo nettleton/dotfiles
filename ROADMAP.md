@@ -160,3 +160,23 @@ All issues from the original audit (sections 3, 4, and 5) have been addressed:
 3. ~~Remove all commented-out cruft (Dropbox, disk image verification, hot corner examples, icon size/spacing)~~
 4. ~~Add missing customizations: Safari extensions + JS from Apple Events, disable all hot corners~~
 5. ~~Simplify restart logic (Option D: unconditional Dock/Finder restart, prompt for others)~~
+
+---
+
+## Future: Kitty Coding Session Tab Bar
+
+The `code-session` fish function creates a coding layout (agent | nvim / terminal). Currently the tab title is set statically to "Coding Session: <dirname>". A future enhancement could make the tab title dynamically track the agent window's title (e.g., showing claude's current status).
+
+### Approach
+
+1. Set `tab_bar_style custom` in kitty.conf
+2. Create `dot_config/kitty/tab_bar.py` with a `draw_tab()` function
+3. Use `kitty @ set-user-vars CODING_SESSION_ROLE=agent` on the agent window (already a natural place in the fish function)
+4. In `draw_tab()`, use `get_boss()` to find the window with the agent user var in the current tab and use its title
+5. Fall back to `draw_tab_with_powerline()` for default rendering of non-session tabs
+
+### References
+
+- `get_boss().os_window_map` → tab managers → tabs → windows → `user_vars`, `title`
+- `draw_tab_with_powerline()` for delegating rendering
+- `draw_data._replace(title_template=...)` to override the title per-tab
