@@ -1,0 +1,19 @@
+[".config/fish/functions/fisher.fish"]
+  type = "file"
+  url = "https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish"
+  refreshPeriod = "168h"
+
+{{ if .is_work_machine -}}
+{{-   $gheDomain := printf "github.%s" .work.domain -}}
+{{-   $gheToken := onepasswordRead "op://personal/github enterprise pat/credential" -}}
+{{-   $awssamlVersion := output "gh" "api" "--hostname" $gheDomain "repos/development/awssaml-go/releases/latest" "--jq" ".tag_name" | trim -}}
+
+[".local/bin/awssaml"]
+  type = "file"
+  url = "https://{{ $gheDomain }}/development/awssaml-go/releases/download/{{ $awssamlVersion }}/awssaml-go_{{ .chezmoi.os }}_{{ .chezmoi.arch }}"
+  executable = true
+  refreshPeriod = "168h"
+  [[".local/bin/awssaml".header]]
+    name = "Authorization"
+    value = "token {{ $gheToken }}"
+{{ end -}}
