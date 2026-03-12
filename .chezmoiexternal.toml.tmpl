@@ -22,7 +22,6 @@
 [".local/bin/awssaml"]
   type = "archive"
   url = "https://{{ $gheDomain }}/development/awssaml-go/releases/download/{{ $awssamlTag }}/awssaml-go_{{ $awssamlVersion }}_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tar.gz"
-  refreshPeriod = "168h"
   [[".local/bin/awssaml".header]]
     name = "Authorization"
     value = "token {{ $gheToken }}"
