@@ -1,0 +1,17 @@
+antivirus_exclusions:
+  # Directory paths to exclude from antivirus scanning
+  folders: []
+  #   - ~/.cargo
+  #   - ~/.local
+
+  # Specific file paths to exclude
+  files: []
+  #   - ~/path/to/file
+
+  # File extensions to exclude (without leading dot)
+  extensions: []
+  #   - log
+
+  # Process paths or names to exclude
+  processes: []
+  #   - /usr/local/bin/some-process

@@ -1,0 +1,72 @@
+{{- if .is_work_machine -}}
+#!/bin/bash
+
+# Declarative Microsoft Defender exclusions
+# Re-runs when antivirus_exclusions data changes
+#
+# Current exclusion data:
+# folders: {{ .antivirus_exclusions.folders | toJson }}
+# files: {{ .antivirus_exclusions.files | toJson }}
+# extensions: {{ .antivirus_exclusions.extensions | toJson }}
+# processes: {{ .antivirus_exclusions.processes | toJson }}
+
+set -euo pipefail
+
+if ! command -v mdatp &>/dev/null; then
+    echo "mdatp not found, skipping Defender exclusion configuration"
+    exit 0
+fi
+
+# Fetch current exclusions once
+current_exclusions=$(mdatp exclusion list 2>/dev/null || true)
+
+is_excluded() {
+    local type="$1"
+    local value="$2"
+    # Match against the mdatp exclusion list output
+    # Output format has columns: Scope, Type, Value
+    # We grep for the type and value as a whole-line match
+    echo "$current_exclusions" | grep -qF "$value"
+}
+
+add_exclusion() {
+    local type="$1"
+    local value="$2"
+
+    if is_excluded "$type" "$value"; then
+        echo "already excluded ($type): $value"
+        return 0
+    fi
+
+    echo "adding $type exclusion: $value"
+    case "$type" in
+        folder)
+            mdatp exclusion folder add --path "$value"
+            ;;
+        file)
+            mdatp exclusion file add --path "$value"
+            ;;
+        extension)
+            mdatp exclusion extension add --name "$value"
+            ;;
+        process)
+            mdatp exclusion process add --path "$value"
+            ;;
+    esac
+}
+
+{{ range .antivirus_exclusions.folders -}}
+add_exclusion folder {{ . | quote }}
+{{ end -}}
+{{ range .antivirus_exclusions.files -}}
+add_exclusion file {{ . | quote }}
+{{ end -}}
+{{ range .antivirus_exclusions.extensions -}}
+add_exclusion extension {{ . | quote }}
+{{ end -}}
+{{ range .antivirus_exclusions.processes -}}
+add_exclusion process {{ . | quote }}
+{{ end -}}
+
+echo "Defender exclusion configuration complete"
+{{ end -}}
