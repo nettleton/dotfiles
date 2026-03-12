@@ -6,12 +6,12 @@
 {{ if .is_work_machine -}}
 {{-   $gheDomain := printf "github.%s" .work.domain -}}
 {{-   $gheToken := onepasswordRead "op://personal/github enterprise pat/credential" -}}
-{{-   $awssamlVersion := output "gh" "api" "--hostname" $gheDomain "repos/development/awssaml-go/releases/latest" "--jq" ".tag_name" | trim -}}
+{{-   $awssamlTag := output "sh" "-c" (printf "curl -sf -H 'Authorization: token %s' https://%s/api/v3/repos/development/awssaml-go/releases/latest | jq -r .tag_name" $gheToken $gheDomain) | trim -}}
+{{-   $awssamlVersion := trimPrefix "v" $awssamlTag -}}
 
 [".local/bin/awssaml"]
-  type = "file"
-  url = "https://{{ $gheDomain }}/development/awssaml-go/releases/download/{{ $awssamlVersion }}/awssaml-go_{{ .chezmoi.os }}_{{ .chezmoi.arch }}"
-  executable = true
+  type = "archive"
+  url = "https://{{ $gheDomain }}/development/awssaml-go/releases/download/{{ $awssamlTag }}/awssaml-go_{{ $awssamlVersion }}_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tar.gz"
   refreshPeriod = "168h"
   [[".local/bin/awssaml".header]]
     name = "Authorization"
