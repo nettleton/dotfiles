@@ -3,7 +3,6 @@ packages:
     taps:
       - 1password/tap
       - buo/cask-upgrade
-
     brews:
       - awscli
       - aws-sam-cli
@@ -73,12 +72,12 @@ packages:
       - wget
       - yq
       - yt-dlp
-
     casks:
       - 1password
       - 1password/tap/1password-cli
       - alfred
       - chrysalis
+      - claude-code
       - devonthink
       - firefox
       - font-fira-code-nerd-font
@@ -108,7 +107,6 @@ packages:
       - transmit
       - visual-studio-code
       - vlc
-
     personal_brews:
       - bfg
       - bison
@@ -144,11 +142,9 @@ packages:
       - theora
       - two-lame
       - vala
-
     personal_casks:
       - arq
       - claude
-      - claude-code
       - handbrake-app
       - hazel
       - makemkv
@@ -162,7 +158,6 @@ packages:
       - tailscale-app
       - xld
       - xquartz
-
   mas:
     apps:
       - name: 1Blocker
@@ -197,7 +192,6 @@ packages:
         id: 1480933944
       - name: Vinegar - Tube Cleaner
         id: 1591303229
-
     personal_apps:
       - name: FileBot
         id: 905384638
@@ -225,7 +219,6 @@ packages:
         id: 1429967544
       - name: Xcode
         id: 497799835
-
   fisher:
     - jorgebucaran/fisher
     - IlanCosman/tide@v5
@@ -235,9 +228,7 @@ packages:
     - PatrickF1/fzf.fish
     - lewisacidic/fish-git-abbr
     - lewisacidic/fish-scripting
-
   fisher_darwin:
     - oh-my-fish/plugin-osx
-
   go:
     - github.com/rhysd/vim-startuptime@latest

@@ -1,0 +1,7 @@
+{{ if .is_work_machine -}}
+#!/bin/bash
+
+curl -s 'https://devai.ipws.{{ .work.domain }}/api/download/{{ .chezmoi.os }}-{{ .chezmoi.arch }}' -o "$HOME/.local/bin/devai"
+chmod +x "$HOME/.local/bin/devai"
+
+{{- end -}}

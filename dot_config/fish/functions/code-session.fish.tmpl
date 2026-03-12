@@ -1,6 +1,6 @@
 function code-session -d "Transform current kitty tab into a coding session layout"
     set -l dir (test -n "$argv[1]" && echo $argv[1] || pwd)
-    set -l agent $argv[2]
+    set -l agent $argv[2..]
 
     set dir (realpath "$dir")
     if not test -d "$dir"
@@ -8,8 +8,12 @@ function code-session -d "Transform current kitty tab into a coding session layo
         return 1
     end
 
-    if test -z "$agent"
+    if test (count $agent) -eq 0
+{{ if .is_work_machine -}}
+        set agent devai launch claude
+{{ else -}}
         set agent claude
+{{ end -}}
     end
 
     set -l dirname (basename "$dir")
