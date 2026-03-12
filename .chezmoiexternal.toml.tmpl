@@ -6,17 +6,7 @@
 {{ if .is_work_machine -}}
 {{-   $gheDomain := printf "github.%s" .work.domain -}}
 {{-   $gheToken := onepasswordRead "op://personal/github enterprise pat/credential" -}}
-{{-   $awssamlCache := joinPath .chezmoi.cacheDir "awssaml-go-latest-tag" -}}
-{{-   $awssamlTag := output "sh" "-c" (printf `
-      cache="%s"; max_age=%d
-      if [ -f "$cache" ] && [ "$(( $(date +%%s) - $(stat -f %%m "$cache") ))" -lt "$max_age" ]; then
-        cat "$cache"
-      else
-        tag=$(curl -sf -H "Authorization: token %s" "https://%s/api/v3/repos/development/awssaml-go/releases/latest" | jq -r .tag_name)
-        mkdir -p "$(dirname "$cache")"
-        printf "%%s" "$tag" > "$cache"
-        printf "%%s" "$tag"
-      fi` $awssamlCache (mul 168 3600) $gheToken $gheDomain) | trim -}}
+{{-   $awssamlTag := output "sh" "-c" (printf "curl -sf -H 'Authorization: token %s' https://%s/api/v3/repos/development/awssaml-go/releases/latest | jq -r .tag_name" $gheToken $gheDomain) | trim -}}
 {{-   $awssamlVersion := trimPrefix "v" $awssamlTag -}}
 
 [".local/bin/awssaml"]
