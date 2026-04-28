@@ -44,8 +44,8 @@ for osw in data:
     # Set layout to splits
     kitty @ goto-layout --match id:$my_window_id splits
 
-    # Launch nvim (right side) via login shell so mise/JAVA_HOME are available
-    set -l nvim_window_id (kitty @ launch --location=vsplit --cwd="$dir" fish -l -c "nvim --listen $nvim_sock")
+    # Launch nvim (right side) via interactive login shell so the window stays open after nvim exits
+    set -l nvim_window_id (kitty @ launch --location=vsplit --cwd="$dir" fish -l -i -C "nvim --listen $nvim_sock")
 
     # Launch terminal (below nvim) — hsplit the now-focused nvim window, then refocus agent
     set -l terminal_window_id (kitty @ launch --location=hsplit --cwd="$dir")
@@ -58,7 +58,7 @@ for osw in data:
     set -gx CODING_SESSION_NVIM_SOCK "$nvim_sock"
     set -gx CODING_SESSION_TERMINAL_KITTY_WINDOW_ID "$terminal_window_id"
 
-    # Replace this shell with the agent
+    # Run the agent as a child so the shell remains when it exits
     cd "$dir"
-    exec $agent
+    $agent
 end
