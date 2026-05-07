@@ -45,10 +45,10 @@ for osw in data:
     kitty @ goto-layout --match id:$my_window_id splits
 
     # Launch nvim (right side) via interactive login shell so the window stays open after nvim exits
-    set -l nvim_window_id (kitty @ launch --location=vsplit --cwd="$dir" fish -l -i -C "nvim --listen $nvim_sock")
+    set -l nvim_window_id (kitty @ launch --location=vsplit --cwd="$dir" --env TEAMCITY_RO=1 fish -l -i -C "nvim --listen $nvim_sock")
 
     # Launch terminal (below nvim) — hsplit the now-focused nvim window, then refocus agent
-    set -l terminal_window_id (kitty @ launch --location=hsplit --cwd="$dir")
+    set -l terminal_window_id (kitty @ launch --location=hsplit --cwd="$dir" --env TEAMCITY_RO=1)
     kitty @ focus-window --match id:$my_window_id
 
     # Set tab title
@@ -57,6 +57,7 @@ for osw in data:
     # Export session variables into this shell before exec
     set -gx CODING_SESSION_NVIM_SOCK "$nvim_sock"
     set -gx CODING_SESSION_TERMINAL_KITTY_WINDOW_ID "$terminal_window_id"
+    set -gx TEAMCITY_RO 1
 
     # Run the agent as a child so the shell remains when it exits
     cd "$dir"

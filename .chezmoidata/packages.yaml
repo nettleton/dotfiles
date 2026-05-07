@@ -41,6 +41,7 @@ packages:
       - graphviz
       - helm
       - ical-buddy
+      - "jetbrains/utils/teamcity"
       - jq
       - kind
       - kubernetes-cli

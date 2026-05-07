@@ -1,0 +1,19 @@
+{{- if .is_work_machine -}}
+#!/usr/bin/env fish
+
+set -l tc_server "https://witbuild.{{ .work.domain }}"
+
+echo ""
+echo "=========================="
+echo "configuring teamcity auth for $tc_server"
+
+if teamcity auth status 2>&1 | grep -q "$tc_server"
+  echo "already authenticated to $tc_server"
+else
+  echo "not logged in to $tc_server; logging in"
+  set -l token (op read --no-newline "op://Private/{{ .work.companyname }}/TeamCity/full_api_token")
+  teamcity auth login --server "$tc_server" --token "$token"
+end
+
+teamcity config set analytics false
+{{ end -}}
