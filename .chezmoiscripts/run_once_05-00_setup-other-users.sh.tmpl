@@ -15,6 +15,11 @@ function createNonAdminUser -a userId password realName uniqueId
   sudo -A chown -R $userId:staff /Users/$userId
 end
 
+function createAdminUser -a userId password realName uniqueId
+  createNonAdminUser $userId $password $realName $uniqueId
+  sudo -A dseditgroup -o edit -a $userId -t user admin
+end
+
 function allowUserToUnlockFilevault -a userId
   if not sudo -A fdesetup list | grep -iq "^$userId,"
     echo "add $userId to filevault unlock list"
@@ -39,6 +44,15 @@ else
 end
 
 allowUserToUnlockFilevault bug
+
+{{- $admin := (onepassword "srjgyi5b6fzwsii5fchs6jgs5i").fields }}
+if test -d /Users/{{ (index $admin 1).value }}
+  echo "user '{{ (index $admin 1).value }}' already exists, not doing anything"
+else
+  createAdminUser {{ (index $admin 1).value }} {{ (index $admin 0).value }} '{{ (index $admin 3).value }}' {{ (index $admin 4).value }}
+end
+
+allowUserToUnlockFilevault {{ (index $admin 1).value }}
 
 # Enable fast user switching
 # https://discussions.apple.com/thread/256185662?sortBy=rank
