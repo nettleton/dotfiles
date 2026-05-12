@@ -1,5 +1,5 @@
 {{- if (and (eq .chezmoi.os "darwin") .is_child_machine) -}}
-#!/usr/bin/env fish 
+#!/usr/bin/env fish
 
 function createNonAdminUser -a userId password realName uniqueId
 # https://apple.stackexchange.com/questions/4814/can-user-accounts-be-managed-via-the-command-line/4981#4981
@@ -15,17 +15,30 @@ function createNonAdminUser -a userId password realName uniqueId
   sudo -A chown -R $userId:staff /Users/$userId
 end
 
+function allowUserToUnlockFilevault -a userId
+  if not sudo -A fdesetup list | grep -iq "^$userId,"
+    echo "add $userId to filevault unlock list"
+    sudo -A fdesetup add -usertoadd $userId
+  else
+    echo "$userId can already unlock filevault"
+  end
+end
+
 if test -d /Users/birdie
   echo "user 'birdie' already exists, not doing anything"
-else 
+else
   createNonAdminUser {{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 0).value }} {{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 1).value }} '{{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 3).value }}' {{ (index (onepassword "ogjvo3qwxvgbkho7iwbwd2qhx4").fields 4).value }}
-end 
+end
+
+allowUserToUnlockFilevault birdie
 
 if test -d /Users/bug
   echo "user 'bug' already exists, not doing anything"
-else 
+else
   createNonAdminUser {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 0).value }} {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 1).value }} '{{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 3).value }}' {{ (index (onepassword "4nwjc4wvnm46vsiq7xybvdekb4").fields 4).value }}
 end
+
+allowUserToUnlockFilevault bug
 
 # Enable fast user switching
 # https://discussions.apple.com/thread/256185662?sortBy=rank
