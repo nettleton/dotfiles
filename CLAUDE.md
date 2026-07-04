@@ -50,7 +50,7 @@ Declarative package lists for brew (taps, brews, casks, personal variants), fish
 ### Tool Versions (`dot_config/mise/config.toml`)
 Python, Node, and their global packages (npm, pip) are managed by mise. This replaces pyenv and brew-installed node.
 
-Note: the `nettleton/tap` tap is hardcoded in the brew install script (not in YAML) because it needs a custom git URL.
+Note: the `nettleton/tap` tap carries a custom git URL via its `url` field in the `taps` list (rendered into the Brewfile `tap` line).
 
 ### External Downloads (`.chezmoiexternal.toml`)
 Manages `fisher.fish` with weekly refresh via chezmoi's native external file support.
@@ -68,6 +68,10 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 
 **`01` Install brew packages** (`run_onchange_`)
 - Installs taps, brews, and casks from `.packages.brew.*`
+- Renders the Brewfile to a temp file (so both install and prune can read it)
+- Taps are structured entries (`name`, optional `url`, optional `trusted`); `trusted: true` emits the Brewfile `trusted:` keyword so Homebrew trusts the tap when tap trust is required
+- Prunes drift: `brew bundle cleanup --brews --casks` uninstalls any formula/cask not declared in the config (prints the plan, then `--force`). Scoped to brews+casks only — NOT taps/mas/go, which are separate managers absent from this Brewfile. Dependency closure of declared packages is preserved.
+- Reconciles tap trust: untrusts any tap Homebrew trusts that the repo no longer declares (the prune step is scoped away from taps). Only tap-level trust is touched.
 - Personal packages gated on `.personalpackages`
 - Re-runs automatically when `packages.yaml` brew lists change
 - Auth via 1Password shell plugin (no hardcoded tokens)
