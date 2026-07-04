@@ -1,8 +1,18 @@
 packages:
   brew:
+    # Third-party taps. `trusted: true` trusts the whole tap so Homebrew loads
+    # it when tap trust is required (see .chezmoiscripts install-brew-packages).
+    # `url` is only needed for taps not resolvable from the default GitHub path.
     taps:
-      - 1password/tap
-      - buo/cask-upgrade
+      - name: 1password/tap
+        trusted: true
+      - name: buo/cask-upgrade
+        trusted: true
+      - name: jetbrains/utils
+        trusted: true
+      - name: nettleton/tap
+        url: git@github.com:nettleton/homebrew-tap.git
+        trusted: true
     brews:
       - awscli
       - aws-sam-cli

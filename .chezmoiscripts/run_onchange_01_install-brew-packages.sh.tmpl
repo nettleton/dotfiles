@@ -11,11 +11,14 @@ find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-
 
 export HOMEBREW_GITHUB_API_TOKEN="$(op read 'op://Family/nettleton-homebrew-install-token/token')"
 
-brew bundle --file=/dev/stdin <<EOF
-{{ range .packages.brew.taps | sortAlpha | uniq -}}
-tap "{{ . }}"
+# Render the Brewfile to a temp file so both `brew bundle` (install) and
+# `brew bundle cleanup` (prune) below can read the same declared package set.
+brewfile="$(mktemp -t chezmoi-brewfile)"
+trap 'rm -f "$brewfile"' EXIT
+cat >"$brewfile" <<EOF
+{{ range .packages.brew.taps -}}
+tap "{{ .name }}"{{ with get . "url" }}, "{{ . }}"{{ end }}{{ if get . "trusted" }}, trusted: true{{ end }}
 {{ end -}}
-tap "nettleton/tap", "git@github.com:nettleton/homebrew-tap.git"
 {{ range .packages.brew.brews | sortAlpha | uniq -}}
 brew "{{ . }}"
 {{ end -}}
@@ -33,6 +36,40 @@ cask "{{ . }}"
 {{ end -}}
 {{ end -}}
 EOF
+
+brew bundle --file="$brewfile"
+
+# Prune: uninstall any brew/cask not declared in the config, forcing everything
+# to live in chezmoi. Scoped to --brews and --casks ONLY — never taps, mas, go,
+# etc., since those live in separate managers and are absent from this Brewfile
+# (cleaning them here would wipe every Mac App Store app and go binary). The
+# dependency closure of declared packages is preserved automatically. First a
+# no-force pass prints exactly what will be removed (so anything worth keeping
+# can be added to packages.yaml), then --force performs the removal.
+echo "==> Pruning Homebrew packages not declared in chezmoi config:"
+brew bundle cleanup --brews --casks --file="$brewfile" || true
+brew bundle cleanup --brews --casks --force --file="$brewfile"
+
+# Reconcile tap trust: untrust any tap Homebrew currently trusts that this repo
+# no longer declares as trusted. `brew bundle` above trusts declared taps; the
+# prune step is scoped away from taps, so this handles tap-trust removals.
+# Only tap-level trust is reconciled — any trusted individual formulae/casks/
+# commands are left untouched. jq is installed by the bundle above.
+desired_trusted="$(cat <<'TRUSTED'
+{{ range .packages.brew.taps -}}
+{{ if get . "trusted" }}{{ .name }}
+{{ end -}}
+{{ end -}}
+TRUSTED
+)"
+if command -v jq >/dev/null 2>&1; then
+  brew trust --json v1 | jq -r '.taps[]' | while IFS= read -r tap; do
+    [ -n "$tap" ] || continue
+    if ! printf '%s\n' "$desired_trusted" | grep -qxF "$tap"; then
+      brew untrust --tap "$tap"
+    fi
+  done
+fi
 
 export SUDO_ASKPASS="$existing_sudo_askpass"
 {{ end -}}
