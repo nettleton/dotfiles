@@ -77,6 +77,7 @@ which_key.add({
   { "<leader>ld", "<cmd>:Telescope lsp_document_symbols<CR>", desc = "Document Symbols", remap = false },
   { "<leader>lf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", desc = "Format", remap = false },
   { "<leader>lh", "<cmd>lua vim.lsp.buf.hover()<CR>", desc = "Hover", remap = false },
+  { "<leader>li", "<cmd>lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<CR>", desc = "Toggle Inlay Hints", remap = false },
   { "<leader>lj", '<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>', desc = "GoTo Next", remap = false },
   { "<leader>lk", '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>', desc = "GoTo Previous", remap = false },
   { "<leader>lo", '<cmd>lua vim.diagnostic.open_float(0, { scope = "line", border = "single" })<CR>', desc = "Open", remap = false },

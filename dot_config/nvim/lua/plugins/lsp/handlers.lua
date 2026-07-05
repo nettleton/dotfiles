@@ -66,6 +66,15 @@ local function lsp_codelens(client, bufnr)
   end
 end
 
+local function lsp_inlay_hints(client, bufnr)
+  -- Which hints are shown is controlled per-server via `settings` (e.g. gopls
+  -- `hints`, rust-analyzer `inlayHints`, ts_ls `inlayHints`); here we just turn
+  -- rendering on for any server that provides them.
+  if client.server_capabilities.inlayHintProvider then
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
+end
+
 
 M.on_attach = function(client, bufnr)
   if client.name == "ts_ls" then
@@ -73,6 +82,7 @@ M.on_attach = function(client, bufnr)
   end
   lsp_highlight_document(client, bufnr)
   lsp_codelens(client, bufnr)
+  lsp_inlay_hints(client, bufnr)
 end
 
 local status_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")

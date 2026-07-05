@@ -11,3 +11,12 @@ else
 end
 set -x -U CARGO_HOME "$HOME/.cargo"
 echo $fish_user_paths | grep -q "$CARGO_HOME/bin"; or set -U fish_user_paths $fish_user_paths "$CARGO_HOME/bin"
+
+# Ensure the clippy component is installed — Neovim's rust-analyzer runs
+# `cargo clippy` on save (check.command = "clippy"). Use the explicit path
+# since a freshly installed rustup may not be on PATH yet in this shell.
+if test -x "$CARGO_HOME/bin/rustup"
+  "$CARGO_HOME/bin/rustup" component add clippy
+else if which rustup > /dev/null
+  rustup component add clippy
+end

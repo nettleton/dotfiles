@@ -97,8 +97,22 @@ vim.lsp.config('marksman', {
 vim.lsp.enable('marksman')
 
 -- JS
+local ts_inlay_hints = {
+  includeInlayParameterNameHints = "all",
+  includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+  includeInlayFunctionParameterTypeHints = true,
+  includeInlayVariableTypeHints = true,
+  includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+  includeInlayPropertyDeclarationTypeHints = true,
+  includeInlayFunctionLikeReturnTypeHints = true,
+  includeInlayEnumMemberValueHints = true,
+}
 vim.lsp.config('ts_ls', {
-  on_attach = lsp_handlers.on_attach
+  on_attach = lsp_handlers.on_attach,
+  settings = {
+    typescript = { inlayHints = ts_inlay_hints },
+    javascript = { inlayHints = ts_inlay_hints },
+  },
 })
 vim.lsp.enable('ts_ls')
 -- Lua
@@ -117,6 +131,21 @@ vim.lsp.config('lua_ls', {
       workspace = {
         -- Make the server aware of Neovim runtime files
         library = vim.api.nvim_get_runtime_file("", true),
+        -- Don't prompt to configure third-party libraries (luv, busted, ...)
+        checkThirdParty = false,
+      },
+      completion = {
+        -- Insert the full function call with parameter placeholders
+        callSnippet = "Replace",
+      },
+      hint = {
+        -- Inlay hints (rendering enabled globally in handlers.on_attach)
+        enable = true,
+        arrayIndex = "Disable",
+        setType = true,
+      },
+      codeLens = {
+        enable = true,
       },
       -- Do not send telemetry data containing a randomized but unique identifier
       telemetry = {
@@ -136,14 +165,7 @@ vim.lsp.enable('golangci_lint_ls')
 -- Gopls — rich configuration.
 -- Settings reference: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
 vim.lsp.config('gopls', {
-  on_attach = function(client, bufnr)
-    lsp_handlers.on_attach(client, bufnr)
-    -- The `hints` settings below only render when inlay hints are enabled
-    -- client-side, so turn them on for Go buffers.
-    if vim.lsp.inlay_hint then
-      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-    end
-  end,
+  on_attach = lsp_handlers.on_attach,
   settings = {
     gopls = {
       -- Formatting
@@ -216,13 +238,62 @@ vim.lsp.enable('lemminx')
 -- You can add/overwrite schema as described here:
 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#yamlls
 vim.lsp.config('yamlls', {
-  on_attach = lsp_handlers.on_attach
+  on_attach = lsp_handlers.on_attach,
+  settings = {
+    yaml = {
+      -- Disable the built-in schema store and use schemastore.nvim instead
+      -- (already required for jsonls) — gives GH Actions, compose, k8s, etc.
+      schemaStore = { enable = false, url = "" },
+      schemas = schemastore.yaml.schemas(),
+      validate = true,
+      format = { enable = true },
+    },
+    redhat = { telemetry = { enabled = false } },
+  },
 })
 vim.lsp.enable('yamlls')
 
 -- Rust
 vim.lsp.config('rust_analyzer', {
-  on_attach = lsp_handlers.on_attach
+  on_attach = lsp_handlers.on_attach,
+  settings = {
+    ["rust-analyzer"] = {
+      cargo = {
+        allFeatures = true,
+        buildScripts = { enable = true },
+      },
+      -- Run clippy instead of `cargo check` on save (needs the clippy component)
+      check = {
+        command = "clippy",
+      },
+      procMacro = { enable = true },
+      imports = {
+        granularity = { group = "module" },
+        prefix = "self",
+      },
+      -- Inlay hints (rendering enabled globally in handlers.on_attach)
+      inlayHints = {
+        bindingModeHints = { enable = false },
+        closureReturnTypeHints = { enable = "never" },
+        lifetimeElisionHints = { enable = "never", useParameterNames = false },
+        parameterHints = { enable = true },
+        typeHints = { enable = true },
+      },
+      -- Code lenses (run via <leader>lc)
+      lens = {
+        enable = true,
+        implementations = { enable = true },
+        references = {
+          adt = { enable = true },
+          enumVariant = { enable = true },
+          method = { enable = true },
+          trait = { enable = true },
+        },
+        run = { enable = true },
+        debug = { enable = true },
+      },
+    },
+  },
 })
 vim.lsp.enable('rust_analyzer')
 
@@ -234,7 +305,23 @@ vim.lsp.enable('terraformls')
 
 -- Python
 vim.lsp.config('pyright', {
-  on_attach = lsp_handlers.on_attach
+  on_attach = lsp_handlers.on_attach,
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        diagnosticMode = "openFilesOnly",
+        useLibraryCodeForTypes = true,
+        typeCheckingMode = "basic",
+        -- Inlay hints (rendering enabled globally in handlers.on_attach)
+        inlayHints = {
+          variableTypes = true,
+          functionReturnTypes = true,
+          callArgumentNames = true,
+        },
+      },
+    },
+  },
 })
 vim.lsp.enable('pyright')
 
