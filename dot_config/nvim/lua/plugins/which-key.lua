@@ -73,6 +73,7 @@ which_key.add({
 
 which_key.add({
   { "<leader>l", group = "Language / LSP", remap = false },
+  { "<leader>lc", "<cmd>lua vim.lsp.codelens.run()<CR>", desc = "Run Code Lens", remap = false },
   { "<leader>ld", "<cmd>:Telescope lsp_document_symbols<CR>", desc = "Document Symbols", remap = false },
   { "<leader>lf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", desc = "Format", remap = false },
   { "<leader>lh", "<cmd>lua vim.lsp.buf.hover()<CR>", desc = "Hover", remap = false },

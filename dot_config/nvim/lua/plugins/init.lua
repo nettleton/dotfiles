@@ -244,18 +244,34 @@ require("lazy").setup({
       end
     },
 
-  -- Treesitter
+  -- Treesitter (main branch — no lazy-loading, parsers via :TSUpdate)
     { 'nvim-treesitter/nvim-treesitter',
-      build = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
+      branch = 'main',
+      lazy = false,
+      build = ':TSUpdate',
       config = function()
         require('plugins.treesitter')
       end,
-      dependencies = {
-        { 'nvim-treesitter/nvim-treesitter-textobjects' },
-      }
     },
     { 'nvim-treesitter/nvim-treesitter-textobjects',
-      branch = "main"
+      branch = 'main',
+      dependencies = { 'nvim-treesitter/nvim-treesitter' },
+      config = function()
+        require('nvim-treesitter-textobjects').setup({
+          select = { lookahead = true },
+          move = { set_jumps = true },
+        })
+        local sel = require('nvim-treesitter-textobjects.select').select_textobject
+        local move = require('nvim-treesitter-textobjects.move')
+        -- select
+        vim.keymap.set({ 'x', 'o' }, 'af', function() sel('@function.outer', 'textobjects') end, { desc = 'a function' })
+        vim.keymap.set({ 'x', 'o' }, 'if', function() sel('@function.inner', 'textobjects') end, { desc = 'inner function' })
+        vim.keymap.set({ 'x', 'o' }, 'ac', function() sel('@class.outer', 'textobjects') end, { desc = 'a class' })
+        vim.keymap.set({ 'x', 'o' }, 'ic', function() sel('@class.inner', 'textobjects') end, { desc = 'inner class' })
+        -- move
+        vim.keymap.set({ 'n', 'x', 'o' }, ']f', function() move.goto_next_start('@function.outer', 'textobjects') end, { desc = 'Next function start' })
+        vim.keymap.set({ 'n', 'x', 'o' }, '[f', function() move.goto_previous_start('@function.outer', 'textobjects') end, { desc = 'Prev function start' })
+      end,
     },
     { 'HiPhish/rainbow-delimiters.nvim' },
     { 'stevearc/aerial.nvim',

@@ -6,7 +6,8 @@ end
 
 lint.linters_by_ft = {
   fish = { "fish" },
-  go = { "golangcilint", "staticcheck" },
+  -- go: handled by the golangci_lint_ls LSP (golangci-lint, incl. staticcheck)
+  -- and gopls (staticcheck + analyses); nvim-lint would just duplicate them.
   lua = { "luacheck" },
   markdown = { "markdownlint", "vale" },
   python = { "pylint" },

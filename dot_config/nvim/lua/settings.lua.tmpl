@@ -65,6 +65,10 @@ g.ruby_host_prog = ''
 g.loaded_perl_provider = 0
 g.perl_host_prog = ''
 
+-- Disable node provider (no remote node plugins in use; silences checkhealth).
+-- If you ever need it, remove this and run: npm install -g neovim
+g.loaded_node_provider = 0
+
 -- GitHub Enterprise configurations
 g.github_enterprise_urls = {'https://github.{{ .work.domain }}', 'git@github.{{ .work.domain }}'}
 

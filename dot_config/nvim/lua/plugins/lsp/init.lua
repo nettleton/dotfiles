@@ -133,9 +133,64 @@ vim.lsp.config('golangci_lint_ls', {
 })
 vim.lsp.enable('golangci_lint_ls')
 
--- Gopls
+-- Gopls — rich configuration.
+-- Settings reference: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
 vim.lsp.config('gopls', {
-  on_attach = lsp_handlers.on_attach
+  on_attach = function(client, bufnr)
+    lsp_handlers.on_attach(client, bufnr)
+    -- The `hints` settings below only render when inlay hints are enabled
+    -- client-side, so turn them on for Go buffers.
+    if vim.lsp.inlay_hint then
+      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+    end
+  end,
+  settings = {
+    gopls = {
+      -- Formatting
+      gofumpt = true,
+      -- Completion
+      usePlaceholders = true,
+      completeUnimported = true,
+      matcher = "Fuzzy",
+      experimentalPostfixCompletions = true,
+      -- Diagnostics
+      staticcheck = true,
+      vulncheck = "Imports",
+      analyses = {
+        nilness = true,
+        shadow = true,          -- flags shadowed variables (can be noisy)
+        unusedparams = true,
+        unusedvariable = true,
+        unusedwrite = true,
+        useany = true,
+      },
+      -- Code lenses (run via vim.lsp.codelens.run())
+      codelenses = {
+        gc_details = true,
+        generate = true,
+        regenerate_cgo = true,
+        run_govulncheck = true,
+        test = true,
+        tidy = true,
+        upgrade_dependency = true,
+        vendor = true,
+      },
+      -- Inlay hints
+      hints = {
+        assignVariableTypes = true,
+        compositeLiteralFields = true,
+        compositeLiteralTypes = true,
+        constantValues = true,
+        functionTypeParameters = true,
+        parameterNames = true,
+        rangeVariableTypes = true,
+      },
+      -- UI / navigation / highlighting
+      semanticTokens = true,
+      symbolMatcher = "Fuzzy",
+      directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+    },
+  },
 })
 vim.lsp.enable('gopls')
 

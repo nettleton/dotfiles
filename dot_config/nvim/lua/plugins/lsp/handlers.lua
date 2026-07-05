@@ -26,7 +26,7 @@ M.setup = function()
       focusable = false,
       style = "minimal",
       border = "rounded",
-      source = "always",
+      source = true,
       header = "",
       prefix = "",
     },
@@ -34,13 +34,9 @@ M.setup = function()
 
   vim.diagnostic.config(config)
 
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-    border = "rounded",
-  })
-
-  vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-    border = "rounded",
-  })
+  -- Global window border (Nvim 0.11+) replaces the deprecated per-handler
+  -- vim.lsp.with() overrides for hover / signatureHelp.
+  vim.o.winborder = "rounded"
 end
 
 local function lsp_highlight_document(client, bufnr)
@@ -61,11 +57,22 @@ local function lsp_highlight_document(client, bufnr)
 end
 
 
+local function lsp_codelens(client, bufnr)
+  -- enable() is stateful and auto-refreshes on buffer changes (via nvim_buf_attach),
+  -- so no manual CursorHold/BufEnter autocmd is needed. Replaces the deprecated
+  -- vim.lsp.codelens.refresh().
+  if client.server_capabilities.codeLensProvider then
+    vim.lsp.codelens.enable(true, { bufnr = bufnr })
+  end
+end
+
+
 M.on_attach = function(client, bufnr)
   if client.name == "ts_ls" then
     client.server_capabilities.documentFormattingProvider = false
   end
   lsp_highlight_document(client, bufnr)
+  lsp_codelens(client, bufnr)
 end
 
 local status_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
