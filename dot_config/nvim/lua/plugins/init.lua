@@ -257,7 +257,9 @@ require("lazy").setup({
       branch = 'main',
       dependencies = { 'nvim-treesitter/nvim-treesitter' },
       config = function()
-        require('nvim-treesitter-textobjects').setup({
+        local ok, ts_textobjects = pcall(require, 'nvim-treesitter-textobjects')
+        if not ok or type(ts_textobjects.setup) ~= "function" then return end
+        ts_textobjects.setup({
           select = { lookahead = true },
           move = { set_jumps = true },
         })

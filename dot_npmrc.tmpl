@@ -1,6 +1,6 @@
 
 {{ if .is_work_machine }}
-registry=http://mw-npm-repository/artifactory/api/npm/npm-repos
+registry=https://mw-npm-repository.{{ .work.domain }}/artifactory/api/npm/npm-repos/
 {{ else }}
 # scoped dependency overrides
 @types:registry=https://registry.npmjs.org
