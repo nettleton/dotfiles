@@ -6,12 +6,26 @@ renders the Brewfile's `trusted:` keywords — so trust drift is reverted on
 every apply. This replaces the imperative untrust-reconcile loop that used to
 live in run_onchange_01_install-brew-packages.
 
-NOTE: brew also writes ad-hoc `brew trust` grants (taps, formulae, casks,
-commands) into this file — chezmoi will revert them on the next apply. To
-trust something durably, declare it in packages.yaml.
+trustedformulae: brew records formula-level trust for safe-upgrade whenever
+`brew safe-upgrade --self` upgrades it through `brew upgrade` (daily, via the
+io.nettleton.brew-update agent). Declared here so brew's write is a no-op
+instead of a perpetual apply-time diff. Serialization (key order, indent, no
+trailing newline) deliberately matches brew's own writer for the same reason.
+
+Any OTHER ad-hoc `brew trust` grant is reverted on the next apply — to trust
+something durably, declare it in packages.yaml (taps) or here.
 */ -}}
 {{- $trusted := list -}}
 {{- range .packages.brew.taps -}}
 {{- if get . "trusted" }}{{ $trusted = append $trusted .name }}{{ end -}}
 {{- end -}}
-{{ dict "trustedtaps" $trusted | toPrettyJson -}}
+{
+  "trustedtaps": [
+{{- range $i, $t := $trusted }}
+    "{{ $t }}"{{ if lt (add1 $i) (len $trusted) }},{{ end }}
+{{- end }}
+  ],
+  "trustedformulae": [
+    "sharkyger/tap/safe-upgrade"
+  ]
+}
