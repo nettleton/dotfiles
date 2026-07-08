@@ -42,11 +42,13 @@ RUN_LOG="$(mktemp -t daily-update-log)"
 brewfile="$(mktemp -t daily-update-brewfile)"
 trap 'rm -f "$RUN_LOG" "$brewfile"' EXIT
 
-# GitHub token for safe-upgrade/install release-age checks (5000/hr vs 60/hr).
-# Best-effort: if 1Password is locked, proceed — safe-* fails closed on limits.
-if token="$(op read 'op://Family/nettleton-homebrew-install-token/token' 2>/dev/null)"; then
-  export GH_TOKEN="$token"
-fi
+# GitHub token for safe-upgrade/install release-age checks (5000/hr vs 60/hr):
+# deliberately NOT fetched via `op read` — with 1Password app integration any
+# op call pops a GUI auth prompt, which an unattended launchd job must never
+# do. safe-upgrade's own fallback chain (GH_TOKEN -> GITHUB_TOKEN -> `gh auth
+# token`) picks up the gh CLI login (02-06_configure-git-auth) prompt-free.
+# If gh is unauthenticated it degrades to 60/hr, plenty for a daily
+# outdated-set scan; safe-* fails closed if the limit is ever hit.
 
 echo "==> [1/5] safe-upgrade --self"
 brew safe-upgrade --self || echo "WARN: --self failed (continuing)"
