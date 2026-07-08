@@ -1,0 +1,17 @@
+{{- /*
+Homebrew tap-trust store (read when HOMEBREW_REQUIRE_TAP_TRUST is set; see
+`brew trust --help`). Declaratively owned by chezmoi: rendered from the
+`trusted: true` taps in .chezmoidata/packages.yaml — the same source that
+renders the Brewfile's `trusted:` keywords — so trust drift is reverted on
+every apply. This replaces the imperative untrust-reconcile loop that used to
+live in run_onchange_01_install-brew-packages.
+
+NOTE: brew also writes ad-hoc `brew trust` grants (taps, formulae, casks,
+commands) into this file — chezmoi will revert them on the next apply. To
+trust something durably, declare it in packages.yaml.
+*/ -}}
+{{- $trusted := list -}}
+{{- range .packages.brew.taps -}}
+{{- if get . "trusted" }}{{ $trusted = append $trusted .name }}{{ end -}}
+{{- end -}}
+{{ dict "trustedtaps" $trusted | toPrettyJson -}}
