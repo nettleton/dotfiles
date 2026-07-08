@@ -50,6 +50,8 @@ trap 'rm -f "$RUN_LOG" "$brewfile"' EXIT
 # If gh is unauthenticated it degrades to 60/hr, plenty for a daily
 # outdated-set scan; safe-* fails closed if the limit is ever hit.
 
+echo "==> daily update starting $(date '+%Y-%m-%d %H:%M:%S')"
+
 echo "==> [1/5] safe-upgrade --self"
 brew safe-upgrade --self || echo "WARN: --self failed (continuing)"
 
@@ -180,4 +182,4 @@ else
   fi
 fi
 
-echo "==> daily update done"
+echo "==> daily update done $(date '+%Y-%m-%d %H:%M:%S') (${SECONDS}s elapsed)"
