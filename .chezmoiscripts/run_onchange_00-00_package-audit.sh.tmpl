@@ -1,0 +1,36 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+# Package audit — re-runs whenever packages.yaml changes (the hash below is part of
+# the rendered content, so chezmoi re-runs on any change). Ordered BEFORE the brew
+# installer (00 < 01). Reports package existence (A4) + deprecation/disabled and
+# newly-added-package CVEs (A7).
+#
+# NON-BLOCKING by default: at apply time the config is already the source of truth,
+# so a pre-existing accepted condition (e.g. a disabled cask you're keeping) must not
+# wedge every apply. Set PACKAGE_AUDIT_STRICT=1 (CI does) to abort on failure.
+# Must NOT call `chezmoi`. See TESTING.md §3.1 / §5.
+#
+# packages.yaml fingerprint (triggers re-run on change): {{ .packages | toJson | sha256sum }}
+set -uo pipefail
+
+REPO="$HOME/.local/share/chezmoi"
+LIB="$REPO/tests/lib"
+if [ ! -d "$LIB" ]; then
+  echo "package-audit: $LIB not found — skipping"
+  exit 0
+fi
+export CHEZMOI_REPO="$REPO"
+
+rc=0
+bash "$LIB/check_packages_exist.sh" || rc=1
+bash "$LIB/check_security.sh"       || rc=1
+
+if [ "$rc" -ne 0 ]; then
+  if [ -n "${PACKAGE_AUDIT_STRICT:-}" ]; then
+    echo "package-audit: FAILED (PACKAGE_AUDIT_STRICT) — aborting apply."
+    exit 1
+  fi
+  echo "package-audit: issues found above (non-blocking; set PACKAGE_AUDIT_STRICT=1 to gate)."
+fi
+exit 0
+{{- end -}}

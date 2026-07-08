@@ -1,0 +1,43 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+# Preflight — runs on EVERY `chezmoi apply`, after bootstrap (00) and before the
+# mutating package scripts. Hard-fails (aborts the apply) only on the two
+# apply-specific catastrophes: a leaked work identifier, or a *mass* prune.
+#
+# Must NOT call `chezmoi` (apply holds the lock) — uses the hardcoded source path
+# and injects the work values via the template. See TESTING.md §3.1.
+set -uo pipefail
+
+if [ -n "${PREFLIGHT_SKIP:-}" ]; then
+  echo "preflight: skipped (PREFLIGHT_SKIP set)"
+  exit 0
+fi
+
+REPO="$HOME/.local/share/chezmoi"
+LIB="$REPO/tests/lib"
+if [ ! -d "$LIB" ]; then
+  echo "preflight: $LIB not found — skipping (test suite not present)"
+  exit 0
+fi
+export CHEZMOI_REPO="$REPO"
+
+rc=0
+
+# 1) Leak scan — work identifier VALUES injected by the template (no chezmoi call).
+IN_PREFLIGHT=1 \
+  WORK_USER={{ .work.user | quote }} \
+  WORK_COMPANYNAME={{ .work.companyname | quote }} \
+  WORK_DOMAIN={{ .work.domain | quote }} \
+  bash "$LIB/leakscan.sh" || rc=1
+
+# 2) Prune-guard — abort only on a mass uninstall (> --max), so an intended single
+#    removal still converges. Tune with PRUNE_MAX.
+bash "$LIB/prune_guard.sh" --max "${PRUNE_MAX:-5}" || rc=1
+
+if [ "$rc" -ne 0 ]; then
+  echo ""
+  echo "preflight FAILED — aborting apply. Fix the above, or PREFLIGHT_SKIP=1 to override."
+  exit 1
+fi
+echo "preflight: OK"
+{{- end -}}
