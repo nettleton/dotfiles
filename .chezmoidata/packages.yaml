@@ -8,14 +8,16 @@ packages:
         trusted: true
       - name: buo/cask-upgrade
         trusted: true
+      - name: homebrew/brew-vulns
       - name: jetbrains/utils
         trusted: true
       - name: nettleton/tap
         url: git@github.com:nettleton/homebrew-tap.git
         trusted: true
+      - name: sharkyger/tap
+        trusted: true
     brews:
       - awscli
-      - aws-sam-cli
       - bat
       - chezmoi
       - cmake
@@ -50,6 +52,7 @@ packages:
       - gotests
       - graphviz
       - helm
+      - "homebrew/brew-vulns/brew-vulns"
       - ical-buddy
       - "jetbrains/utils/teamcity"
       - jq
@@ -67,12 +70,12 @@ packages:
       - nghttp2
       - openconnect
       - pandoc
-      - pcre
       - podman
       - poppler
       - rename
       - ripgrep-all
       - ruby
+      - "sharkyger/tap/safe-upgrade"
       - starship
       - taglib
       - tmux
@@ -109,7 +112,6 @@ packages:
       - microsoft-teams
       - netnewswire
       - podman-desktop
-      - screens
       - sf-symbols
       - shortcat
       - soundsource
@@ -131,7 +133,6 @@ packages:
       - harfbuzz
       - hugo
       - imagemagick
-      - imagemagick@6
       - leptonica
       - libass
       - libbluray
@@ -159,12 +160,10 @@ packages:
       - handbrake-app
       - hazel
       - makemkv
-      - openin
       - moneydance
-      - rancher
+      - openin
       - receipts
       - resilio-sync
-      - screens-connect
       - signal
       - tailscale-app
       - xld
@@ -193,6 +192,8 @@ packages:
         id: 403504866
       - name: "Play: Save Videos Watch Later"
         id: 1596506190
+      - name: "Screens 5"
+        id: 1663047912
       - name: StopTheFonts
         id: 1671452642
       - name: StopTheMadness Pro
