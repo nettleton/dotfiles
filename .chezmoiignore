@@ -8,6 +8,10 @@ ROADMAP.md
 Library/LaunchAgents/io.nettleton.calendar.poller.plist
 {{- end }}
 {{- if not .is_personal_machine }}
+# brew-update agent: trialing on the personal desktop before wider rollout
+Library/LaunchAgents/io.nettleton.brew-update.plist
+{{- end }}
+{{- if not .is_personal_machine }}
 .config/swiftbar/solaredge.15m.py
 {{- end }}
 {{- if not (and .is_work_machine .is_laptop) }}

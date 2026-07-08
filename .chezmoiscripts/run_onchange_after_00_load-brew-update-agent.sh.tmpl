@@ -1,6 +1,8 @@
-{{- if (eq .chezmoi.os "darwin") -}}
+{{- if (and (eq .chezmoi.os "darwin") .is_personal_machine) -}}
 #!/bin/bash
-# (Re)load the daily brew-update LaunchAgent. run_onchange_after_: runs AFTER
+# (Re)load the daily brew-update LaunchAgent. Personal machines only for now
+# (trial run; .chezmoiignore excludes the plist elsewhere too).
+# run_onchange_after_: runs AFTER
 # chezmoi has written the plist (after-phase avoids the scripts-before-files
 # ordering caveat), and re-runs whenever the plist template changes (hash
 # below is part of this script's rendered content). launchd also auto-loads

@@ -21,6 +21,12 @@
     <key>PATH</key>
     <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
   </dict>
+  <!-- RunAtLoad: also fire at login and on plist reload — covers fire times
+       missed while the machine was off or the agent not yet loaded. The
+       updater is idempotent and cheap when there's nothing to do, and brew's
+       own locking serializes any overlap with an in-flight apply. -->
+  <key>RunAtLoad</key>
+  <true/>
   <key>StartCalendarInterval</key>
   <dict>
     <key>Hour</key>
