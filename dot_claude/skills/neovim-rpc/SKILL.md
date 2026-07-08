@@ -104,12 +104,36 @@ nvim --server "$CODING_SESSION_NVIM_SOCK" --remote-expr 'luaeval("vim.json.encod
 nvim --server "$CODING_SESSION_NVIM_SOCK" --remote-expr 'luaeval("vim.json.encode(vim.tbl_map(function(c) return c.name end, vim.lsp.get_clients({bufnr = 0})))")'
 ```
 
+## Reloading Buffers After External Edits
+
+When you edit files externally (e.g., via the Edit/Write tools), nvim won't
+automatically show the changes. Use `checktime` to tell nvim to check all
+open buffers for disk changes and reload them:
+
+```bash
+nvim --server "$CODING_SESSION_NVIM_SOCK" --remote-expr 'execute("checktime")'
+```
+
+**Do NOT use `--remote-send ':edit!<CR>'`** to reload files. Simulating
+keystrokes is unreliable — if nvim is in insert mode, has a floating window
+focused, or a plugin intercepts the keystroke, it can open blank tabs or cause
+other unexpected behavior. Always use `--remote-expr` with `execute()` instead.
+
+In most cases you do not need to reload at all — nvim will detect changes when
+the user switches to its window. Only reload if the user asks you to refresh
+the editor, or if you need to trigger LSP re-analysis (see below).
+
 ## Stale LSP Diagnostics
 
 When files are edited externally (e.g., by Claude), nvim's LSP diagnostics
-become stale. To refresh:
+become stale. To refresh, reload the buffer and save (forces LSP re-analysis):
 
-**Reload buffer and save** (forces LSP re-analysis):
+```bash
+nvim --server "$CODING_SESSION_NVIM_SOCK" --remote-expr 'execute("checktime")'
+```
+
+If that isn't enough (LSP still shows stale diagnostics), force a specific
+buffer to reload:
 
 ```bash
 nvim --server "$CODING_SESSION_NVIM_SOCK" --remote-expr 'execute("lua vim.api.nvim_buf_call(BUFNR, function() vim.cmd(\"edit! | write\") end)")'
@@ -118,7 +142,7 @@ nvim --server "$CODING_SESSION_NVIM_SOCK" --remote-expr 'execute("lua vim.api.nv
 Replace `BUFNR` with the actual buffer number, or use `0` for the current
 buffer.
 
-**Restart LSP** (if reload isn't enough):
+**Restart LSP** (last resort):
 
 ```bash
 nvim --server "$CODING_SESSION_NVIM_SOCK" --remote-expr 'execute("LspRestart")'
