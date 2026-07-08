@@ -34,8 +34,9 @@
     <key>Minute</key>
     <integer>0</integer>
   </dict>
-  <key>ProcessType</key>
-  <string>Background</string>
+  <!-- No ProcessType Background: it throttles the dozens of ruby/git
+       processes brew spawns ~10-20x, stretching a ~3-minute run past an
+       hour. Standard priority for a once-daily job is the better trade. -->
   <key>StandardOutPath</key>
   <string>{{ .chezmoi.homeDir }}/Library/Logs/io.nettleton.brew-update.log</string>
   <key>StandardErrorPath</key>
