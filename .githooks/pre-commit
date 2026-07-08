@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# pre-commit — block commits that would leak a work/personal identifier into the
+# tree (the §6 leak scan). Tracked in .githooks/ and activated via core.hooksPath
+# (see .chezmoiscripts/run_once_00-04_configure-git-hooks.sh).
+#
+# Bypass a false positive with:  git commit --no-verify
+set -uo pipefail
+
+repo="$(git rev-parse --show-toplevel)"
+scan="$repo/tests/lib/leakscan.sh"
+[ -x "$scan" ] || exit 0   # test suite absent → don't block commits
+
+if ! bash "$scan"; then
+  echo ""
+  echo "pre-commit: identifier leak detected — commit blocked."
+  echo "  Remove the flagged value(s) above, or bypass with:  git commit --no-verify"
+  exit 1
+fi
