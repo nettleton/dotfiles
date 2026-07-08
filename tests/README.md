@@ -56,6 +56,11 @@ scheduled daily job) force-upgrades them with `--min-age 0` — still CVE/SHA
 checked. Held-since state: `~/.cache/chezmoi-dotfiles-tests/held_since.txt`.
 `chezmoi apply` never forces.
 
+Final step: **sudo summary** — pkg-installer casks (mactex, tailscale-app, …)
+can't `sudo installer` unattended; failures are detected, the affected casks
+listed (age-held ones excluded), and a macOS notification posted so you know an
+interactive `mise run update` (Touch ID sudo) is due.
+
 Note: safe-upgrade is installed early by `run_before_00_bootstrap.sh` (the gate must
 exist before the gated installer runs) but stays declared in packages.yaml — the
 1Password pattern — so it's prune-safe and audited like any other package.

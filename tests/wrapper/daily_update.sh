@@ -14,6 +14,11 @@
 #      With --upgrade-capped (or UPGRADE_CAPPED=1), upgrade/install them with
 #      --min-age 0 — a deliberate, bounded policy exception (still CVE/SHA
 #      checked). chezmoi apply NEVER forces; only this updater can, opt-in.
+#   5. sudo summary: pkg-installer casks (mactex, tailscale-app, …) run
+#      `sudo installer`, which fails without a TTY when this job runs
+#      unattended. Detect those failures, list the casks that need an
+#      interactive `mise run update` (Touch ID sudo), and post a macOS
+#      notification so stale pkg casks aren't discovered by accident.
 #
 # Usage: daily_update.sh [--upgrade-capped]
 # Env:   MIN_AGE (7) · STALENESS_CAP days (21) · UPGRADE_CAPPED=1
@@ -43,13 +48,13 @@ if token="$(op read 'op://Family/nettleton-homebrew-install-token/token' 2>/dev/
   export GH_TOKEN="$token"
 fi
 
-echo "==> [1/4] safe-upgrade --self"
+echo "==> [1/5] safe-upgrade --self"
 brew safe-upgrade --self || echo "WARN: --self failed (continuing)"
 
-echo "==> [2/4] safe-upgrade --yes --min-age $MIN_AGE (installed packages)"
+echo "==> [2/5] safe-upgrade --yes --min-age $MIN_AGE (installed packages)"
 brew safe-upgrade --yes --min-age "$MIN_AGE" 2>&1 | tee -a "$RUN_LOG"
 
-echo "==> [3/4] reconcile declared set (retries previously-held installs)"
+echo "==> [3/5] reconcile declared set (retries previously-held installs)"
 # Personal packages only on non-work machines — ask chezmoi (allowed here).
 personal_flag="--personal"
 if command -v chezmoi >/dev/null 2>&1; then
@@ -62,7 +67,7 @@ awk -F'"' '/^brew /{print $2}' "$brewfile" \
 awk -F'"' '/^cask /{print $2}' "$brewfile" \
   | xargs brew safe-install --cask --min-age "$MIN_AGE" 2>&1 | tee -a "$RUN_LOG"
 
-echo "==> [4/4] staleness cap (held > ${STALENESS_CAP}d)"
+echo "==> [4/5] staleness cap (held > ${STALENESS_CAP}d)"
 # Currently-held set: every "Held (too fresh): a b c" line from steps 2-3.
 now="$(date +%s)"
 held_now="$(grep 'Held (too fresh):' "$RUN_LOG" | sed 's/.*Held (too fresh)://' \
@@ -108,6 +113,40 @@ else
       echo "WARN: capped '$p' neither installed nor declared — skipping"
     fi
   done <<<"$capped"
+fi
+
+echo "==> [5/5] sudo-required casks (pkg installers can't sudo unattended)"
+# Unattended sudo fails with a recognizable message; attribute it to the
+# outdated pkg-installer casks (minus any merely age-held ones) and surface.
+sudo_hits="$(grep -cE 'a terminal is required to read the password|no tty present and no askpass' "$RUN_LOG" || true)"
+if [[ "${sudo_hits:-0}" -eq 0 ]]; then
+  echo "no sudo failures detected"
+else
+  outdated_casks="$(brew outdated --cask --quiet 2>/dev/null | sed 's|.*/||' || true)"
+  pkg_casks=""
+  if [[ -n "$outdated_casks" ]]; then
+    # shellcheck disable=SC2086  # word-splitting the cask names is intended
+    pkg_casks="$(brew info --json=v2 --cask $outdated_casks 2>/dev/null \
+      | jq -r '.casks[] | select(.artifacts[]? | has("pkg") or has("installer")) | .token' 2>/dev/null \
+      | sort -u || true)"
+  fi
+  needs_interactive=""
+  while IFS= read -r c; do
+    [[ -n "$c" ]] || continue
+    grep -qxF "$c" <<<"$held_now" || needs_interactive="$needs_interactive$c"$'\n'
+  done <<<"$pkg_casks"
+  needs_interactive="$(printf '%s' "$needs_interactive" | sed '/^$/d')"
+  if [[ -n "$needs_interactive" ]]; then
+    echo "NEEDS INTERACTIVE RUN — $sudo_hits sudo failure(s); these pkg casks need a terminal (Touch ID sudo):"
+    while IFS= read -r c; do printf '  - %s\n' "$c"; done <<<"$needs_interactive"
+    echo "run in a terminal:  mise run update"
+    if command -v osascript >/dev/null 2>&1; then
+      msg="Needs interactive 'mise run update' (sudo): $(printf '%s ' $needs_interactive)"
+      osascript -e "display notification \"$msg\" with title \"brew daily update\"" 2>/dev/null || true
+    fi
+  else
+    echo "sudo failure(s) detected ($sudo_hits) but no outdated pkg casks remain — inspect the run output above"
+  fi
 fi
 
 echo "==> daily update done"
