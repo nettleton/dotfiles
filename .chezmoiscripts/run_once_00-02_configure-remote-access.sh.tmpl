@@ -1,0 +1,31 @@
+{{- if not .is_work_machine -}}
+#!/bin/bash
+# Configure remote access on personal machines:
+#   1. Remote Login (sshd), key-only auth — used by ssh and Screens'
+#      "Secure Connection" mode.
+#   2. Screen Sharing (VNC on 5900) — what Screens 5 actually connects to,
+#      directly over Tailscale (Screens Connect was removed from packages).
+
+if ! sudo systemsetup -getremotelogin 2>/dev/null | grep -q "On"; then
+  sudo sed -i '' \
+    -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
+    -e 's/^#\?ChallengeResponseAuthentication .*/ChallengeResponseAuthentication no/' \
+    /etc/ssh/sshd_config
+  sudo systemsetup -setremotelogin on
+  echo "Remote Login enabled with key-only auth"
+else
+  echo "Remote Login already enabled, skipping"
+fi
+
+# Enable Screen Sharing. `launchctl load -w` both clears the disabled flag and
+# starts the service, persisting across reboots. No-op guard: `launchctl print`
+# exits 0 iff the service is already bootstrapped. (If Remote Management/ARD is
+# ever enabled it supersedes this service and the load prints a warning — the
+# personal machines here don't run ARD.)
+if ! sudo launchctl print system/com.apple.screensharing >/dev/null 2>&1; then
+  sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist
+  echo "Screen Sharing enabled"
+else
+  echo "Screen Sharing already enabled, skipping"
+fi
+{{- end }}
