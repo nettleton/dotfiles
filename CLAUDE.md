@@ -64,17 +64,16 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 **`00-*` System config** (`run_once_`)
 - `00-00` — Convert git origin to SSH
 - `00-01` — Configure sudo Touch ID
-- `00-02` — Configure sshd (non-work machines only)
+- `00-02` — Configure remote access: sshd + Screen Sharing (non-work machines only)
 
 **`01` Install brew packages** (`run_onchange_`)
-- Installs taps, brews, and casks from `.packages.brew.*`
-- Renders the Brewfile to a temp file (so both install and prune can read it)
-- Taps are structured entries (`name`, optional `url`, optional `trusted`); `trusted: true` emits the Brewfile `trusted:` keyword so Homebrew trusts the tap when tap trust is required
+- Renders the Brewfile to a temp file (single source of truth: taps install and the prune both read it)
+- Taps via a taps-only `brew bundle`; `trusted: true` on a tap entry emits the Brewfile `trusted:` keyword. Tap-trust state itself is declarative: `~/.homebrew/trust.json` is a chezmoi-managed template (`private_dot_homebrew/`) rendered from the same taps list, so ad-hoc trust drift is reverted on every apply
+- Installs declared brews/casks via `brew safe-install --min-age 7` (age hold + CVE check + SHA verify; already-installed packages skip fast and are never upgraded here — upgrades go through the daily gated `safe-upgrade`). Held/vulnerable packages are skipped, picked up later by the daily updater's reconcile pass
 - Prunes drift: `brew bundle cleanup --brews --casks` uninstalls any formula/cask not declared in the config (prints the plan, then `--force`). Scoped to brews+casks only — NOT taps/mas/go, which are separate managers absent from this Brewfile. Dependency closure of declared packages is preserved.
-- Reconciles tap trust: untrusts any tap Homebrew trusts that the repo no longer declares (the prune step is scoped away from taps). Only tap-level trust is touched.
 - Personal packages gated on `.personalpackages`
 - Re-runs automatically when `packages.yaml` brew lists change
-- Auth via 1Password shell plugin (no hardcoded tokens)
+- Auth via 1Password shell plugin; the op-sourced GitHub token is exported as `GH_TOKEN` for safe-install's release-age checks
 
 **`02-*` Configure brew-installed packages** (`run_once_`)
 - `02-00` — Fish shell (/etc/shells, chsh, fisher plugins, tide settings)

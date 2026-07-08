@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# Bootstrap script: installs Homebrew, 1Password, and 1Password CLI
+# Bootstrap script: installs Homebrew, 1Password, 1Password CLI, and
+# safe-upgrade (the security gate every later brew install/upgrade goes
+# through — it must exist before the package installer runs).
 # This is a non-template file — it cannot use onepasswordRead since
 # it may be installing 1Password for the first time.
 
@@ -35,6 +37,21 @@ if ! command -v op &>/dev/null; then
   brew install --cask 1password/tap/1password-cli
 else
   echo "1Password CLI already installed, skipping"
+fi
+
+# Install safe-upgrade (security-gated brew install/upgrade) if not present.
+# Same pattern as 1Password: bootstrap installs it early (the gate must exist
+# before the gated package installer runs), while packages.yaml still declares
+# it (prune-safe, covered by the package audits). The explicit `brew trust`
+# is needed only in the fresh-machine window: run_before scripts execute
+# before chezmoi places the managed ~/.homebrew/trust.json.
+if ! command -v brew-safe-install &>/dev/null; then
+  echo "Installing safe-upgrade..."
+  brew tap sharkyger/tap 2>/dev/null || true
+  brew trust --tap sharkyger/tap
+  brew install sharkyger/tap/safe-upgrade
+else
+  echo "safe-upgrade already installed, skipping"
 fi
 
 # Verify 1Password CLI is signed in
