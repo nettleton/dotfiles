@@ -1,0 +1,6 @@
+# Packages that `brew bundle cleanup` may uninstall WITHOUT failing the
+# prune-guard (tests/lib/prune_guard.sh). One token per line; # for comments.
+#
+# Keep this as empty as possible: every entry here is a package that will be
+# silently removed on the next `chezmoi apply`. Prefer adding a package to
+# .chezmoidata/packages.yaml over allowlisting its removal.

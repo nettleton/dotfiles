@@ -1,0 +1,6 @@
+# Path globs (matched against git-relative paths) excluded from the identifier /
+# PII leak scan (tests/lib/leakscan.sh). One glob per line; # for comments.
+#
+# Only add a path here if it INTENTIONALLY contains a work/personal identifier
+# value and that exposure has been reviewed. Treat every addition as a security
+# review. Empty by default — nothing is exempt.

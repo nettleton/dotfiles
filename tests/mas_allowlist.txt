@@ -1,0 +1,11 @@
+# Mac App Store ids acknowledged as not resolvable via the iTunes lookup API
+# (tests/lib/check_packages_exist.sh downgrades these from WARN to a note).
+# One id per line; # for comments. Typical case: Apple re-released the app
+# under a new id and the legacy id — still valid for `mas install` on machines
+# that own it — no longer appears in lookup results.
+
+# iWork legacy ids (apps re-released under new "creator studio" ids; keeping
+# the old ids deliberately — not upgrading yet):
+409183694  # Keynote (legacy id)
+409201541  # Pages (legacy id)
+409203825  # Numbers (legacy id)

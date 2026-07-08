@@ -22,3 +22,10 @@ Library/LaunchAgents/io.nettleton.calendar.poller.plist
 .config/pip/pip.conf
 .config/uv/uv.toml
 {{- end }}
+
+# Test suite — source-only, never applied to $HOME.
+# (Dotfiles at the source root — .github/, .mise.toml — are not applied by
+# chezmoi, so they need no entry here.)
+TESTING.md
+tests
+tests/**

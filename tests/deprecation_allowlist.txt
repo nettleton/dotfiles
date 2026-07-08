@@ -1,0 +1,12 @@
+# Packages whose upstream DEPRECATION has been reviewed and consciously accepted.
+# The A7 security audit (tests/lib/check_security.sh) downgrades a deprecated
+# package on this list from a ⚠ WARN to a informational · note. One token per
+# line; # for comments.
+#
+# This only affects DEPRECATED packages. A DISABLED package (e.g. one moved to
+# the App Store) always fails — it cannot be silenced here, because it can no
+# longer be installed.
+
+# fails_gatekeeper_check — apps still install; vendor-signing issue, not removal.
+makemkv
+xld

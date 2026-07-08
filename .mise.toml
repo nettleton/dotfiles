@@ -1,0 +1,31 @@
+# Repo-local mise tasks for the chezmoi dotfiles test suite (see TESTING.md).
+# A dotfile at the source root, so chezmoi does not apply it to $HOME (like
+# .github/). Run `mise trust` once, then `mise run test`, `mise tasks`, etc.
+
+[tasks.test]
+description = "Run the full Phase-1 test suite"
+run = "./tests/run.sh"
+
+[tasks."test:hermetic"]
+description = "Hermetic (no-network) checks only: schema + leak scan"
+run = "./tests/run.sh --offline schema leak"
+
+[tasks.check]
+description = "Run one check: schema | exist | security | prune | leak"
+run = "./tests/run.sh {{arg(name='check')}}"
+
+[tasks."audit:all"]
+description = "Security/maintenance audit over ALL packages (slow), not just newly-added"
+run = "./tests/run.sh security --audit-all"
+
+[tasks.brewfile]
+description = "Render the Brewfile the installer would apply (superset incl. personal)"
+run = "./tests/lib/render_brewfile.sh --personal"
+
+[tasks.update]
+description = "Daily brew update: safe-upgrade --self, gated upgrades, reconcile held installs (staleness-capped packages reported only)"
+run = "./tests/wrapper/daily_update.sh"
+
+[tasks."update:auto"]
+description = "Daily-job variant: also force-upgrades staleness-capped packages (held > 21d) with --min-age 0"
+run = "./tests/wrapper/daily_update.sh --upgrade-capped"
