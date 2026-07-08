@@ -390,9 +390,13 @@ the CI added-package gate (A7) and on-demand checks.
   Tier B on `macos-latest`. Both are GitHub-hosted; no self-hosted runner. A security
   job submits a CycloneDX SBOM to the dependency graph (→ **Dependabot** alerts,
   server-side, immediate) and runs the `brew vulns` added-package gate.
-- **Local automation:** a `launchd` plist (or cron / Claude Code agent) on the Mac
-  runs the daily upgrade flow and the chezmoi-calling wrapper checks (C4–C8). The
-  in-apply preflight (§3.1) gates the rest.
+- **Local automation — DONE (brew leg):** `io.nettleton.brew-update` LaunchAgent
+  (chezmoi-managed plist in `private_Library/LaunchAgents/`, bootstrapped/reloaded by
+  `run_onchange_after_00_load-brew-update-agent` whenever the plist changes) runs
+  `daily_update.sh --upgrade-capped` daily at 10:00, logging to
+  `~/Library/Logs/io.nettleton.brew-update.log`. The chezmoi-calling wrapper checks
+  (C4–C8) and the mise/fisher/go/mas legs remain Phase-4 work. The in-apply preflight
+  (§3.1) gates the rest.
 
 ## 9. Proposed layout
 

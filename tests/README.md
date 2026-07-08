@@ -61,6 +61,10 @@ can't `sudo installer` unattended; failures are detected, the affected casks
 listed (age-held ones excluded), and a macOS notification posted so you know an
 interactive `mise run update` (Touch ID sudo) is due.
 
+**Scheduling:** the `io.nettleton.brew-update` LaunchAgent (chezmoi-managed,
+reloaded on change by `run_onchange_after_00`) runs the `--upgrade-capped`
+variant daily at 10:00; log at `~/Library/Logs/io.nettleton.brew-update.log`.
+
 Note: safe-upgrade is installed early by `run_before_00_bootstrap.sh` (the gate must
 exist before the gated installer runs) but stays declared in packages.yaml — the
 1Password pattern — so it's prune-safe and audited like any other package.

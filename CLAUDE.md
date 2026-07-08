@@ -95,6 +95,12 @@ Organized by execution phase. Scripts are ordered alphabetically; `run_once_` an
 - `04-00` — Configure MailMate (`run_once_`; installed via `mailmate@beta` cask)
 - `04-01` — Install Mac App Store apps (`run_onchange_`, from `.packages.mas.*`)
 
+**`after` scripts**
+- `run_after_00_fix-permissions` — chmod ~/.netrc (every apply)
+- `run_onchange_after_00_load-brew-update-agent` — bootstraps/reloads the
+  `io.nettleton.brew-update` LaunchAgent (daily gated brew updater, 10:00,
+  `daily_update.sh --upgrade-capped`) whenever its chezmoi-managed plist changes
+
 **`05-*` macOS system configuration** (`run_once_`)
 - `05-00` — Setup other users
 - `05-01` — macOS UI/UX and input (computer name, dark mode, trackpad, keyboard, locale)

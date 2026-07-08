@@ -1,0 +1,27 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+# (Re)load the daily brew-update LaunchAgent. run_onchange_after_: runs AFTER
+# chezmoi has written the plist (after-phase avoids the scripts-before-files
+# ordering caveat), and re-runs whenever the plist template changes (hash
+# below is part of this script's rendered content). launchd also auto-loads
+# ~/Library/LaunchAgents at login — this just makes changes take effect on
+# the apply that ships them, with no manual launchctl invocation.
+#
+# plist fingerprint: {{ include "private_Library/LaunchAgents/io.nettleton.brew-update.plist.tmpl" | sha256sum }}
+set -uo pipefail
+
+label="io.nettleton.brew-update"
+plist="$HOME/Library/LaunchAgents/$label.plist"
+uid="$(id -u)"
+
+if [ ! -f "$plist" ]; then
+  echo "brew-update agent: $plist not present — skipping"
+  exit 0
+fi
+
+# bootout is a no-op error when not loaded; bootstrap then (re)loads the
+# current file. Together: idempotent load-or-reload.
+launchctl bootout "gui/$uid/$label" 2>/dev/null || true
+launchctl bootstrap "gui/$uid" "$plist"
+echo "brew-update agent: (re)loaded — daily at 10:00, log: ~/Library/Logs/$label.log"
+{{- end -}}

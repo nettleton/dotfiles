@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>io.nettleton.brew-update</string>
+  <!-- Daily gated brew updater (TESTING.md §7): safe-upgrade + reconcile +
+       staleness cap. --upgrade-capped = the `mise run update:auto` variant;
+       invoked directly so the job doesn't depend on mise activation.
+       (Re)loaded by run_onchange_after_00_load-brew-update-agent when this
+       file changes. pkg-installer casks can't sudo unattended — the updater
+       detects that and posts a notification to run `mise run update`. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>{{ .chezmoi.homeDir }}/.local/share/chezmoi/tests/wrapper/daily_update.sh</string>
+    <string>--upgrade-capped</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>10</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>StandardOutPath</key>
+  <string>{{ .chezmoi.homeDir }}/Library/Logs/io.nettleton.brew-update.log</string>
+  <key>StandardErrorPath</key>
+  <string>{{ .chezmoi.homeDir }}/Library/Logs/io.nettleton.brew-update.log</string>
+</dict>
+</plist>
