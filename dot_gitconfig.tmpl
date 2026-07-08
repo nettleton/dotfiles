@@ -53,9 +53,11 @@
 # unattended contexts (launchd brew update fetching private taps) — unlike
 # SSH, which routes through the 1Password agent and pops an authorization
 # dialog. gh login is configured by 02-06_configure-git-auth.
+# ABSOLUTE path: brew update runs git through its shims with a scrubbed PATH
+# that lacks /opt/homebrew/bin, so a bare `gh` is "command not found" there.
 [credential "https://github.com"]
   helper =
-  helper = !gh auth git-credential
+  helper = !/opt/homebrew/bin/gh auth git-credential
 
 [includeIf "hasconfig:remote.*.url:git@github.com:*/**"]
   path = ~/.ssh/github_com_config/.gitconfig
