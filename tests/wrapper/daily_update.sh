@@ -64,10 +64,39 @@ if command -v chezmoi >/dev/null 2>&1; then
     && personal_flag="--no-personal"
 fi
 bash "$REPO/tests/lib/render_brewfile.sh" "$personal_flag" >"$brewfile"
-awk -F'"' '/^brew /{print $2}' "$brewfile" \
-  | xargs brew safe-install --min-age "$MIN_AGE" 2>&1 | tee -a "$RUN_LOG"
-awk -F'"' '/^cask /{print $2}' "$brewfile" \
-  | xargs brew safe-install --cask --min-age "$MIN_AGE" 2>&1 | tee -a "$RUN_LOG"
+
+# Compute MISSING = declared − installed here (two fast `brew list` calls,
+# basename-matched for tapped tokens) instead of handing safe-install the
+# whole declared set: it spawns a `brew info` ruby process per package just
+# to conclude "already installed", which costs ~50 min for ~150 packages at
+# launchd Background QoS. Held packages are missing, so the daily retry
+# behavior is preserved; typically nothing is missing and both calls skip.
+missing_of() { # <declared-names> <installed-names> -> declared-not-installed,
+               # as FULL declared tokens (tapped names must keep vendor/tap/).
+  local declared="$1" installed="$2" m
+  comm -23 <(printf '%s\n' "$declared" | sed 's|.*/||' | sort -u) \
+           <(printf '%s\n' "$installed" | sed 's|.*/||' | sort -u) \
+    | while IFS= read -r m; do
+        [[ -n "$m" ]] && printf '%s\n' "$declared" | grep -E "(^|/)${m}$" | head -1
+      done
+}
+installed_formulae="$(brew list --formula -1 2>/dev/null || true)"
+installed_casks="$(brew list --cask -1 2>/dev/null || true)"
+missing_formulae="$(missing_of "$(awk -F'"' '/^brew /{print $2}' "$brewfile")" "$installed_formulae")"
+missing_casks="$(missing_of "$(awk -F'"' '/^cask /{print $2}' "$brewfile")" "$installed_casks")"
+
+if [[ -n "$missing_formulae" ]]; then
+  # shellcheck disable=SC2086
+  brew safe-install --min-age "$MIN_AGE" $missing_formulae 2>&1 | tee -a "$RUN_LOG"
+else
+  echo "all declared formulae installed — nothing to reconcile"
+fi
+if [[ -n "$missing_casks" ]]; then
+  # shellcheck disable=SC2086
+  brew safe-install --cask --min-age "$MIN_AGE" $missing_casks 2>&1 | tee -a "$RUN_LOG"
+else
+  echo "all declared casks installed — nothing to reconcile"
+fi
 
 echo "==> [4/5] staleness cap (held > ${STALENESS_CAP}d)"
 # Currently-held set: every "Held (too fresh): a b c" line from steps 2-3.
