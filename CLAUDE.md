@@ -50,7 +50,7 @@ Declarative package lists for brew (taps, brews, casks, personal variants), fish
 ### Tool Versions (`dot_config/mise/config.toml`)
 Python, Node, and their global packages (npm, pip) are managed by mise. This replaces pyenv and brew-installed node.
 
-Note: the `nettleton/tap` tap carries a custom git URL via its `url` field in the `taps` list (rendered into the Brewfile `tap` line).
+Note: `nettleton/tap` is a private repo fetched over HTTPS via the gh credential helper (`[credential "https://github.com"]` in dot_gitconfig) — deliberately not SSH, which would route `brew update` through the 1Password agent and prompt during unattended runs. `run_once_00-05` converts pre-existing SSH clones.
 
 ### External Downloads (`.chezmoiexternal.toml`)
 Manages `fisher.fish` with weekly refresh via chezmoi's native external file support.

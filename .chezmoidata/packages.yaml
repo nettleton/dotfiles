@@ -11,8 +11,10 @@ packages:
       - name: homebrew/brew-vulns
       - name: jetbrains/utils
         trusted: true
+      # Private repo, fetched over HTTPS via the gh credential helper (see
+      # dot_gitconfig) — SSH would route brew update through the 1Password
+      # agent and prompt during unattended runs.
       - name: nettleton/tap
-        url: git@github.com:nettleton/homebrew-tap.git
         trusted: true
       - name: sharkyger/tap
         trusted: true

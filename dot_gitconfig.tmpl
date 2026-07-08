@@ -49,6 +49,14 @@
 [url "git@github.{{ .work.domain }}:"]
     insteadOf = https://github.{{ .work.domain }}
 
+# HTTPS github.com auth via the gh CLI's stored token. Prompt-free in
+# unattended contexts (launchd brew update fetching private taps) — unlike
+# SSH, which routes through the 1Password agent and pops an authorization
+# dialog. gh login is configured by 02-06_configure-git-auth.
+[credential "https://github.com"]
+  helper =
+  helper = !gh auth git-credential
+
 [includeIf "hasconfig:remote.*.url:git@github.com:*/**"]
   path = ~/.ssh/github_com_config/.gitconfig
 [includeIf "hasconfig:remote.*.url:https://github.com/**"]
