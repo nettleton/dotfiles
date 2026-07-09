@@ -1,5 +1,3 @@
-{{- $opPersonal := onepassword "lijudxpzrfcopmw2ejdlv3kxgq" -}}
-{{- $opWife := onepassword "srjgyi5b6fzwsii5fchs6jgs5i" -}}
 {{- $targetname := promptString "targetname" .chezmoi.hostname -}}
 {{- $is_personal_machine := eq $targetname "starship" -}}
 {{- $is_wife_machine := eq $targetname "nessie" -}}
@@ -18,14 +16,21 @@
 {{- end -}}
 {{- $is_work_machine := and $has_work_access (contains $workuser $targetname) -}}
 {{- $is_laptop := contains "Book" (output "sysctl" "-n" "hw.model" | trim) -}}
+{{- /* only fetch the personal/wife items on machines that actually consume them */ -}}
 {{- $sudoItem := "" -}}
-{{- if $is_work_machine -}}{{- $sudoItem = index $opWork "title" -}}
-{{- else if $is_personal_machine -}}{{- $sudoItem = index $opPersonal "title" -}}
-{{- else if $is_wife_machine -}}{{- $sudoItem = index $opWife "title" -}}
-{{- else if $is_child_machine -}}{{- $sudoItem = index $opPersonal "title" -}}
+{{- $starshipuser := "" -}}
+{{- $nessieuser := "" -}}
+{{- if $is_work_machine -}}
+{{-   $sudoItem = index $opWork "title" -}}
+{{- else if $is_personal_machine -}}
+{{-   $sudoItem = index (onepassword "lijudxpzrfcopmw2ejdlv3kxgq") "title" -}}
+{{-   $nessieuser = output "op" "item" "get" "srjgyi5b6fzwsii5fchs6jgs5i" "--fields" "username" | trim -}}
+{{- else if $is_wife_machine -}}
+{{-   $sudoItem = index (onepassword "srjgyi5b6fzwsii5fchs6jgs5i") "title" -}}
+{{-   $starshipuser = output "op" "item" "get" "lijudxpzrfcopmw2ejdlv3kxgq" "--fields" "username" | trim -}}
+{{- else if $is_child_machine -}}
+{{-   $sudoItem = index (onepassword "lijudxpzrfcopmw2ejdlv3kxgq") "title" -}}
 {{- end -}}
-{{- $starshipuser := output "op" "item" "get" "lijudxpzrfcopmw2ejdlv3kxgq" "--fields" "username" | trim -}}
-{{- $nessieuser := output "op" "item" "get" "srjgyi5b6fzwsii5fchs6jgs5i" "--fields" "username" | trim -}}
 
 [data]
   targetname = {{ $targetname | quote }}
