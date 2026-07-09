@@ -1,14 +1,22 @@
-{{- $opWork := onepassword "m52t7zda3dt6bodn2oqn7ugqqa" -}}
 {{- $opPersonal := onepassword "lijudxpzrfcopmw2ejdlv3kxgq" -}}
 {{- $opWife := onepassword "srjgyi5b6fzwsii5fchs6jgs5i" -}}
-{{- $workname := promptString "company" (index $opWork "title") -}}
-{{- $workuser := output "op" "read" (printf "op://personal/%s/username" $workname) "-n" | trim -}}
-{{- $workdomain := printf "%s.com" ($workname | lower) -}}
 {{- $targetname := promptString "targetname" .chezmoi.hostname -}}
-{{- $is_work_machine := contains $workuser $targetname -}}
 {{- $is_personal_machine := eq $targetname "starship" -}}
 {{- $is_wife_machine := eq $targetname "nessie" -}}
 {{- $is_child_machine := eq $targetname "cooper" -}}
+{{- /* wife/child machines cannot read the work 1Password item; skip everything work-related */ -}}
+{{- $has_work_access := not (or $is_wife_machine $is_child_machine) -}}
+{{- $opWork := dict -}}
+{{- $workname := "" -}}
+{{- $workuser := "" -}}
+{{- $workdomain := "" -}}
+{{- if $has_work_access -}}
+{{-   $opWork = onepassword "m52t7zda3dt6bodn2oqn7ugqqa" -}}
+{{-   $workname = promptString "company" (index $opWork "title") -}}
+{{-   $workuser = output "op" "read" (printf "op://personal/%s/username" $workname) "-n" | trim -}}
+{{-   $workdomain = printf "%s.com" ($workname | lower) -}}
+{{- end -}}
+{{- $is_work_machine := and $has_work_access (contains $workuser $targetname) -}}
 {{- $is_laptop := contains "Book" (output "sysctl" "-n" "hw.model" | trim) -}}
 {{- $sudoItem := "" -}}
 {{- if $is_work_machine -}}{{- $sudoItem = index $opWork "title" -}}
