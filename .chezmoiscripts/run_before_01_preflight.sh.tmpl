@@ -24,11 +24,16 @@ export CHEZMOI_REPO="$REPO"
 rc=0
 
 # 1) Leak scan — work identifier VALUES injected by the template (no chezmoi call).
+#    Machines without work-item access have no work identifiers to leak.
+{{ if or .is_wife_machine .is_child_machine -}}
+echo "preflight: leak scan skipped (no work-item access on this machine)"
+{{- else }}
 IN_PREFLIGHT=1 \
   WORK_USER={{ .work.user | quote }} \
   WORK_COMPANYNAME={{ .work.companyname | quote }} \
   WORK_DOMAIN={{ .work.domain | quote }} \
   bash "$LIB/leakscan.sh" || rc=1
+{{- end }}
 
 # 2) Prune-guard — abort only on a mass uninstall (> --max), so an intended single
 #    removal still converges. Tune with PRUNE_MAX.

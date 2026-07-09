@@ -94,6 +94,8 @@ work/personal identifier value (bypass: `git commit --no-verify`). Activated via
   scripts can back the in-apply preflight (TESTING.md §3.1).
 - The leak scan never prints the secret value (redacted to `****`); set
   `WORK_USER` / `WORK_COMPANYNAME` / `WORK_DOMAIN` to run it without chezmoi.
+- On machines without work-item access (wife/child), the work identifiers can
+  never resolve — the scan (and the preflight step invoking it) skips cleanly.
 - HTTP results cache under `${XDG_CACHE_HOME:-~/.cache}/chezmoi-dotfiles-tests`
   (6h TTL) — outside the repo.
 - CVE scanning uses `brew vulns` (official `homebrew/brew-vulns` tap, declared in
