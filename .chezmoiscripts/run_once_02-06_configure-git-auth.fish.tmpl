@@ -60,10 +60,10 @@ end
 
 # public github — the token item is shared to every family account, so it lands
 # in a different vault per account; resolve by item UUID (vault-agnostic)
-checkAndAddGitHubKeys github.com nettleton "$(op item get 3nurohuy6c7w5vbfxaevr6pawq --fields label=chezmoi_token --reveal)" "$HOME/.ssh/github_com.pub"
+checkAndAddGitHubKeys github.com nettleton "$(op item get 3nurohuy6c7w5vbfxaevr6pawq --fields label=password --reveal)" "$HOME/.ssh/github_com.pub"
 
 # public gitlab
-checkAndAddGitlabKeys gitlab.com nettleton op://Personal/Gitlab/chezmoi_token "$HOME/.ssh/gitlab_com.pub"
+checkAndAddGitlabKeys gitlab.com nettleton op://Family/Gitlab/chezmoi_token "$HOME/.ssh/gitlab_com.pub"
 
 {{ if .is_work_machine }}
 # internal github
