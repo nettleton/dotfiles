@@ -19,7 +19,7 @@ have chezmoi || die "chezmoi is required for render checks"
 [[ -d "$FIXTURES_DIR" ]] || die "fixtures not found at $FIXTURES_DIR"
 export PATH="$STUBBIN:$PATH"
 
-workdir="$(mktemp -d -t chezmoi-render)"
+workdir="$(mktemp -d -t chezmoi-render.XXXXXX)"
 trap 'rm -rf "$workdir"' EXIT
 
 # cz <fixture> <args...> — chezmoi against a synthetic profile, isolated state.
@@ -49,6 +49,12 @@ for f in "$FIXTURES_DIR"/*.toml; do
 done
 
 section "machine-guard spot checks"
+if [[ "$(uname)" != "Darwin" ]]; then
+  # All .chezmoiscripts are darwin-guarded and .chezmoi.os is not fakeable,
+  # so on Linux they ALL render empty — the non-empty assertions below would
+  # false-fail. The full-source renders above still cover file templates.
+  note "non-Darwin host: script-guard spot checks skipped (.chezmoi.os guards)"
+else
 # assert_empty <fixture> <template> / assert_nonempty <fixture> <template>
 assert_empty() {
   local n; n="$(render "$1" "$2" 2>/dev/null | tr -d '[:space:]' | wc -c | tr -d ' ')"
@@ -71,6 +77,7 @@ assert_empty    work     .chezmoiscripts/run_onchange_after_00_load-brew-update-
 assert_empty    wife     .chezmoiscripts/run_onchange_after_00_load-brew-update-agent.sh.tmpl
 # preflight runs everywhere (darwin)
 assert_nonempty work     .chezmoiscripts/run_before_01_preflight.sh.tmpl
+fi
 
 section "managed-set routing (.chezmoiignore per profile)"
 # assert_managed <fixture> <target> <yes|no>

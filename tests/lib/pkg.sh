@@ -36,7 +36,10 @@ _cache_fresh() {
   [[ -s "$f" ]] || return 1
   local now mtime
   now=$(date +%s)
-  mtime=$(stat -f %m "$f" 2>/dev/null || stat -c %Y "$f" 2>/dev/null || echo 0)
+  # GNU first: on Linux, BSD-style `stat -f %m` "succeeds" with filesystem
+  # info (garbage here), so it must not be the first attempt. macOS fails
+  # `stat -c` cleanly and falls through to the BSD form.
+  mtime=$(stat -c %Y "$f" 2>/dev/null || stat -f %m "$f" 2>/dev/null || echo 0)
   [[ $((now - mtime)) -lt "$CACHE_TTL" ]]
 }
 

@@ -32,7 +32,7 @@ rc=0
 # Side-channel: each check's summary_exit appends its collected FAIL/WARN
 # messages here (labeled), so we can print ONE consolidated issue list at the
 # end without parsing colored output.
-SUMMARY_FILE="$(mktemp -t chezmoi-tests-summary)"
+SUMMARY_FILE="$(mktemp -t chezmoi-tests-summary.XXXXXX)"
 export SUMMARY_FILE
 trap 'rm -f "$SUMMARY_FILE"' EXIT
 

@@ -19,7 +19,9 @@ section "identifier / PII leak scan"
 resolve_var() { # <template> -> value on stdout
   [[ -n "${IN_PREFLIGHT:-}" ]] && return 0        # preflight must not call chezmoi
   have chezmoi || return 0
-  chezmoi execute-template "$1" 2>/dev/null | head -1
+  # `|| true`: on hosts with no chezmoi config (CI) the template errors; the
+  # substitution feeding DENY_VALS must not kill the script under set -e.
+  chezmoi execute-template "$1" 2>/dev/null | head -1 || true
 }
 
 # Wife/child machines cannot read the work 1Password item, so the work.* values

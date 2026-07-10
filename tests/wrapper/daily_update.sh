@@ -38,8 +38,8 @@ HELD_STATE="$STATE_DIR/held_since.txt"   # lines: <pkg>|<epoch first seen held>
 mkdir -p "$STATE_DIR"
 touch "$HELD_STATE"
 
-RUN_LOG="$(mktemp -t daily-update-log)"
-brewfile="$(mktemp -t daily-update-brewfile)"
+RUN_LOG="$(mktemp -t daily-update-log.XXXXXX)"
+brewfile="$(mktemp -t daily-update-brewfile.XXXXXX)"
 trap 'rm -f "$RUN_LOG" "$brewfile"' EXIT
 
 # GitHub token for safe-upgrade/install release-age checks (5000/hr vs 60/hr):
@@ -107,7 +107,7 @@ held_now="$(grep 'Held (too fresh):' "$RUN_LOG" | sed 's/.*Held (too fresh)://' 
   | tr ' ' '\n' | sed '/^$/d' | sort -u)"
 
 # Update state: keep first-seen epoch for still-held; add new; drop resolved.
-new_state="$(mktemp -t held-state)"
+new_state="$(mktemp -t held-state.XXXXXX)"
 while IFS= read -r pkg; do
   [[ -n "$pkg" ]] || continue
   since="$(grep -m1 "^$pkg|" "$HELD_STATE" | cut -d'|' -f2 || true)"

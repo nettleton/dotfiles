@@ -20,7 +20,7 @@ export GH_TOKEN="$HOMEBREW_GITHUB_API_TOKEN"
 # (safe-upgrade is installed early by run_before_00_bootstrap.sh, but stays
 # declared in packages.yaml — same pattern as 1Password — so the prune, the
 # managed trust.json, and the package audits all treat it normally.)
-brewfile="$(mktemp -t chezmoi-brewfile)"
+brewfile="$(mktemp -t chezmoi-brewfile.XXXXXX)"
 trap 'rm -f "$brewfile"' EXIT
 cat >"$brewfile" <<EOF
 {{ range .packages.brew.taps -}}

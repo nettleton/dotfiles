@@ -13,7 +13,7 @@ STUBBIN="$TESTS_DIR/stubbin"
 have chezmoi || die "chezmoi is required for lint (renders templates)"
 export PATH="$STUBBIN:$PATH"
 
-workdir="$(mktemp -d -t chezmoi-lint)"
+workdir="$(mktemp -d -t chezmoi-lint.XXXXXX)"
 trap 'rm -rf "$workdir"' EXIT
 
 render() { # <fixture> <template> -> stdout
