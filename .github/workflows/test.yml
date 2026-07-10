@@ -52,7 +52,6 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write # dependency-graph snapshot submission
-      security-events: write # SARIF upload
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Install tooling
@@ -68,33 +67,24 @@ jobs:
           ./tests/lib/render_brewfile.sh --personal \
             | grep -E '^(brew|cask) ' | grep -vE '"[^"]*/' > Brewfile.ci
           wc -l Brewfile.ci
-      - name: CVE scan (SARIF)
+      - name: Chunked CVE scan + SBOM (brew vulns, batched for OSV timeouts)
         id: scan
         run: |
           set +e
-          brew vulns --brewfile Brewfile.ci --severity high --sarif > results.sarif
+          ./tests/lib/ci_cve_scan.sh Brewfile.ci .
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
-          # 0 = clean, 1 = findings (fail at the end, after uploads); >=2 = scan error
+          # 0 clean · 1 findings (gate at the end, after the SBOM submits)
+          # 2 scan errors (coverage gap) — fail here
           [ "$rc" -le 1 ]
-      - name: Upload SARIF to code scanning
-        # Runs on scan rc 0/1 (clean/findings); a scan ERROR fails the scan
-        # step, skipping this — never upload an empty/invalid SARIF.
-        if: hashFiles('results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
-        with:
-          sarif_file: results.sarif
-      - name: Generate CycloneDX SBOM
-        run: |
-          brew vulns --brewfile Brewfile.ci --cyclonedx > sbom.cdx.json || [ $? -eq 1 ]
       - name: Submit SBOM to dependency graph
         # Not on PRs: the graph should reflect main, not proposals.
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && hashFiles('sbom.cdx.json') != ''
         uses: evryfs/sbom-dependency-submission-action@4466eb923772acc3bd54081f8e2a0ef601d2f28a # v0.0.14
         with:
           sbom-files: sbom.cdx.json
       - name: Gate on high/critical findings
         if: steps.scan.outputs.rc == '1'
         run: |
-          echo "::error::brew vulns found high/critical CVEs in the declared set at latest versions (see code scanning)"
+          echo "::error::high/critical CVEs in the declared set at latest versions (see scan output + SBOM vulnerabilities)"
           exit 1

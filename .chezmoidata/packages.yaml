@@ -127,7 +127,6 @@ packages:
       - bfg
       - bison
       - docutils
-      - fontforge
       - gd
       - gdk-pixbuf
       - gobject-introspection

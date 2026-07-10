@@ -78,9 +78,15 @@ Shared helpers: `common.sh` (logging/counters/paths), `pkg.sh` (yaml accessors +
 - **tier-a** (ubuntu, every push/PR + daily cron): schema, render matrix, lint,
   existence, deprecation/abandonment, leak scan (authoritative iff the
   `WORK_USER`/`WORK_COMPANYNAME`/`WORK_DOMAIN` repo secrets are set).
-- **tier-b** (macos): `brew vulns` over the rendered Brewfile at **latest**
-  versions (desired-state CVE gate) → SARIF to code scanning; CycloneDX SBOM →
-  dependency graph → **Dependabot alerts** (not on PRs). Actions SHA-pinned.
+- **tier-b** (macos): chunked `brew vulns` (`tests/lib/ci_cve_scan.sh` — batches
+  of 10 + per-package fallback; one big query hits OSV's read timeout) over the
+  rendered core-only Brewfile at **latest** versions → merged CycloneDX SBOM →
+  dependency graph → **Dependabot** (not on PRs); job fails on high/critical.
+  `cve_scan_skiplist.txt` holds packages too OSV-heavy to scan at all (vim) —
+  still covered by safe-upgrade at upgrade time. Actions SHA-pinned.
+  Known gap: brew-vulns resolves packages via source repos, so **casks are
+  absent** from the scan and SBOM (~98 formula components) — casks rely on
+  safe-upgrade's NVD mapping at upgrade time and their own self-updaters.
 
 ## Git pre-commit hook
 

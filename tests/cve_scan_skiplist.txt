@@ -1,0 +1,10 @@
+# Packages excluded from the CI desired-state CVE scan (tests/lib/ci_cve_scan.sh).
+# One name per line; # for comments.
+#
+# Only for packages whose OSV history is so large that brew vulns' fixed read
+# timeout cannot fetch it EVEN AS A SINGLE-PACKAGE QUERY (verified locally
+# before adding). This is a conscious, documented coverage gap in the CI scan
+# only: these packages are still CVE-checked by `brew safe-upgrade` (OSV + NVD
+# + GitHub Advisory) at every upgrade, and by Dependabot where covered.
+
+vim  # OSV response exceeds brew vulns' read timeout even solo (verified 2026-07-10)
