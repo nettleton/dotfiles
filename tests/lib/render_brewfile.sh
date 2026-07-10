@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Render a Brewfile from packages.yaml, mirroring the logic in
-# .chezmoiscripts/run_onchange_01_install-brew-packages.sh.tmpl. Used by the
+# .chezmoiscripts/run_onchange_after_01_install-brew-packages.sh.tmpl. Used by the
 # prune-guard and Brewfile tests so they don't need `chezmoi` (and thus can run
 # inside the apply preflight). Emits the Brewfile on stdout.
 #

@@ -45,7 +45,7 @@ environment variable, etc.), **always put the configuration into chezmoi**:
 - **New packages** → add to `.chezmoidata/packages.yaml` (not `brew install`)
 - **New npm/pip tools** → add to `dot_config/mise/config.toml` (not `npm -g`)
 - **Shell config** → edit `dot_config/fish/config.fish.tmpl` (not `~/.config/fish/config.fish`)
-- **New scripts** → add to `.chezmoiscripts/` with proper `run_once_`/`run_onchange_` prefix
+- **New scripts** → add to `.chezmoiscripts/` with proper `run_once_after_`/`run_onchange_after_` prefix (`after_` is mandatory — see Script Taxonomy)
 - **Environment variables** → add to the appropriate shell config template
 - **Machine-specific config** → use template conditionals or `.chezmoiignore`
 
@@ -132,7 +132,7 @@ For excluding entire files by machine type, add entries to `.chezmoiignore`.
 ## Managing Brew Packages
 
 Packages are declared in `.chezmoidata/packages.yaml` under `.packages.brew`.
-The brew install script (`run_onchange_01_install-brew-packages.sh.tmpl`)
+The brew install script (`run_onchange_after_01_install-brew-packages.sh.tmpl`)
 re-runs automatically whenever the rendered package list changes.
 
 ### Package lists
@@ -165,14 +165,16 @@ Same as above but under `packages.brew.casks` or `packages.brew.personal_casks`.
 
 ### Private tap
 
-`nettleton/tap` is hardcoded in the brew script (not in YAML) because it uses
-a custom SSH git URL. Auth token is injected via `op read`. To add a formula
-from this tap, add it as `"nettleton/tap/formulaname"` in the brews list.
+`nettleton/tap` is declared in packages.yaml like any other tap and fetched
+over HTTPS, authenticated by the gh credential helper in dot_gitconfig (with
+an op-token fallback inside the install script for fresh machines). To add a
+formula from this tap, add it as `"nettleton/tap/formulaname"` in the brews
+list.
 
 ## Managing Mise Tools
 
 Tool versions are in `dot_config/mise/config.toml`. The mise install script
-(`dot_config/mise/run_onchange_configure-mise.fish.tmpl`) re-runs when the
+(`.chezmoiscripts/run_onchange_after_02-03_configure-mise.fish.tmpl`) re-runs when the
 config changes.
 
 ```toml
@@ -197,14 +199,14 @@ Fisher plugins are listed in `.chezmoidata/packages.yaml` under
 ## Managing Go Binaries
 
 Go packages are in `.chezmoidata/packages.yaml` under `.packages.go`.
-The install script (`run_onchange_03-02_install-go.fish.tmpl`) re-runs
+The install script (`run_onchange_after_03-02_install-go.fish.tmpl`) re-runs
 when the list changes.
 
 ## Managing Mac App Store Apps
 
 MAS apps are in `.chezmoidata/packages.yaml` under `.packages.mas.apps`
 (with `name` and `id`). The install script
-(`run_onchange_04-01_install-mas-apps.sh.tmpl`) re-runs when the list changes.
+(`run_onchange_after_04-01_install-mas-apps.sh.tmpl`) re-runs when the list changes.
 
 ## Conflict Resolution
 
@@ -227,17 +229,26 @@ cp ~/.config/foo ~/.local/share/chezmoi/dot_config/foo.tmpl
 
 ## Script Taxonomy
 
-Scripts in `.chezmoiscripts/` follow a numeric prefix taxonomy that controls
-execution order (alphabetical by target path):
+Scripts in `.chezmoiscripts/` run in two phases. `run_before_` scripts run
+before anything is applied (bootstrap only). Every other script carries the
+`after_` attribute (`run_once_after_` / `run_onchange_after_`) so it runs
+after ALL files and externals are applied — scripts always see current
+dotfiles. Within the after phase, numeric prefixes control order:
 
 | Prefix | Phase | Purpose |
 |---|---|---|
-| `00` | Bootstrap | Install prerequisites (Homebrew, 1Password), system config (sudo, sshd, git origin, op plugins) |
-| `01` | Brew packages | `run_onchange_` — install taps, brews, casks from packages.yaml |
-| `02` | Configure tools | `run_once_` — configure tools installed by brew (fish, rust, go, mise, containers, git auth, etc.) |
-| `03` | Other package managers | `run_onchange_` — install packages via go, pip, etc. |
-| `04` | Apps | Configure/install apps (MailMate, Mac App Store) |
-| `05` | macOS defaults | System preferences (UI, energy, screen, Finder, Dock, app defaults, restarts) |
+| (before) | Bootstrap | `run_before_` — install prerequisites (Homebrew, 1Password, safe-upgrade), preflight |
+| `00-*` | System config | `run_once_after_` — sudo Touch ID, sshd, git origin, op plugins, git hooks, tap remote |
+| `01` | Brew packages | `run_onchange_after_` — install taps, brews, casks from packages.yaml; prune drift |
+| `02-*` | Configure tools | `run_once_after_` — configure tools installed by brew (fish, rust, go, mise, containers, git auth, etc.) |
+| `03-*` | Other package managers | `run_onchange_after_` — install packages via go, etc. |
+| `04-*` | Apps | Configure/install apps (MailMate, Mac App Store) |
+| `05-*` | macOS defaults | System preferences (UI, energy, screen, Finder, Dock, app defaults, restarts) |
+| `99-*` | End of apply | fix-permissions (`run_after_`), load brew-update LaunchAgent |
+
+Never add a plain (no-attribute) `run_once_`/`run_onchange_` script to
+`.chezmoiscripts` — it would run BEFORE all dotfiles (see Update Phase
+Ordering) and, if it fails, block every file in the repo from applying.
 
 ### Script design principles
 
@@ -247,9 +258,9 @@ execution order (alphabetical by target path):
   `02-02_configure-go` only sets up Go.
 - **Name scripts after what they configure**, not what they do generically.
   Good: `02-06_configure-git-auth`. Bad: `02-06_setup-stuff`.
-- **Use the right prefix type**: `run_onchange_` for package installs (re-run
-  when lists change), `run_once_` for one-time configuration, `run_after_`
-  for every-apply fixups.
+- **Use the right prefix type**: `run_onchange_after_` for package installs
+  (re-run when lists change), `run_once_after_` for one-time configuration,
+  `run_after_` for every-apply fixups. Bootstrap only: `run_before_`.
 - **When adding a new tool**, create a new script rather than appending to an
   existing one. Pick the appropriate numeric prefix for the phase.
 
@@ -263,10 +274,14 @@ repeated execution.
 
 | Prefix | Re-runs when | Idempotency requirement |
 |---|---|---|
-| `run_once_` | Rendered content changes (hash-based) | Must handle already-configured state |
-| `run_onchange_` | Rendered content changes (hash-based) | Must handle already-installed packages |
+| `run_once_after_` | Rendered content changes (state keyed by content hash — renames alone don't re-trigger) | Must handle already-configured state |
+| `run_onchange_after_` | Rendered content changes (state keyed by target path — renames DO re-trigger) | Must handle already-installed packages |
 | `run_before_` | Every apply | Must be fast and safe to repeat |
 | `run_after_` | Every apply | Must be fast and safe to repeat |
+
+A failed `run_once_after_` script is NOT recorded as run, so it retries on
+every subsequent apply until it succeeds. Failing loudly (exit 1) on a
+missing prerequisite is correct — files are already applied by then.
 
 ### Patterns for idempotent scripts
 
@@ -301,15 +316,17 @@ chezmoi re-runs it.
 
 ## Update Phase Ordering
 
-Scripts, externals, and files run alphabetically by **target path** during
-apply. This matters for dependencies:
+Update-phase entries (files, externals, scripts) run alphabetically by
+**target path** — and scripts in `.chezmoiscripts/` KEEP the
+`.chezmoiscripts/` prefix in that sort. Since `.chezmoiscripts` sorts before
+`.config`, `.gitconfig`, and every other home dotfile, a plain
+`run_once_`/`run_onchange_` script there always runs before any dotfile is
+written — and if it fails, it aborts the apply before any dotfile lands.
 
-- `dot_config/mise/config.toml` (placed as `.config/mise/config.toml`)
-- `dot_config/mise/run_onchange_configure-mise.fish.tmpl` (runs as
-  `.config/mise/configure-mise.fish` — sorts after config.toml)
-
-If a script depends on a config file, ensure the script's target path sorts
-after the config file's target path.
+That is why all non-bootstrap scripts use the `after_` attribute: chezmoi
+runs `after_` scripts only once every file and external has been applied, so
+scripts can rely on dotfiles (gitconfig credential helper, mise config.toml,
+fisher.fish) being current. No second apply is ever needed.
 
 ## Secrets
 
@@ -334,4 +351,4 @@ All secrets come from 1Password:
 | Call `chezmoi` inside a chezmoi script | Use hardcoded paths instead |
 | Package not in alphabetical order | Sort the YAML list |
 | Missing `{{-` before shebang | Add whitespace trimming to avoid blank lines |
-| Script runs before its config is placed | Rename so target path sorts after config |
+| Script needs a dotfile from the same apply | Use the `after_` attribute (all non-bootstrap scripts have it) |

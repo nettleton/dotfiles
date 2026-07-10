@@ -2,6 +2,15 @@
 
 fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
 
+# calBuddy is installed by 01_install-brew-packages but can be legitimately
+# absent (safe-install age hold, or a failed install). Exit nonzero so this
+# run_once is NOT recorded as done and retries on the next apply — dotfiles
+# are unaffected since all scripts run in the after phase.
+if not command -q calBuddy
+  echo "calBuddy not installed (held or failed in 01_install-brew-packages); will retry on next apply" >&2
+  exit 1
+end
+
 {{- if .is_personal_machine }}
 if calBuddy accounts list | string match -q "church: not authenticated"
   echo "calBuddy: Logging in church..."

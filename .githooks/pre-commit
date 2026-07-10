@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # pre-commit — block commits that would leak a work/personal identifier into the
 # tree (the §6 leak scan). Tracked in .githooks/ and activated via core.hooksPath
-# (see .chezmoiscripts/run_once_00-04_configure-git-hooks.sh).
+# (see .chezmoiscripts/run_once_after_00-04_configure-git-hooks.sh).
 #
 # Bypass a false positive with:  git commit --no-verify
 set -uo pipefail

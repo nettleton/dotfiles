@@ -1,8 +1,12 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/bin/bash
 
+# Fail fast and loud: a partial run of this script is worse than no run — the
+# prune at the end must never execute after a failed tap or install step.
+set -euo pipefail
+
 # Save and unset SUDO_ASKPASS so brew doesn't hang on custom askpass programs
-existing_sudo_askpass="$SUDO_ASKPASS"
+existing_sudo_askpass="${SUDO_ASKPASS:-}"
 unset SUDO_ASKPASS
 
 {{ if eq .chezmoi.arch "arm64" -}}
@@ -14,6 +18,28 @@ export HOMEBREW_GITHUB_API_TOKEN="$(op read 'op://Family/nettleton-homebrew-inst
 # (60/hr unauthenticated -> 5000/hr). Without it a fresh-machine bootstrap of
 # ~150 packages would rate-limit and fail closed.
 export GH_TOKEN="$HOMEBREW_GITHUB_API_TOKEN"
+if [ -z "$HOMEBREW_GITHUB_API_TOKEN" ]; then
+  echo "error: GitHub token did not resolve from 1Password; aborting before any install/prune" >&2
+  exit 1
+fi
+
+# Private tap (nettleton/tap) is fetched over HTTPS. Normally the gh credential
+# helper in ~/.gitconfig serves credentials, but that chain has two bootstrap
+# gaps: gh itself is installed by THIS script, and gh login happens later
+# (02-06_configure-git-auth). If the helper can't serve credentials, append an
+# inline helper (via git's environment config, scoped to this script) that
+# serves the op-sourced token. Verified BEFORE any install or prune runs: an
+# unreachable tap must not cascade into a mass install-skip followed by a prune.
+tap_url="https://github.com/nettleton/homebrew-tap.git"
+if ! GIT_TERMINAL_PROMPT=0 git ls-remote "$tap_url" >/dev/null 2>&1; then
+  export GIT_CONFIG_COUNT=1
+  export GIT_CONFIG_KEY_0="credential.https://github.com.helper"
+  export GIT_CONFIG_VALUE_0='!f() { echo username=x-access-token; echo "password=${GH_TOKEN}"; }; f'
+  if ! GIT_TERMINAL_PROMPT=0 git ls-remote "$tap_url" >/dev/null 2>&1; then
+    echo "error: cannot authenticate to $tap_url (gh helper and token fallback both failed); aborting" >&2
+    exit 1
+  fi
+fi
 
 # Render the Brewfile to a temp file. It is the single source of truth for the
 # declared set: taps install (step 1) and the prune (step 3) both read it.
@@ -50,18 +76,42 @@ grep '^tap ' "$brewfile" | brew bundle --file=/dev/stdin
 # 2) Install declared formulae/casks through the security gate (replaces the
 #    former `brew bundle` install, which also UPGRADED every outdated declared
 #    package ungated). safe-install:
-#      - skips already-installed packages up front, no network (~0.8s/pkg), and
-#        never upgrades them (upgrades are the daily safe-upgrade's job);
 #      - holds packages whose formula changed < 7 days ago (supply-chain
 #        cushion) — held packages are skipped with exit 0 and picked up by the
 #        daily updater's reconcile pass once they age out;
 #      - fail-closed CVE check (OSV + NVD + GitHub Advisory) and bottle SHA
 #        verification on everything it would install (incl. new dependencies).
-#    A non-zero exit here is a real failure (e.g. rate-limit abort), not a hold.
-awk -F'"' '/^brew /{print $2}' "$brewfile" \
-  | xargs brew safe-install --min-age 7
-awk -F'"' '/^cask /{print $2}' "$brewfile" \
-  | xargs brew safe-install --cask --min-age 7
+#    Only MISSING (declared − installed) packages are handed to safe-install —
+#    same missing_of logic as the daily updater's reconcile pass: it avoids a
+#    `brew info` process per already-installed package, and safe-install exits
+#    1 when given nothing installable ("No clean packages to install"), which
+#    under set -e would fail a fully-converged run. With only missing packages
+#    passed, a non-zero exit is a real failure (e.g. rate-limit abort).
+missing_of() { # <declared-names> <installed-names> -> declared-not-installed,
+               # as FULL declared tokens (tapped names must keep vendor/tap/).
+  local declared="$1" installed="$2" m
+  comm -23 <(printf '%s\n' "$declared" | sed 's|.*/||' | sort -u) \
+           <(printf '%s\n' "$installed" | sed 's|.*/||' | sort -u) \
+    | while IFS= read -r m; do
+        [[ -n "$m" ]] && printf '%s\n' "$declared" | grep -E "(^|/)${m}$" | head -1
+      done
+}
+missing_formulae="$(missing_of "$(awk -F'"' '/^brew /{print $2}' "$brewfile")" \
+                               "$(brew list --formula -1 2>/dev/null || true)")"
+missing_casks="$(missing_of "$(awk -F'"' '/^cask /{print $2}' "$brewfile")" \
+                            "$(brew list --cask -1 2>/dev/null || true)")"
+if [[ -n "$missing_formulae" ]]; then
+  # shellcheck disable=SC2086
+  brew safe-install --min-age 7 $missing_formulae
+else
+  echo "all declared formulae installed — nothing to install"
+fi
+if [[ -n "$missing_casks" ]]; then
+  # shellcheck disable=SC2086
+  brew safe-install --cask --min-age 7 $missing_casks
+else
+  echo "all declared casks installed — nothing to install"
+fi
 
 # 3) Prune drift: uninstall any brew/cask not declared in the config, forcing
 #    everything to live in chezmoi. Scoped to --brews and --casks ONLY — never

@@ -7,7 +7,7 @@
   <!-- Daily gated brew updater (TESTING.md §7): safe-upgrade + reconcile +
        staleness cap. --upgrade-capped = the `mise run update:auto` variant;
        invoked directly so the job doesn't depend on mise activation.
-       (Re)loaded by run_onchange_after_00_load-brew-update-agent when this
+       (Re)loaded by run_onchange_after_99-01_load-brew-update-agent when this
        file changes. pkg-installer casks can't sudo unattended — the updater
        detects that and posts a notification to run `mise run update`. -->
   <key>ProgramArguments</key>

@@ -41,7 +41,7 @@ re-collected in a `-- issues --` block per script and a labeled
 | Script | When | Blocks apply? | Calls |
 |---|---|---|---|
 | `run_before_01_preflight` | every apply | **yes** | leak scan + prune-guard `--max ${PRUNE_MAX:-5}` |
-| `run_onchange_00-00_package-audit` | on `packages.yaml` change | no (`PACKAGE_AUDIT_STRICT=1` to gate) | existence + security |
+| `run_onchange_after_00-00_package-audit` | on `packages.yaml` change | no (`PACKAGE_AUDIT_STRICT=1` to gate) | existence + security |
 
 Upgrades are gated by `brew safe-upgrade --min-age 7` (age hold + OSV/NVD/GitHub CVE
 check + SHA verify) in the daily updater — not by an in-apply scan. See TESTING.md §7.
@@ -93,7 +93,7 @@ Shared helpers: `common.sh` (logging/counters/paths), `pkg.sh` (yaml accessors +
 `.githooks/pre-commit` runs the leak scan and **blocks any commit** that contains a
 work/personal identifier value (bypass: `git commit --no-verify`). Activated via
 `git config core.hooksPath .githooks` — done automatically per machine by
-`.chezmoiscripts/run_once_00-04_configure-git-hooks.sh`.
+`.chezmoiscripts/run_once_after_00-04_configure-git-hooks.sh`.
 
 ## Config
 

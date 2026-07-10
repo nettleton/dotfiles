@@ -65,16 +65,16 @@ assert_nonempty() {
   [[ "$n" -gt 0 ]] && pass "$2 renders on $1" || fail "$2 rendered EMPTY on $1 (guard broken?)"
 }
 # work-only internal packages script
-assert_nonempty work     .chezmoiscripts/run_onchange_03-03_install-internal-packages.sh.tmpl
-assert_empty    personal .chezmoiscripts/run_onchange_03-03_install-internal-packages.sh.tmpl
-assert_empty    wife     .chezmoiscripts/run_onchange_03-03_install-internal-packages.sh.tmpl
+assert_nonempty work     .chezmoiscripts/run_onchange_after_03-03_install-internal-packages.sh.tmpl
+assert_empty    personal .chezmoiscripts/run_onchange_after_03-03_install-internal-packages.sh.tmpl
+assert_empty    wife     .chezmoiscripts/run_onchange_after_03-03_install-internal-packages.sh.tmpl
 # non-work remote access (sshd + screen sharing)
-assert_nonempty personal .chezmoiscripts/run_once_00-02_configure-remote-access.sh.tmpl
-assert_empty    work     .chezmoiscripts/run_once_00-02_configure-remote-access.sh.tmpl
+assert_nonempty personal .chezmoiscripts/run_once_after_00-02_configure-remote-access.sh.tmpl
+assert_empty    work     .chezmoiscripts/run_once_after_00-02_configure-remote-access.sh.tmpl
 # brew-update agent loader: personal desktop only (trial)
-assert_nonempty personal .chezmoiscripts/run_onchange_after_00_load-brew-update-agent.sh.tmpl
-assert_empty    work     .chezmoiscripts/run_onchange_after_00_load-brew-update-agent.sh.tmpl
-assert_empty    wife     .chezmoiscripts/run_onchange_after_00_load-brew-update-agent.sh.tmpl
+assert_nonempty personal .chezmoiscripts/run_onchange_after_99-01_load-brew-update-agent.sh.tmpl
+assert_empty    work     .chezmoiscripts/run_onchange_after_99-01_load-brew-update-agent.sh.tmpl
+assert_empty    wife     .chezmoiscripts/run_onchange_after_99-01_load-brew-update-agent.sh.tmpl
 # preflight runs everywhere (darwin)
 assert_nonempty work     .chezmoiscripts/run_before_01_preflight.sh.tmpl
 fi

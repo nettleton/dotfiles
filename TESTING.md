@@ -25,7 +25,7 @@ The suite is the gate the automation merges against, so it is built first.
 
 ## 2. Highest-risk surfaces in this repo (what the tests must protect)
 
-- **The Homebrew prune** in `.chezmoiscripts/run_onchange_01_install-brew-packages.sh.tmpl`
+- **The Homebrew prune** in `.chezmoiscripts/run_onchange_after_01_install-brew-packages.sh.tmpl`
   runs `brew bundle cleanup --force`, which uninstalls anything not declared in
   `packages.yaml`. A typo or an upstream formula rename could trigger a mass
   uninstall. This is the single most dangerous operation under auto-update.
@@ -70,11 +70,11 @@ splits Tier C in two:
     local-only: leak scan (§6) and prune-guard preview (B2). Because it is a template,
     chezmoi injects `{{ .work.user }}` etc. directly, so the leak scan needs no
     `chezmoi data` call. Non-zero exit aborts the apply before anything is touched.
-  - `run_onchange_00-00_package-audit.sh.tmpl` — runs **only when `packages.yaml`
+  - `run_onchange_after_00-00_package-audit.sh.tmpl` — runs **only when `packages.yaml`
     changes** (its rendered content is hashed), ordered before the installer
     (`00` < `01`). Checks that only matter when the *declared set* changes: existence
     (A4) and deprecation/disabled (A7). A failure stops the apply before
-    `run_onchange_01` installs or prunes anything. (The **latest-version CVE** scan of
+    `run_onchange_after_01` installs or prunes anything. (The **latest-version CVE** scan of
     the declared set is done in CI, not here — see below.)
 - **Checks that must call chezmoi** (`apply --dry-run`, `verify`, secret-render) →
   can't run inside apply. They live in a **thin local wrapper** the daily job runs
@@ -119,7 +119,7 @@ This yields a **render matrix**: every `*.tmpl` × every machine profile.
 **A1. Template renders**
 - `chezmoi execute-template` every `*.tmpl` against every fixture profile → assert
   exit 0, non-empty where expected, and that machine-guarded files (e.g. work-only
-  `run_onchange_03-03`) render empty on the profiles that should exclude them.
+  `run_onchange_after_03-03`) render empty on the profiles that should exclude them.
 - `.chezmoiignore` yields the expected file set per profile (`chezmoi managed`).
 - Golden-file snapshots for a few high-value **synthetic** renders (the Brewfile,
   SSH config) so diffs are reviewable.
@@ -218,7 +218,7 @@ so trust drift is reverted declaratively by apply.)
 
 Runs on the actual Mac. Per §3.1, checks are placed by whether they call chezmoi.
 
-**In the preflight scripts** (`run_before_01_preflight`, `run_onchange_00-00_package-audit`):
+**In the preflight scripts** (`run_before_01_preflight`, `run_onchange_after_00-00_package-audit`):
 - **C1. Leak scan** — the §6 three-string scan, with `{{ .work.* }}` injected by the
   template (no `chezmoi data` call). Non-zero exit aborts the apply.
 - **C2. Prune-guard** (B2) and **C3. package audit** (A4 + A7) — abort before the
@@ -303,7 +303,7 @@ gated installer runs) while **remaining declared in `packages.yaml`**, so the pr
 the managed trust.json, and the A4/A7 package audits all treat it like any other
 package. No special cases in the Brewfile.
 
-**The package installer goes through the gate too.** `run_onchange_01` no longer does
+**The package installer goes through the gate too.** `run_onchange_after_01` no longer does
 a blanket `brew bundle` (which also *upgraded* every outdated declared package,
 ungated). Instead: taps via a taps-only `brew bundle`, then
 `brew safe-install --min-age 7` over declared brews and casks (installed → skipped
@@ -385,14 +385,14 @@ the CI added-package gate (A7) and on-demand checks.
 - **Pre-commit:** `.githooks/pre-commit` runs the §6 leak scan and blocks the commit
   on a hit (bypass with `git commit --no-verify`). Activated via `core.hooksPath`
   (tracked in `.githooks/`, auto-ignored by chezmoi as a dot-dir); set per-machine by
-  `run_once_00-04_configure-git-hooks`. **DONE.**
+  `run_once_after_00-04_configure-git-hooks`. **DONE.**
 - **CI:** `.github/workflows/test.yml` — Tier A on `ubuntu-latest` for every push;
   Tier B on `macos-latest`. Both are GitHub-hosted; no self-hosted runner. A security
   job submits a CycloneDX SBOM to the dependency graph (→ **Dependabot** alerts,
   server-side, immediate) and runs the `brew vulns` added-package gate.
 - **Local automation — DONE (brew leg):** `io.nettleton.brew-update` LaunchAgent
   (chezmoi-managed plist in `private_Library/LaunchAgents/`, bootstrapped/reloaded by
-  `run_onchange_after_00_load-brew-update-agent` whenever the plist changes) runs
+  `run_onchange_after_99-01_load-brew-update-agent` whenever the plist changes) runs
   `daily_update.sh --upgrade-capped` daily at 10:00, logging to
   `~/Library/Logs/io.nettleton.brew-update.log`. The chezmoi-calling wrapper checks
   (C4–C8) and the mise/fisher/go/mas legs remain Phase-4 work. The in-apply preflight
@@ -417,7 +417,7 @@ tests/
 
 # In-apply preflight (these ARE applied — they live in .chezmoiscripts, not tests/):
 .chezmoiscripts/run_before_01_preflight.sh.tmpl        # leak scan + prune-guard, every apply (blocking)
-.chezmoiscripts/run_onchange_00-00_package-audit.sh.tmpl  # existence + deprecation + added-CVE, on packages.yaml change
+.chezmoiscripts/run_onchange_after_00-00_package-audit.sh.tmpl  # existence + deprecation + added-CVE, on packages.yaml change
 ```
 
 `tests/` and `TESTING.md` are listed in `.chezmoiignore` so they are never applied to
@@ -436,7 +436,7 @@ CLAUDE.md) rather than `chezmoi source-path`.
   `tests/lib/`. These directly de-risk the auto-updater and need minimal scaffolding.
 - **Phase 2 — DONE.** Wired the Phase-1 scripts into the in-apply lifecycle (§3.1):
   `run_before_01_preflight` (blocking: leak scan + prune-guard `--max`) and
-  `run_onchange_00-00_package-audit` (non-blocking existence + deprecation + added-CVE;
+  `run_onchange_after_00-00_package-audit` (non-blocking existence + deprecation + added-CVE;
   `PACKAGE_AUDIT_STRICT=1` to gate). No runner. (An installed-version `brew vulns`
   `run_after` was prototyped and dropped — see §3.1/§7; `safe-upgrade` covers it.)
 - **Phase 3 — DONE.** Hermetic render matrix (A1: `tests/fixtures/` synthetic
