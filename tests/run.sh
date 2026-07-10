@@ -6,7 +6,8 @@
 #   tests/run.sh [--offline] [--audit-all] [check ...]
 #     --offline    skip network checks (existence, security audit)
 #     --audit-all  run the abandonment/CVE audit over ALL packages (slow)
-#     check ...    subset of: schema exist security prune leak  (default: all)
+#     check ...    subset of: schema render lint exist security prune leak
+#                  (default: all)
 #
 # Exit code is non-zero if any selected check fails.
 
@@ -20,12 +21,12 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --offline) offline=1; shift ;;
     --audit-all) audit_all=1; shift ;;
-    schema|exist|security|prune|leak) checks+=("$1"); shift ;;
+    schema|render|lint|exist|security|prune|leak) checks+=("$1"); shift ;;
     -h|--help) grep '^#' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown arg: $1" >&2; exit 2 ;;
   esac
 done
-[[ "${#checks[@]}" -eq 0 ]] && checks=(schema exist security prune leak)
+[[ "${#checks[@]}" -eq 0 ]] && checks=(schema render lint exist security prune leak)
 
 rc=0
 # Side-channel: each check's summary_exit appends its collected FAIL/WARN
@@ -49,6 +50,8 @@ run() { # <label> <script> [args...]
 for c in "${checks[@]}"; do
   case "$c" in
     schema)   run "A3 schema"   "$LIB/check_packages_schema.sh" ;;
+    render)   run "A1 render"   "$LIB/check_render.sh" ;;
+    lint)     run "A2 lint"     "$LIB/check_lint.sh" ;;
     exist)    [[ "$offline" -eq 1 ]] && { echo "(skipping exist — offline)"; continue; }
               run "A4 existence" "$LIB/check_packages_exist.sh" ;;
     security) [[ "$offline" -eq 1 ]] && { echo "(skipping security — offline)"; continue; }

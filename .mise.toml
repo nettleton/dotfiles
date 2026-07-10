@@ -7,12 +7,14 @@ description = "Run the full Phase-1 test suite"
 run = "./tests/run.sh"
 
 [tasks."test:hermetic"]
-description = "Hermetic (no-network) checks only: schema + leak scan"
-run = "./tests/run.sh --offline schema leak"
+description = "Hermetic (no-network) checks only: schema, render matrix, lint, leak scan"
+run = "./tests/run.sh --offline schema render lint leak"
 
 [tasks.check]
-description = "Run one check: schema | exist | security | prune | leak"
-run = "./tests/run.sh {{arg(name='check')}}"
+# mise appends extra CLI args to the run command, so `mise run check render`
+# becomes `./tests/run.sh render` (no deprecated Tera arg() templating).
+description = "Run checks by name: schema | render | lint | exist | security | prune | leak (none = all)"
+run = "./tests/run.sh"
 
 [tasks."audit:all"]
 description = "Security/maintenance audit over ALL packages (slow), not just newly-added"

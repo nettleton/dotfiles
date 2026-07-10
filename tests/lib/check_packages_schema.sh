@@ -68,8 +68,8 @@ check_cross "mas.apps & personal_apps ids" pkg_mas_ids pkg_mas_personal_ids
 for key in apps personal_apps; do
   n=$(yq ".packages.mas.$key | length" "$PACKAGES_YAML" 2>/dev/null || echo 0)
   [[ "$n" -gt 0 ]] || continue
-  bad_id=$(yq "[.packages.mas.$key[] | select(.id | tag != \"!!int\")] | length" "$PACKAGES_YAML")
-  no_name=$(yq "[.packages.mas.$key[] | select(has(\"name\") | not)] | length" "$PACKAGES_YAML")
+  bad_id=$(yq "[.packages.mas.${key}[] | select(.id | tag != \"!!int\")] | length" "$PACKAGES_YAML")
+  no_name=$(yq "[.packages.mas.${key}[] | select(has(\"name\") | not)] | length" "$PACKAGES_YAML")
   [[ "$bad_id" -eq 0 ]]  && pass "mas.$key: all ids are integers" || fail "mas.$key: $bad_id non-integer id(s)"
   [[ "$no_name" -eq 0 ]] && pass "mas.$key: all entries have a name" || fail "mas.$key: $no_name entry/entries missing name"
 done

@@ -27,6 +27,8 @@ re-collected in a `-- issues --` block per script and a labeled
 
 | Script | ID | What it does | Network |
 |---|---|---|---|
+| `check_render.sh`          | A1 | hermetic render matrix: every template × every synthetic profile (`tests/fixtures/`), op faked by `tests/stubbin/op`; machine-guard + .chezmoiignore routing assertions | no |
+| `check_lint.sh`            | A2 | lint rendered scripts (personal+work profiles) + raw shell: bash -n, shellcheck (errors), fish -n | no |
 | `check_packages_schema.sh` | A3 | packages.yaml valid, no dup/cross-list dup, mas id+name | no |
 | `check_packages_exist.sh`  | A4 | every brew/cask exists upstream; mas ids (advisory) | yes |
 | `check_security.sh`        | A7 | deprecated/**disabled** (all pkgs); archived/stale + CVE via `brew vulns` (added pkgs) | yes |
@@ -70,6 +72,15 @@ exist before the gated installer runs) but stays declared in packages.yaml — t
 1Password pattern — so it's prune-safe and audited like any other package.
 
 Shared helpers: `common.sh` (logging/counters/paths), `pkg.sh` (yaml accessors + Homebrew JSON API cache).
+
+## CI (`.github/workflows/test.yml`)
+
+- **tier-a** (ubuntu, every push/PR + daily cron): schema, render matrix, lint,
+  existence, deprecation/abandonment, leak scan (authoritative iff the
+  `WORK_USER`/`WORK_COMPANYNAME`/`WORK_DOMAIN` repo secrets are set).
+- **tier-b** (macos): `brew vulns` over the rendered Brewfile at **latest**
+  versions (desired-state CVE gate) → SARIF to code scanning; CycloneDX SBOM →
+  dependency graph → **Dependabot alerts** (not on PRs). Actions SHA-pinned.
 
 ## Git pre-commit hook
 

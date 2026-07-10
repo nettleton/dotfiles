@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Fake 1Password CLI for hermetic template rendering (TESTING.md §4).
+# Returns SYNTHETIC data only — never real secrets. Covers the op invocations
+# chezmoi's template functions make:
+#   op --version                          (client detection)
+#   op item get <id> --format json ...    (onepassword "<uuid>")
+#   op read <op://ref> ...                (onepasswordRead)
+#   op account list                       (some chezmoi versions probe)
+# chezmoi interleaves global flags (--session <tok>, --account <id>) before
+# the subcommand — find the first bare word.
+sub=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --version) sub="--version"; break ;;
+    --session|--account|--format) shift 2 ;;
+    --*) shift ;;
+    *) sub="$1"; break ;;
+  esac
+done
+
+case "$sub" in
+  --version) echo "2.30.0" ;;
+  account) echo "[]" ;;
+  signin) echo "stub-session-token" ;;
+  whoami) echo "stub-account" ;;
+  read) echo "stub-secret" ;;
+  item)
+    # Generic item: templates index .fields N .value positionally (0-5 seen).
+    cat <<'JSON'
+{
+  "id": "stub-item-id",
+  "title": "stub-item",
+  "vault": {"id": "stub-vault", "name": "stub"},
+  "category": "LOGIN",
+  "fields": [
+    {"id": "f0", "label": "field0", "value": "stub-field-0"},
+    {"id": "f1", "label": "field1", "value": "stub-field-1"},
+    {"id": "f2", "label": "field2", "value": "stub-field-2"},
+    {"id": "f3", "label": "field3", "value": "stub-field-3"},
+    {"id": "f4", "label": "field4", "value": "stub-field-4"},
+    {"id": "f5", "label": "field5", "value": "stub-field-5"}
+  ]
+}
+JSON
+    ;;
+  *) echo "op-stub: unhandled subcommand: $sub ($*)" >&2; exit 1 ;;
+esac

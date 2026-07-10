@@ -78,6 +78,7 @@ packages:
       - ripgrep-all
       - ruby
       - "sharkyger/tap/safe-upgrade"
+      - shellcheck
       - starship
       - taglib
       - tmux

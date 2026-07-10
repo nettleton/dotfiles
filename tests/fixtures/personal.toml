@@ -1,0 +1,61 @@
+# Synthetic machine profile: personal desktop ("starship"-equivalent).
+# SYNTHETIC DATA ONLY — mirrors the [data] shape .chezmoi.toml.tmpl produces;
+# the §6 leak scanner scans these fixtures too. See TESTING.md §4.
+destDir = "/tmp/chezmoi-render-dest"
+
+[onepassword]
+  command = "op" # resolved on PATH; tests prepend tests/stubbin
+
+[data]
+  targetname = "starship"
+  personalpackages = true
+  is_work_machine = false
+  is_personal_machine = true
+  is_wife_machine = false
+  is_child_machine = false
+  is_laptop = false
+  starshipuser = "fixtureuser"
+  nessieuser = "fixturespouse"
+
+[data.op]
+  sudoItem = "fixture-sudo-item"
+
+[data.op.urls]
+  github_internal = "op://fixture/gh-internal/public key"
+  gitlab_internal = "op://fixture/gl-internal/public key"
+  github_com = "op://fixture/gh-com/public key"
+  gitlab_com = "op://fixture/gl-com/public key"
+  work_desktop = "op://fixture/wd/public key"
+  wd_starship = "op://fixture/wd-starship/public key"
+  wd_wl = "op://fixture/wd-wl/public key"
+  work_laptop = "op://fixture/wl/public key"
+  wl_starship = "op://fixture/wl-starship/public key"
+  wl_wd = "op://fixture/wl-wd/public key"
+  wl_wms = "op://fixture/wl-wms/public key"
+  wl_endurance = "op://fixture/wl-endurance/public key"
+  wl_home_ip = "op://fixture/ips/work_laptop"
+  wl_home_wifi = "op://fixture/ips/work_laptop_wifi"
+  wms = "op://fixture/wms/public key"
+  wms_starship = "op://fixture/wms-starship/public key"
+  wms_wl = "op://fixture/wms-wl/public key"
+  wms_endurance = "op://fixture/wms-endurance/public key"
+  starship_nessie = "op://fixture/starship-nessie/public key"
+  starship_endurance = "op://fixture/starship-endurance/public key"
+  nessie_starship = "op://fixture/nessie-starship/public key"
+  nessie_endurance = "op://fixture/nessie-endurance/public key"
+  awssaml = "op://fixture/acme/.awssaml.yaml"
+
+[data.work]
+  user = "acmeuser"
+  domain = "acme.example"
+  companyname = "Acme"
+  email = "acmeuser@acme.example"
+
+[data.work.hostnames]
+  mac_desktop = "ah-acmeuser-m.dhcp.acme.example"
+  mac_studio = "ah-acmeuser-m.dhcp.acme.example"
+  mac_laptop = "ah-acmeuser1-m.wifi.acme.example"
+  linux = "acmeuser-deb10-64.dhcp.acme.example"
+
+[data.github]
+  email = "fixture@example.com"
