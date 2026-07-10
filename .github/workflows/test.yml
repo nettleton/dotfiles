@@ -1,0 +1,91 @@
+# CI for the chezmoi dotfiles repo (TESTING.md §3/§8).
+#   tier-a (ubuntu): hermetic render matrix, lint, packages.yaml schema,
+#     upstream existence, deprecation/abandonment audit, leak scan.
+#   tier-b (macos): desired-state CVE scan of the rendered Brewfile at LATEST
+#     versions via brew vulns -> SARIF (code scanning) + CycloneDX SBOM ->
+#     dependency graph (Dependabot alerts, server-side, continuous).
+# Daily cron: deprecations and CVEs drift without any repo change.
+# Actions are SHA-pinned (supply-chain hygiene).
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 13 * * *" # daily ~9am ET
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tier-a:
+    name: hermetic + package checks
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }} # gh api (abandonment checks)
+      # Leak scan is authoritative only when these repo secrets exist;
+      # unset -> the scan self-skips (values come from 1Password locally).
+      WORK_USER: ${{ secrets.WORK_USER }}
+      WORK_COMPANYNAME: ${{ secrets.WORK_COMPANYNAME }}
+      WORK_DOMAIN: ${{ secrets.WORK_DOMAIN }}
+      # On PRs, audit packages ADDED relative to the base branch.
+      AUDIT_BASE: ${{ github.event.pull_request.base.sha || 'HEAD' }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0 # AUDIT_BASE diffing needs history
+      - name: Install chezmoi + fish
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          sudo apt-get update -q
+          sudo apt-get install -y -q fish
+      - name: Run test suite
+        # prune-guard omitted: it compares against installed brew state,
+        # which only exists on the real machines (in-apply preflight).
+        run: ./tests/run.sh schema render lint exist security leak
+
+  tier-b:
+    name: CVE scan + SBOM (desired state)
+    runs-on: macos-latest
+    permissions:
+      contents: write # dependency-graph snapshot submission
+      security-events: write # SARIF upload
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - name: Install tooling
+        run: |
+          brew install yq
+          brew install homebrew/brew-vulns/brew-vulns
+      - name: Render Brewfile (declared set, latest versions)
+        run: ./tests/lib/render_brewfile.sh --personal > Brewfile.ci
+      - name: CVE scan (SARIF)
+        id: scan
+        run: |
+          set +e
+          brew vulns --brewfile Brewfile.ci --severity high --sarif > results.sarif
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          # 0 = clean, 1 = findings (fail at the end, after uploads); >=2 = scan error
+          [ "$rc" -le 1 ]
+      - name: Upload SARIF to code scanning
+        if: always() && hashFiles('results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
+        with:
+          sarif_file: results.sarif
+      - name: Generate CycloneDX SBOM
+        run: |
+          brew vulns --brewfile Brewfile.ci --cyclonedx > sbom.cdx.json || [ $? -eq 1 ]
+      - name: Submit SBOM to dependency graph
+        # Not on PRs: the graph should reflect main, not proposals.
+        if: github.event_name != 'pull_request'
+        uses: evryfs/sbom-dependency-submission-action@4466eb923772acc3bd54081f8e2a0ef601d2f28a # v0.0.14
+        with:
+          sbom-files: sbom.cdx.json
+      - name: Gate on high/critical findings
+        if: steps.scan.outputs.rc == '1'
+        run: |
+          echo "::error::brew vulns found high/critical CVEs in the declared set at latest versions (see code scanning)"
+          exit 1

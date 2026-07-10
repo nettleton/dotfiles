@@ -439,8 +439,12 @@ CLAUDE.md) rather than `chezmoi source-path`.
   `run_onchange_00-00_package-audit` (non-blocking existence + deprecation + added-CVE;
   `PACKAGE_AUDIT_STRICT=1` to gate). No runner. (An installed-version `brew vulns`
   `run_after` was prototyped and dropped — see §3.1/§7; `safe-upgrade` covers it.)
-- **Phase 3:** hermetic render matrix + stubs/fixtures (A1) and shell/fish lint (A2);
-  GitHub-hosted CI (Tier A) + the SBOM → Dependabot alert job (§7). Unlocks pre-merge
-  gating and continuous CVE alerts.
+- **Phase 3 — DONE.** Hermetic render matrix (A1: `tests/fixtures/` synthetic
+  profiles × full-source `apply --dry-run`, op faked by `tests/stubbin/op`) and
+  rendered-script lint (A2: bash -n + shellcheck + fish -n) — both in the local suite
+  and in `.github/workflows/test.yml`: tier-a (ubuntu) runs the hermetic + package
+  checks on every push/PR + daily cron; tier-b (macos) runs the desired-state
+  `brew vulns` gate → SARIF code scanning + CycloneDX SBOM → dependency graph →
+  Dependabot alerts. Leak scan in CI is authoritative iff WORK_* repo secrets are set.
 - **Phase 4:** macOS smoke + nvim health (B3/B4) on `macos-latest`, then the local
   `launchd` wrapper (C4–C8) + the daily `brew safe-upgrade --min-age 7` flow (§7).
