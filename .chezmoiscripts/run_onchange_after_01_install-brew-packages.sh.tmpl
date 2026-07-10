@@ -76,17 +76,23 @@ grep '^tap ' "$brewfile" | brew bundle --file=/dev/stdin
 # 2) Install declared formulae/casks through the security gate (replaces the
 #    former `brew bundle` install, which also UPGRADED every outdated declared
 #    package ungated). safe-install:
-#      - holds packages whose formula changed < 7 days ago (supply-chain
-#        cushion) — held packages are skipped with exit 0 and picked up by the
-#        daily updater's reconcile pass once they age out;
+#      - holds packages whose bottle was published < 7 days ago (supply-chain
+#        cushion), skipping them with exit 0;
 #      - fail-closed CVE check (OSV + NVD + GitHub Advisory) and bottle SHA
 #        verification on everything it would install (incl. new dependencies).
 #    Only MISSING (declared − installed) packages are handed to safe-install —
 #    same missing_of logic as the daily updater's reconcile pass: it avoids a
 #    `brew info` process per already-installed package, and safe-install exits
-#    1 when given nothing installable ("No clean packages to install"), which
-#    under set -e would fail a fully-converged run. With only missing packages
-#    passed, a non-zero exit is a real failure (e.g. rate-limit abort).
+#    1 when given nothing installable ("No clean packages to install").
+#
+#    The freshness hold exists to slow down UPGRADES of working packages; it
+#    must not leave a fresh machine permanently without a declared tool. So
+#    after the held pass, anything STILL missing (held as too-new, or a live
+#    CVE) is offered for install with the hold disabled (--min-age 0). The CVE
+#    and SHA checks still apply, so a genuinely vulnerable package stays blocked
+#    even if you say yes. Non-interactive runs (no controlling tty) never
+#    prompt and leave the package held — the daily updater installs it once it
+#    ages out (the updater is unattended and keeps the hold, by design).
 missing_of() { # <declared-names> <installed-names> -> declared-not-installed,
                # as FULL declared tokens (tapped names must keep vendor/tap/).
   local declared="$1" installed="$2" m
@@ -96,22 +102,39 @@ missing_of() { # <declared-names> <installed-names> -> declared-not-installed,
         [[ -n "$m" ]] && printf '%s\n' "$declared" | grep -E "(^|/)${m}$" | head -1
       done
 }
-missing_formulae="$(missing_of "$(awk -F'"' '/^brew /{print $2}' "$brewfile")" \
-                               "$(brew list --formula -1 2>/dev/null || true)")"
-missing_casks="$(missing_of "$(awk -F'"' '/^cask /{print $2}' "$brewfile")" \
-                            "$(brew list --cask -1 2>/dev/null || true)")"
-if [[ -n "$missing_formulae" ]]; then
+install_missing() { # $1=label  $2=brew-list-kind (formula|cask)  $3=safe-install kind flag  $4=declared tokens
+  local label="$1" kind="$2" kindflag="$3" declared="$4" missing held
+  missing="$(missing_of "$declared" "$(brew list --"$kind" -1 2>/dev/null || true)")"
+  if [[ -z "$missing" ]]; then
+    echo "all declared $label installed — nothing to install"
+    return 0
+  fi
+  # First pass: the normal freshness hold. `|| true` because an all-held batch
+  # can exit non-zero; the recompute below is the authoritative check.
   # shellcheck disable=SC2086
-  brew safe-install --min-age 7 $missing_formulae
-else
-  echo "all declared formulae installed — nothing to install"
-fi
-if [[ -n "$missing_casks" ]]; then
-  # shellcheck disable=SC2086
-  brew safe-install --cask --min-age 7 $missing_casks
-else
-  echo "all declared casks installed — nothing to install"
-fi
+  brew safe-install $kindflag --min-age 7 $missing || true
+  held="$(missing_of "$declared" "$(brew list --"$kind" -1 2>/dev/null || true)")"
+  [[ -z "$held" ]] && return 0
+  echo "" >&2
+  echo "Declared $label still missing after the freshness-hold pass: $held" >&2
+  echo "(bottle < 7 days old, or blocked by a CVE)." >&2
+  if [[ ! -e /dev/tty ]]; then
+    echo "non-interactive run — leaving held; the daily updater installs once aged out." >&2
+    return 0
+  fi
+  local reply=""
+  printf 'Install now with the freshness hold disabled? CVE + SHA checks still apply. [y/N] ' >&2
+  read -r reply </dev/tty || true
+  case "$reply" in
+    [yY]*)
+      # shellcheck disable=SC2086
+      brew safe-install $kindflag --min-age 0 $held \
+        || echo "WARN: could not install $held (likely a live CVE block); continuing." >&2 ;;
+    *) echo "Left held; the daily updater will install it once it ages out." >&2 ;;
+  esac
+}
+install_missing formulae formula ""       "$(awk -F'"' '/^brew /{print $2}' "$brewfile")"
+install_missing casks    cask    "--cask" "$(awk -F'"' '/^cask /{print $2}' "$brewfile")"
 
 # 3) Prune drift: uninstall any brew/cask not declared in the config, forcing
 #    everything to live in chezmoi. Scoped to --brews and --casks ONLY — never

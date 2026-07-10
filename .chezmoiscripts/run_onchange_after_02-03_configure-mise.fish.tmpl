@@ -3,6 +3,17 @@
 fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
 
 # mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+
+# mise is installed by 01_install-brew-packages but can be legitimately absent
+# (safe-install freshness hold, or a declined override). Exit nonzero so this
+# run_onchange is NOT recorded and retries on the next apply, rather than
+# no-opping `mise install` and recording success — dotfiles are unaffected
+# since all scripts run in the after phase.
+if not command -q mise
+  echo "mise not installed (held or declined in 01_install-brew-packages); will retry on next apply" >&2
+  exit 1
+end
+
 mise install
 
 set pipbin "$HOME/.local/bin"

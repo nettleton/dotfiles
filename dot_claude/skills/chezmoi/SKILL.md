@@ -149,7 +149,7 @@ re-runs automatically whenever the rendered package list changes.
 
 1. Edit `.chezmoidata/packages.yaml`
 2. Add the package name to the appropriate list (alphabetically sorted)
-3. Run `chezmoi apply` — the `run_onchange_` script auto-triggers
+3. Run `chezmoi apply` — the `run_onchange_after_` script auto-triggers
 
 ```bash
 # Example: add a new CLI tool
@@ -158,6 +158,15 @@ re-runs automatically whenever the rendered package list changes.
 # Then:
 chezmoi apply
 ```
+
+The installer (`01_install-brew-packages`) hands only MISSING packages to
+`brew safe-install --min-age 7`. A brand-new package whose bottle is < 7 days
+old is held by the freshness check; the installer then prompts (interactive
+apply only) to install it with the hold disabled (`--min-age 0` — CVE + SHA
+checks still run). Decline, or run non-interactively, and it stays held for the
+daily updater to install once it ages out. So a fresh install of a just-released
+tool is never permanently blocked, while routine upgrades still wait out the
+supply-chain cushion.
 
 ### To install a new cask
 
