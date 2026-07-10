@@ -46,9 +46,10 @@
   autoupdate = true 
 [tag]
   sort = version:refname
+{{ if .is_work_machine }}
 [url "git@github.{{ .work.domain }}:"]
     insteadOf = https://github.{{ .work.domain }}
-
+{{- end }}
 # HTTPS github.com auth via the gh CLI's stored token. Prompt-free in
 # unattended contexts (launchd brew update fetching private taps) — unlike
 # SSH, which routes through the 1Password agent and pops an authorization
@@ -63,6 +64,7 @@
   path = ~/.ssh/github_com_config/.gitconfig
 [includeIf "hasconfig:remote.*.url:https://github.com/**"]
   path = ~/.ssh/github_com_config/.gitconfig
+{{ if .is_work_machine }}
 [includeIf "hasconfig:remote.*.url:git@github.{{ .work.domain }}:*/**"]
   path = ~/.ssh/github_internal_config/.gitconfig
 [includeIf "hasconfig:remote.*.url:https://github.{{ .work.domain }}/**"]
@@ -71,10 +73,13 @@
   path = ~/.ssh/gitlab_internal_config/.gitconfig
 [includeIf "hasconfig:remote.*.url:https://*-git.{{ .work.domain }}/**"]
   path = ~/.ssh/gitlab_internal_config/.gitconfig
+{{- end }}
+{{ if .is_personal_machine }}
 [includeIf "hasconfig:remote.*.url:git@gitlab.com:*/**"]
   path = ~/.ssh/gitlab_com_config/.gitconfig
 [includeIf "hasconfig:remote.*.url:https://gitlab.com/**"]
   path = ~/.ssh/gitlab_com_config/.gitconfig
+{{- end }}
 
 # References
 #  - https://blog.gitbutler.com/how-git-core-devs-configure-git/

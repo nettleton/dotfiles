@@ -62,8 +62,10 @@ end
 # in a different vault per account; resolve by item UUID (vault-agnostic)
 checkAndAddGitHubKeys github.com nettleton "$(op item get 3nurohuy6c7w5vbfxaevr6pawq --fields label=password --reveal)" "$HOME/.ssh/github_com.pub"
 
+{{ if (or .is_personal_machine .is_work_machine) }}
 # public gitlab
 checkAndAddGitlabKeys gitlab.com nettleton op://Family/Gitlab/chezmoi_token "$HOME/.ssh/gitlab_com.pub"
+{{- end }}
 
 {{ if .is_work_machine }}
 # internal github
