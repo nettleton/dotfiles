@@ -22,7 +22,7 @@ hosts:
         # Configure host for API endpoint. Defaults to the host itself.
         api_host: gitlab.com
         # Your GitLab access token. To get one, read https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
-        token: {{ onepasswordRead "op://Personal/Gitlab/chezmoi_token" }}
+        token: {{ onepasswordRead "op://Family/Gitlab/chezmoi_token" }}
 {{- if .is_work_machine }}
     insidelabs-git.{{ .work.domain }}:
         # What protocol to use to access the API endpoint. Supported values: http, https.
