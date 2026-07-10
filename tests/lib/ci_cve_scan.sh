@@ -96,7 +96,13 @@ fi
 jq -s '. as $all
        | $all[0]
        | .components      = ($all | map(.components // [])      | add)
-       | .vulnerabilities = ($all | map(.vulnerabilities // []) | add)' \
+       | .vulnerabilities = ($all | map(.vulnerabilities // []) | add)
+       # The dependency-submission action calls .values() on metadata.tools,
+       # which only works on the legacy ARRAY form; brew-vulns emits the
+       # CycloneDX 1.5 object form ({components: [...]}) — normalize it.
+       | if (.metadata.tools | type) == "object"
+         then .metadata.tools = ((.metadata.tools.components // []) | map({name, version}))
+         else . end' \
   "${sbom_files[@]}" > "$outdir/sbom.cdx.json"
 echo "merged SBOM from ${#sbom_files[@]} scan(s): $(jq '.components | length' "$outdir/sbom.cdx.json") component(s), $(jq '.vulnerabilities | length' "$outdir/sbom.cdx.json") vulnerability record(s)"
 
