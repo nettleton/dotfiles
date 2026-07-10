@@ -22,6 +22,17 @@ resolve_var() { # <template> -> value on stdout
   chezmoi execute-template "$1" 2>/dev/null | head -1
 }
 
+# Wife/child machines cannot read the work 1Password item, so the work.* values
+# can never resolve there — skip cleanly instead of warning about 1Password.
+# Env-injected values (preflight, CI) always win; default-open on any doubt.
+if [[ -z "${WORK_USER:-}${WORK_COMPANYNAME:-}${WORK_DOMAIN:-}" && -z "${IN_PREFLIGHT:-}" ]] && have chezmoi; then
+  if [[ "$(chezmoi execute-template '{{ or .is_wife_machine .is_child_machine }}' 2>/dev/null)" == "true" ]]; then
+    note "no work-item access on this machine — leak scan skipped"
+    summary_exit
+    exit $?
+  fi
+fi
+
 # Parallel indexed arrays (macOS /bin/bash is 3.2 — no associative arrays).
 DENY_KEYS=(work.user work.companyname work.domain)
 DENY_VALS=(
