@@ -2,8 +2,7 @@
 #   tier-a (ubuntu): hermetic render matrix, lint, packages.yaml schema,
 #     upstream existence, deprecation/abandonment audit, leak scan.
 #   tier-b (macos): desired-state CVE scan of the rendered Brewfile at LATEST
-#     versions via brew vulns -> SARIF (code scanning) + CycloneDX SBOM ->
-#     dependency graph (Dependabot alerts, server-side, continuous).
+#     versions via `brew vulns` (core command) — high/critical gate the build.
 # Daily cron: deprecations and CVEs drift without any repo change.
 # Actions are SHA-pinned (supply-chain hygiene).
 name: tests
@@ -48,16 +47,14 @@ jobs:
         run: ./tests/run.sh schema render lint exist security leak
 
   tier-b:
-    name: CVE scan + SBOM (desired state)
+    name: CVE scan (desired state)
     runs-on: macos-latest
-    permissions:
-      contents: write # dependency-graph snapshot submission
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Install tooling
-        run: |
-          brew install yq
-          brew install homebrew/brew-vulns/brew-vulns
+        # `brew vulns` is a built-in command (merged into brew core; the
+        # homebrew/brew-vulns tap is archived) — nothing to install for it.
+        run: brew install yq
       - name: Render Brewfile (declared set, latest versions)
         # Tapped tokens (vendor/tap/name) are dropped: their taps aren't on the
         # runner (nettleton/tap is private and never can be), and brew vulns
@@ -67,24 +64,17 @@ jobs:
           ./tests/lib/render_brewfile.sh --personal \
             | grep -E '^(brew|cask) ' | grep -vE '"[^"]*/' > Brewfile.ci
           wc -l Brewfile.ci
-      - name: Chunked CVE scan + SBOM (brew vulns, batched for OSV timeouts)
+      - name: Chunked CVE scan (brew vulns, batched for OSV timeouts)
         id: scan
         run: |
           set +e
           ./tests/lib/ci_cve_scan.sh Brewfile.ci .
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
-          # 0 clean · 1 findings (gate at the end, after the SBOM submits)
-          # 2 scan errors (coverage gap) — fail here
+          # 0 clean · 1 findings (gate at the end) · 2 scan errors — fail here
           [ "$rc" -le 1 ]
-      - name: Submit SBOM to dependency graph
-        # Not on PRs: the graph should reflect main, not proposals.
-        if: github.event_name != 'pull_request' && hashFiles('sbom.cdx.json') != ''
-        uses: evryfs/sbom-dependency-submission-action@4466eb923772acc3bd54081f8e2a0ef601d2f28a # v0.0.14
-        with:
-          sbom-files: sbom.cdx.json
       - name: Gate on high/critical findings
         if: steps.scan.outputs.rc == '1'
         run: |
-          echo "::error::high/critical CVEs in the declared set at latest versions (see scan output + SBOM vulnerabilities)"
+          echo "::error::high/critical CVEs in the declared set at latest versions (see scan output + cve-findings.json)"
           exit 1

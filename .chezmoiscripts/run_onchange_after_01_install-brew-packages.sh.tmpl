@@ -125,6 +125,7 @@ install_missing() { # $1=label  $2=brew-list-kind (formula|cask)  $3=safe-instal
   local reply=""
   printf 'Install now with the freshness hold disabled? CVE + SHA checks still apply. [y/N] ' >&2
   read -r reply </dev/tty || true
+  printf '> %s\n' "${reply:-N}" >&2   # echo the keystroke (a /dev/tty read often isn't echoed)
   case "$reply" in
     [yY]*)
       # shellcheck disable=SC2086
@@ -142,12 +143,60 @@ install_missing casks    cask    "--cask" "$(awk -F'"' '/^cask /{print $2}' "$br
 #    from this Brewfile (cleaning them here would wipe every Mac App Store app
 #    and go binary). The dependency closure of declared packages is preserved
 #    automatically. A held (not-yet-installed) declared package is simply
-#    absent and is unaffected by cleanup. First a no-force pass prints exactly
-#    what will be removed (so anything worth keeping can be added to
-#    packages.yaml), then --force performs the removal.
+#    absent and is unaffected by cleanup. A no-force plan pass prints exactly
+#    what would be removed (so anything worth keeping can be added to
+#    packages.yaml); after an interactive confirm, --force performs it. A plan
+#    that can't resolve an installed package (formula/cask deleted upstream —
+#    e.g. an archived tap) is reported with the exact commands to clear it.
 echo "==> Pruning Homebrew packages not declared in chezmoi config:"
-brew bundle cleanup --brews --casks --file="$brewfile" || true
-brew bundle cleanup --brews --casks --force --file="$brewfile"
+# Plan pass: no --force. Per brew's help it exits 1 iff something would be
+# removed; capture output+rc (|| plan_rc=$? keeps set -e happy on that 1).
+prune_plan="$(brew bundle cleanup --brews --casks --file="$brewfile" 2>&1)" && plan_rc=0 || plan_rc=$?
+# Show the plan, minus brew's own "Run ... --force" hint — this script drives
+# the force pass itself, so the hint would just be a redundant instruction.
+printf '%s\n' "$prune_plan" | grep -vF 'bundle cleanup --force' || true
+
+# Blocked prune: an INSTALLED package no longer resolves (formula/cask gone from
+# a now-archived/deprecated tap, e.g. homebrew/brew-vulns). bundle cleanup can't
+# uninstall a package whose formula is gone — surface the exact fix and stop.
+orphans="$(printf '%s\n' "$prune_plan" \
+  | sed -nE 's/^Error: No available (formula|cask) with the name "([^"]+)".*/\2/p' | sort -u)"
+if [[ -n "$orphans" ]]; then
+  {
+    echo ""
+    echo "PRUNE BLOCKED — installed package(s) no longer resolve upstream (archived or"
+    echo "removed tap/formula). 'brew bundle cleanup' can't remove these; run directly:"
+    while IFS= read -r p; do
+      [[ -n "$p" ]] || continue
+      printf '  brew uninstall %s\n' "${p##*/}"
+      case "$p" in */*/*) printf '  brew untap %s\n' "${p%/*}" ;; esac
+    done <<<"$orphans"
+    echo "then re-run 'chezmoi apply'."
+  } >&2
+  exit 1
+fi
+
+if [[ "$plan_rc" -eq 0 ]]; then
+  echo "no undeclared packages — nothing to prune"
+else
+  # Removals pending. Confirm interactively, echoing the keystroke (a /dev/tty
+  # read often isn't echoed by the terminal), then run --force behind a clear
+  # start line so the frequently-long uninstall isn't a silent pause.
+  proceed=1
+  if [[ -e /dev/tty ]]; then
+    reply=""
+    printf 'Proceed with uninstalling the above undeclared package(s)? [y/N] ' >&2
+    read -r reply </dev/tty || true
+    printf '> %s\n' "${reply:-N}" >&2
+    [[ "$reply" == [yY]* ]] || proceed=0
+  fi
+  if [[ "$proceed" -eq 1 ]]; then
+    echo "==> Running: brew bundle cleanup --force (uninstalling drift, may take a moment)…"
+    brew bundle cleanup --brews --casks --force --file="$brewfile"
+  else
+    echo "prune skipped; undeclared package(s) left in place." >&2
+  fi
+fi
 
 # (Tap trust needs no reconcile step here: ~/.homebrew/trust.json is a
 #  chezmoi-managed template rendered from the same packages.yaml taps —

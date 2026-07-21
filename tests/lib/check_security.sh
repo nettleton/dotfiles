@@ -129,21 +129,23 @@ audit_abandonment() {
   fi
 }
 
-# --- CVE scan via `brew vulns` (homebrew/brew-vulns; OSV GIT ecosystem) -------
+# --- CVE scan via `brew vulns` (core Homebrew command; OSV GIT ecosystem) -----
 # Purpose-built: maps each formula to its upstream repo, queries OSV, and marks
 # CVEs already patched by the formula as resolved (fewer false positives). We
 # scan the given formulae in one call; high/critical => FAIL. Casks are not
 # covered (formula-source-repo based), so they are excluded.
+#
+# `brew vulns` was merged into Homebrew/brew as a built-in command (the
+# homebrew/brew-vulns tap is archived) — so it's a `brew` subcommand now, not a
+# `brew-vulns` executable on PATH. Availability = a recent enough brew.
 brew_vulns_available() {
-  # The `brew-vulns` executable is what `brew vulns` dispatches to. `brew commands`
-  # does not list external tap commands reliably, so check the binary directly.
-  have brew-vulns
+  brew commands 2>/dev/null | grep -qx vulns
 }
 audit_cve_brewvulns() {
   local formulae=("$@")
   [[ "${#formulae[@]}" -gt 0 ]] || return 0
   if ! brew_vulns_available; then
-    note "CVE scan skipped — install it: brew install homebrew/brew-vulns/brew-vulns"
+    note "CVE scan skipped — 'brew vulns' unavailable; update Homebrew (brew update)"
     return 0
   fi
   local out rc
@@ -161,7 +163,7 @@ for tok in "${new_tokens[@]}"; do
   [[ -n "$tok" ]] || continue
   k=$(kind_of "$tok")
   audit_abandonment "$k" "$tok"
-  # CVE scan applies to formulae only (brew-vulns is formula-source based).
+  # CVE scan applies to formulae only (brew vulns is formula-source based).
   if [[ "$k" == formula ]] && ! is_tapped "$tok"; then cve_formulae+=("$tok"); fi
 done
 if [[ "${#cve_formulae[@]}" -gt 0 ]]; then audit_cve_brewvulns "${cve_formulae[@]}"; fi

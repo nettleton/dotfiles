@@ -80,13 +80,12 @@ Shared helpers: `common.sh` (logging/counters/paths), `pkg.sh` (yaml accessors +
   `WORK_USER`/`WORK_COMPANYNAME`/`WORK_DOMAIN` repo secrets are set).
 - **tier-b** (macos): chunked `brew vulns` (`tests/lib/ci_cve_scan.sh` — batches
   of 10 + per-package fallback; one big query hits OSV's read timeout) over the
-  rendered core-only Brewfile at **latest** versions → merged CycloneDX SBOM →
-  dependency graph → **Dependabot** (not on PRs); job fails on high/critical.
+  rendered core-only Brewfile at **latest** versions; job fails on high/critical.
   `cve_scan_skiplist.txt` holds packages too OSV-heavy to scan at all (vim) —
   still covered by safe-upgrade at upgrade time. Actions SHA-pinned.
-  Known gap: brew-vulns resolves packages via source repos, so **casks are
-  absent** from the scan and SBOM (~98 formula components) — casks rely on
-  safe-upgrade's NVD mapping at upgrade time and their own self-updaters.
+  Known gap: `brew vulns` resolves packages via source repos, so **casks are
+  absent** from the scan (~98 formulae) — casks rely on safe-upgrade's NVD
+  mapping at upgrade time and their own self-updaters.
 
 ## Git pre-commit hook
 
@@ -115,7 +114,8 @@ work/personal identifier value (bypass: `git commit --no-verify`). Activated via
   never resolve — the scan (and the preflight step invoking it) skips cleanly.
 - HTTP results cache under `${XDG_CACHE_HOME:-~/.cache}/chezmoi-dotfiles-tests`
   (6h TTL) — outside the repo.
-- CVE scanning uses `brew vulns` (official `homebrew/brew-vulns` tap, declared in
-  `packages.yaml`). If it isn't installed yet, A7 notes it and skips the CVE step:
-  `brew install homebrew/brew-vulns/brew-vulns`. It also emits `--cyclonedx` (SBOM,
-  for Dependabot) and `--sarif` (code scanning) for continuous CI monitoring.
+- CVE scanning uses `brew vulns` — a built-in Homebrew command since it merged
+  into Homebrew/brew (the `homebrew/brew-vulns` tap is archived). If an older brew
+  lacks it, A7 notes that and skips the CVE step (update via `brew update`). The
+  merge dropped `--cyclonedx`/`--sarif`, so there's no SBOM/dependency-graph feed;
+  the CI job gates on high/critical findings only.

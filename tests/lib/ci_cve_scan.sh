@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# CI CVE scan (tier-b): chunked `brew vulns --cyclonedx` over a core-only
-# Brewfile, merged into one SBOM. See TESTING.md §7.
+# CI CVE scan (tier-b): chunked `brew vulns --severity high --json` over a
+# core-only Brewfile. Gate only — the exit code decides pass/fail; the merged
+# findings JSON is an informational artifact. See TESTING.md §7.
 #
 # Why chunked: brew vulns sends each invocation's packages as ONE OSV query
 # with a fixed read timeout — the full ~145-package set reliably times out
@@ -10,11 +11,13 @@
 # (e.g. vim) live in tests/cve_scan_skiplist.txt — a documented CI-only gap;
 # safe-upgrade still CVE-checks them at every upgrade.
 #
-# Single CycloneDX pass: the SBOM embeds the vulnerability findings, so it is
-# both the gate (exit code) and the Dependabot submission artifact. (A SARIF
-# pass would double the OSV load for a nice-to-have; dropped.)
+# No SBOM: `brew vulns` dropped --cyclonedx when it merged into brew core, and
+# --json emits a findings list (vulnerable packages only), not a CycloneDX
+# component inventory — so the old dependency-graph / Dependabot submission
+# can't be fed from here anymore. This gate is the primary control; the daily
+# safe-upgrade gate (§7) is the continuous one.
 #
-# Usage: ci_cve_scan.sh <brewfile> [outdir]     (writes <outdir>/sbom.cdx.json)
+# Usage: ci_cve_scan.sh <brewfile> [outdir]   (writes <outdir>/cve-findings.json)
 # Exit:  0 clean · 1 high/critical findings · 2 scan errors (coverage gap)
 set -uo pipefail
 
@@ -47,13 +50,14 @@ errors=0
 
 # scan_once <outfile> <pkgs...> — one retry on scan error (rc>=2); deletes
 # the output on final failure so the merge never sees partial/garbage JSON.
+# brew vulns exit codes: 0 clean · 1 open high/critical vuln(s) · >=2 error.
 scan_once() {
   local out="$1"; shift
   local rc
-  brew vulns --severity high --cyclonedx "$@" >"$out" 2>"$work/err"; rc=$?
+  brew vulns --severity high --json "$@" >"$out" 2>"$work/err"; rc=$?
   if [[ "$rc" -ge 2 ]]; then
     sleep 3
-    brew vulns --severity high --cyclonedx "$@" >"$out" 2>"$work/err"; rc=$?
+    brew vulns --severity high --json "$@" >"$out" 2>"$work/err"; rc=$?
   fi
   [[ "$rc" -ge 2 ]] && rm -f "$out"
   return "$rc"
@@ -65,14 +69,14 @@ while [[ "$i" -lt "$total" ]]; do
   batch=("${names[@]:i:BATCH}")
   batch_no=$((batch_no + 1))
   rc=0
-  scan_once "$work/sbom.$batch_no" "${batch[@]}" || rc=$?
+  scan_once "$work/out.$batch_no" "${batch[@]}" || rc=$?
   if [[ "$rc" -eq 1 ]]; then
     findings=1
   elif [[ "$rc" -ge 2 ]]; then
     echo "  batch $batch_no error — falling back to per-package: ${batch[*]}"
     for p in "${batch[@]}"; do
       prc=0
-      scan_once "$work/sbom.$batch_no-$p" "$p" || prc=$?
+      scan_once "$work/out.$batch_no-$p" "$p" || prc=$?
       if [[ "$prc" -eq 1 ]]; then
         findings=1
       elif [[ "$prc" -ge 2 ]]; then
@@ -84,27 +88,19 @@ while [[ "$i" -lt "$total" ]]; do
   i=$((i + BATCH))
 done
 
-# Merge CycloneDX: first doc's envelope + concatenated components/vulns.
-# Only files that parse as JSON (failed scans were deleted; belt-and-braces).
+# Merge findings arrays into one informational artifact (the gate is the exit
+# code, not this file). Only files that parse as JSON (failed scans were
+# deleted; belt-and-braces). `brew vulns --json` emits [] for a clean batch.
 valid_json() { local f; for f in "$@"; do [[ -s "$f" ]] && jq empty "$f" 2>/dev/null && echo "$f"; done; }
-sbom_files=()
-while IFS= read -r f; do sbom_files+=("$f"); done < <(valid_json "$work"/sbom.*)
-if [[ "${#sbom_files[@]}" -eq 0 ]]; then
+json_files=()
+while IFS= read -r f; do json_files+=("$f"); done < <(valid_json "$work"/out.*)
+if [[ "${#json_files[@]}" -eq 0 ]]; then
   echo "no valid scan output produced"
   exit 2
 fi
-jq -s '. as $all
-       | $all[0]
-       | .components      = ($all | map(.components // [])      | add)
-       | .vulnerabilities = ($all | map(.vulnerabilities // []) | add)
-       # The dependency-submission action calls .values() on metadata.tools,
-       # which only works on the legacy ARRAY form; brew-vulns emits the
-       # CycloneDX 1.5 object form ({components: [...]}) — normalize it.
-       | if (.metadata.tools | type) == "object"
-         then .metadata.tools = ((.metadata.tools.components // []) | map({name, version}))
-         else . end' \
-  "${sbom_files[@]}" > "$outdir/sbom.cdx.json"
-echo "merged SBOM from ${#sbom_files[@]} scan(s): $(jq '.components | length' "$outdir/sbom.cdx.json") component(s), $(jq '.vulnerabilities | length' "$outdir/sbom.cdx.json") vulnerability record(s)"
+jq -s 'add // []' "${json_files[@]}" > "$outdir/cve-findings.json"
+vuln_pkgs="$(jq 'length' "$outdir/cve-findings.json")"
+echo "merged findings from ${#json_files[@]} scan(s): $vuln_pkgs package(s) with high/critical vulnerabilities"
 
 echo "batches: $batch_no · findings: $findings · scan errors: $errors"
 [[ "$errors" -gt 0 ]] && exit 2

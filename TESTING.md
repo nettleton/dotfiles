@@ -160,7 +160,7 @@ first:
   best maintenance signal. **Hard-gate on `disabled`; flag on `deprecated`.**
   Consciously-accepted deprecations go in `tests/deprecation_allowlist.txt`
   (WARN → note); `disabled` can never be allowlisted (it can't be installed).
-- **CVEs — via `brew vulns`** (the official `homebrew/brew-vulns` tap). It maps each
+- **CVEs — via `brew vulns`** (a built-in `brew` command since it merged into Homebrew/brew). It maps each
   formula to its upstream repo and queries **OSV's GIT ecosystem** — the right way to
   get real Homebrew coverage — and marks CVEs already patched by the formula as
   resolved (few false positives). Scan the rendered Brewfile or the *added* formulae;
@@ -330,7 +330,7 @@ and vulnerable *transitive* deps — hard unattended guarantees are only "no kno
 direct installs" and "no SHA-mismatched bottles"; (2) if all 3 vuln sources are
 unreachable the scanner exits 0 "clean" (0/3 checked); (3) brew formulae with names
 < 4 chars (jq, gh, go, fzf, vim…) are never CVE-queried — covered instead by our
-`brew vulns` CI gate + Dependabot SBOM alerts (defense in depth); (4) never use the
+`brew vulns` CI gate (defense in depth); (4) never use the
 curl-based `brew safe-update` — self-update only via `--self` (formula route,
 SHA-pinned through tap PRs), which `daily_update.sh` already does; the repo's
 "signed manifest" wording is inaccurate (unsigned checksums, same-channel).
@@ -360,10 +360,12 @@ run via `mise run update`):
    real rollback; the fallback is pinning the last-good version in `packages.yaml`.)
 4. **PR** — open with the version diff + test results for human/agent review.
 
-**CVE monitoring (continuous, server-side).** Submit a CycloneDX SBOM to GitHub's
-dependency graph so **Dependabot** matches CVEs server-side and alerts immediately — no
-OSV-from-the-Mac flakiness. `brew vulns` is kept only for the small, reliable jobs:
-the CI added-package gate (A7) and on-demand checks.
+**CVE monitoring.** `brew vulns` (merged into Homebrew/brew as a built-in command)
+drives the CI desired-state gate (tier-b), the added-package audit (A7), and on-demand
+checks. The former CycloneDX-SBOM → GitHub dependency-graph → **Dependabot** submission
+was dropped: core `brew vulns` no longer emits CycloneDX (`--json` is a findings list,
+not a component inventory), so there's no equal-fidelity feed for it. The desired-state
+gate plus safe-upgrade's per-upgrade OSV/NVD check are the CVE controls.
 
 ## 8. Tooling to add
 
@@ -374,7 +376,7 @@ the CI added-package gate (A7) and on-demand checks.
 - **Upgrade gate:** `brew safe-upgrade` / `brew safe-install`
   (`sharkyger/tap/safe-upgrade`, declared in `packages.yaml`) — age hold (`--min-age
   7`) + CVE check (OSV+NVD+GitHub) + SHA verify on every brew upgrade/install.
-- **Security audit:** `brew vulns` (`homebrew/brew-vulns/brew-vulns`, declared) for the
+- **Security audit:** `brew vulns` (core Homebrew command) for the
   small CI added-package CVE gate + on-demand; `gh` for repo abandonment metadata;
   `brew info --json=v2` for deprecation. No hand-rolled OSV code.
 - **Entrypoint:** repo-local **mise tasks** in `.mise.toml` (`mise run test`,
@@ -388,8 +390,7 @@ the CI added-package gate (A7) and on-demand checks.
   `run_once_after_00-04_configure-git-hooks`. **DONE.**
 - **CI:** `.github/workflows/test.yml` — Tier A on `ubuntu-latest` for every push;
   Tier B on `macos-latest`. Both are GitHub-hosted; no self-hosted runner. A security
-  job submits a CycloneDX SBOM to the dependency graph (→ **Dependabot** alerts,
-  server-side, immediate) and runs the `brew vulns` added-package gate.
+  job runs the `brew vulns` desired-state CVE gate (high/critical fail the build).
 - **Local automation — DONE (brew leg):** `io.nettleton.brew-update` LaunchAgent
   (chezmoi-managed plist in `private_Library/LaunchAgents/`, bootstrapped/reloaded by
   `run_onchange_after_99-01_load-brew-update-agent` whenever the plist changes) runs
@@ -444,7 +445,7 @@ CLAUDE.md) rather than `chezmoi source-path`.
   rendered-script lint (A2: bash -n + shellcheck + fish -n) — both in the local suite
   and in `.github/workflows/test.yml`: tier-a (ubuntu) runs the hermetic + package
   checks on every push/PR + daily cron; tier-b (macos) runs the desired-state
-  `brew vulns` gate → SARIF code scanning + CycloneDX SBOM → dependency graph →
-  Dependabot alerts. Leak scan in CI is authoritative iff WORK_* repo secrets are set.
+  `brew vulns` gate (high/critical CVEs fail the build). Leak scan in CI is
+  authoritative iff WORK_* repo secrets are set.
 - **Phase 4:** macOS smoke + nvim health (B3/B4) on `macos-latest`, then the local
   `launchd` wrapper (C4–C8) + the daily `brew safe-upgrade --min-age 7` flow (§7).

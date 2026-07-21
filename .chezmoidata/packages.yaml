@@ -8,7 +8,6 @@ packages:
         trusted: true
       - name: buo/cask-upgrade
         trusted: true
-      - name: homebrew/brew-vulns
       - name: jetbrains/utils
         trusted: true
       # Private repo, fetched over HTTPS via the gh credential helper (see
@@ -54,7 +53,6 @@ packages:
       - gotests
       - graphviz
       - helm
-      - "homebrew/brew-vulns/brew-vulns"
       - ical-buddy
       - "jetbrains/utils/teamcity"
       - jq
