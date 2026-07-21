@@ -73,8 +73,16 @@ jobs:
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           # 0 clean · 1 findings (gate at the end) · 2 scan errors — fail here
           [ "$rc" -le 1 ]
+      - name: Upload CVE findings
+        # always(): the interesting case is a FAILING gate, so upload even then.
+        if: always() && hashFiles('cve-findings.json') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: cve-findings
+          path: cve-findings.json
+          if-no-files-found: ignore
       - name: Gate on high/critical findings
         if: steps.scan.outputs.rc == '1'
         run: |
-          echo "::error::high/critical CVEs in the declared set at latest versions (see scan output + cve-findings.json)"
+          echo "::error::high/critical CVEs in the declared set at latest versions (see the 'High/critical findings' list in the scan step, or the cve-findings.json artifact)"
           exit 1

@@ -102,6 +102,25 @@ jq -s 'add // []' "${json_files[@]}" > "$outdir/cve-findings.json"
 vuln_pkgs="$(jq 'length' "$outdir/cve-findings.json")"
 echo "merged findings from ${#json_files[@]} scan(s): $vuln_pkgs package(s) with high/critical vulnerabilities"
 
+# Surface the findings in the log — the gate otherwise only prints a count, so
+# CI shows THAT something is vulnerable but not WHAT. Each vulnerable formula,
+# then its open CVEs with severity and (if known) the version that fixes them.
+# The full records are also written to cve-findings.json (uploaded as an
+# artifact by the workflow) for machine-readable detail.
+if [[ "$vuln_pkgs" -gt 0 ]]; then
+  echo ""
+  echo "High/critical findings (formula @ version — open CVEs):"
+  jq -r '.[]
+    | "  \(.formula) \(.version)",
+      ( .vulnerabilities[]
+        | "      \(.id)  [\(.severity)]"
+          + (if .summary then "  " + .summary else "" end)
+          + (if (.fixed_versions | length) > 0
+             then "  (fixed in: " + (.fixed_versions | join(", ")) + ")" else "" end) )' \
+    "$outdir/cve-findings.json"
+  echo ""
+fi
+
 echo "batches: $batch_no · findings: $findings · scan errors: $errors"
 [[ "$errors" -gt 0 ]] && exit 2
 [[ "$findings" -gt 0 ]] && exit 1
