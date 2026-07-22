@@ -17,14 +17,24 @@
 # can't be fed from here anymore. This gate is the primary control; the daily
 # safe-upgrade gate (§7) is the continuous one.
 #
+# Triaged findings can be suppressed from the gate via tests/cve_accept.txt
+# ("<formula>  <OSV-ID>  # reason [(expires YYYY-MM-DD)]"); a suppressed finding
+# is still printed and kept in the artifact. Fail-closed on drift, like the rest
+# of the repo: an accept whose formula scans clean but no longer reports the ID
+# (STALE — resolved upstream) or whose expiry has passed (EXPIRED) re-fails the
+# build. A formula that couldn't be scanned this run (skiplisted / scan error)
+# is never judged stale — absence there is a coverage gap, not a fix.
+#
 # Usage: ci_cve_scan.sh <brewfile> [outdir]   (writes <outdir>/cve-findings.json)
-# Exit:  0 clean · 1 high/critical findings · 2 scan errors (coverage gap)
+# Exit:  0 clean (or every finding accepted) · 1 gated finding / stale / expired
+#        accept · 2 scan errors (coverage gap)
 set -uo pipefail
 
 brewfile="${1:?usage: ci_cve_scan.sh <brewfile> [outdir]}"
 outdir="${2:-.}"
 BATCH="${CVE_SCAN_BATCH:-10}"
 SKIPLIST="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/cve_scan_skiplist.txt"
+ACCEPT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/cve_accept.txt"
 mkdir -p "$outdir"
 work="$(mktemp -d -t ci-cve-scan.XXXXXX)"
 trap 'rm -rf "$work"' EXIT
@@ -45,7 +55,6 @@ total="${#names[@]}"
 echo "scanning $total packages in batches of $BATCH"
 [[ -n "$skipped" ]] && echo "skiplisted (cve_scan_skiplist.txt, CI-only gap): $skipped"
 
-findings=0
 errors=0
 
 # scan_once <outfile> <pkgs...> — one retry on scan error (rc>=2); deletes
@@ -65,21 +74,23 @@ scan_once() {
 
 i=0
 batch_no=0
+: > "$work/scanned_ok"   # formulae scanned authoritatively (rc 0/1) — the only
+                         # ones an accept can be judged STALE against.
 while [[ "$i" -lt "$total" ]]; do
   batch=("${names[@]:i:BATCH}")
   batch_no=$((batch_no + 1))
   rc=0
   scan_once "$work/out.$batch_no" "${batch[@]}" || rc=$?
-  if [[ "$rc" -eq 1 ]]; then
-    findings=1
-  elif [[ "$rc" -ge 2 ]]; then
+  if [[ "$rc" -le 1 ]]; then
+    printf '%s\n' "${batch[@]}" >> "$work/scanned_ok"
+  else
     echo "  batch $batch_no error — falling back to per-package: ${batch[*]}"
     for p in "${batch[@]}"; do
       prc=0
       scan_once "$work/out.$batch_no-$p" "$p" || prc=$?
-      if [[ "$prc" -eq 1 ]]; then
-        findings=1
-      elif [[ "$prc" -ge 2 ]]; then
+      if [[ "$prc" -le 1 ]]; then
+        printf '%s\n' "$p" >> "$work/scanned_ok"
+      else
         errors=$((errors + 1))
         echo "  SCAN ERROR after retries: $p — $(head -1 "$work/err" 2>/dev/null) (candidate for cve_scan_skiplist.txt if chronic)"
       fi
@@ -102,26 +113,94 @@ jq -s 'add // []' "${json_files[@]}" > "$outdir/cve-findings.json"
 vuln_pkgs="$(jq 'length' "$outdir/cve-findings.json")"
 echo "merged findings from ${#json_files[@]} scan(s): $vuln_pkgs package(s) with high/critical vulnerabilities"
 
-# Surface the findings in the log — the gate otherwise only prints a count, so
-# CI shows THAT something is vulnerable but not WHAT. Each vulnerable formula,
-# then its open CVEs with severity and (if known) the version that fixes them.
-# The full records are also written to cve-findings.json (uploaded as an
-# artifact by the workflow) for machine-readable detail.
+# Surface every finding in the log — the gate otherwise only prints a count, so
+# CI shows THAT something is vulnerable but not WHAT. Full records (incl.
+# accepted ones) are also in cve-findings.json (uploaded as an artifact).
 if [[ "$vuln_pkgs" -gt 0 ]]; then
   echo ""
   echo "High/critical findings (formula @ version — open CVEs):"
   jq -r '.[]
     | "  \(.formula) \(.version)",
-      ( .vulnerabilities[]
+      ( (.vulnerabilities // [])[]
         | "      \(.id)  [\(.severity)]"
           + (if .summary then "  " + .summary else "" end)
-          + (if (.fixed_versions | length) > 0
+          + (if ((.fixed_versions // []) | length) > 0
              then "  (fixed in: " + (.fixed_versions | join(", ")) + ")" else "" end) )' \
     "$outdir/cve-findings.json"
-  echo ""
 fi
 
-echo "batches: $batch_no · findings: $findings · scan errors: $errors"
+# ---- Apply triaged acceptances (tests/cve_accept.txt) --------------------
+today="$(date +%F)"
+accepts="$work/accepts.tsv"   # formula \t id \t expiry \t reason
+: > "$accepts"
+if [[ -f "$ACCEPT" ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%$'\r'}"
+    [[ "$line" =~ ^[[:space:]]*(#|$) ]] && continue
+    af="$(awk '{print $1}' <<<"$line")"; aid="$(awk '{print $2}' <<<"$line")"
+    [[ -n "$af" && -n "$aid" ]] || { echo "WARN: malformed cve_accept.txt line: $line" >&2; continue; }
+    reason="${line#*#}"; [[ "$reason" == "$line" ]] && reason=""
+    reason="${reason#"${reason%%[![:space:]]*}"}"   # ltrim
+    expiry=""
+    [[ "$reason" =~ \(expires[[:space:]]+([0-9]{4}-[0-9]{2}-[0-9]{2})\) ]] && expiry="${BASH_REMATCH[1]}"
+    printf '%s\t%s\t%s\t%s\n' "$af" "$aid" "$expiry" "$reason" >> "$accepts"
+  done < "$ACCEPT"
+fi
+
+# Open (formula, id) findings from the merged artifact.
+open_pairs="$work/open.tsv"
+jq -r '.[] | .formula as $f | (.vulnerabilities // [])[] | "\($f)\t\(.id)"' \
+  "$outdir/cve-findings.json" | sort -u > "$open_pairs"
+
+# Classify each open finding: suppressed (live accept) vs gated (fails).
+gated="$work/gated.tsv"; suppressed="$work/suppressed.tsv"
+: > "$gated"; : > "$suppressed"
+while IFS=$'\t' read -r f id; do
+  [[ -n "$f" ]] || continue
+  m="$(awk -F'\t' -v f="$f" -v id="$id" '$1==f && $2==id{print $3"\t"$4; exit}' "$accepts")"
+  if [[ -z "$m" ]]; then
+    printf '%s\t%s\t\n' "$f" "$id" >> "$gated"
+  else
+    exp="${m%%$'\t'*}"; reason="${m#*$'\t'}"
+    if [[ -n "$exp" && "$exp" < "$today" ]]; then
+      printf '%s\t%s\taccept EXPIRED %s — re-review\n' "$f" "$id" "$exp" >> "$gated"
+    else
+      printf '%s\t%s\t%s\n' "$f" "$id" "${reason:-accepted}" >> "$suppressed"
+    fi
+  fi
+done < "$open_pairs"
+
+# STALE accepts: formula scanned authoritatively but no longer reports the id.
+stale="$work/stale.tsv"; : > "$stale"
+while IFS=$'\t' read -r af aid exp reason; do
+  [[ -n "$af" ]] || continue
+  grep -qxF "$af" "$work/scanned_ok" || continue   # not authoritative → not stale
+  awk -F'\t' -v f="$af" -v id="$aid" '$1==f && $2==id{h=1} END{exit !h}' "$open_pairs" && continue
+  printf '%s\t%s\n' "$af" "$aid" >> "$stale"
+done < "$accepts"
+
+sup_n=$(wc -l < "$suppressed" | tr -d '[:space:]')
+gate_n=$(wc -l < "$gated"      | tr -d '[:space:]')
+stale_n=$(wc -l < "$stale"     | tr -d '[:space:]')
+
+if [[ "$sup_n" -gt 0 ]]; then
+  echo ""
+  echo "accepted — suppressed via tests/cve_accept.txt (shown above, kept in artifact):"
+  while IFS=$'\t' read -r f id reason; do echo "  $f $id — ${reason:-accepted}"; done < "$suppressed"
+fi
+if [[ "$stale_n" -gt 0 ]]; then
+  echo ""
+  echo "STALE acceptances — no longer flagged (resolved upstream). DELETE from tests/cve_accept.txt:"
+  while IFS=$'\t' read -r f id; do echo "  $f  $id"; done < "$stale"
+fi
+if [[ "$gate_n" -gt 0 ]]; then
+  echo ""
+  echo "GATED — high/critical findings with no accepted exception:"
+  while IFS=$'\t' read -r f id note; do echo "  $f $id${note:+  — $note}"; done < "$gated"
+fi
+
+echo ""
+echo "batches: $batch_no · scan errors: $errors · gated: $gate_n · suppressed: $sup_n · stale: $stale_n"
 [[ "$errors" -gt 0 ]] && exit 2
-[[ "$findings" -gt 0 ]] && exit 1
+{ [[ "$gate_n" -gt 0 ]] || [[ "$stale_n" -gt 0 ]]; } && exit 1
 exit 0

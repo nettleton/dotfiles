@@ -1,0 +1,26 @@
+# Triaged CVE acceptances for the tier-b desired-state scan
+# (tests/lib/ci_cve_scan.sh). Each non-comment line suppresses ONE
+# (formula, OSV-ID) finding from the gate:
+#
+#   <formula>  <OSV-ID>  # reason [(expires YYYY-MM-DD)]
+#
+# Rules (fail-closed, like the rest of this repo):
+#   * The finding is still printed and kept in cve-findings.json — an accept
+#     only stops it from FAILING the build, it does not hide it.
+#   * STALE: if the formula still scans cleanly but no longer reports the ID
+#     (i.e. it was fixed upstream), the build FAILS and asks you to delete the
+#     line. A stale suppression is drift; don't let it linger.
+#   * EXPIRED: past an optional "(expires YYYY-MM-DD)" the line stops
+#     suppressing and the finding gates again — a forced periodic re-review.
+#   * Prefer upgrading or removing the package over accepting. Accept only
+#     after triage, and always leave a reason.
+#
+# --- libxml2 --------------------------------------------------------------
+# Two OSS-Fuzz heap-use-after-free reports (OSV ecosystem "OSS-Fuzz") with an
+# "introduced" commit but NO "fixed" event in OSV, so they mark every libxml2
+# version affected — including the latest — and upgrading cannot clear them.
+# brew's heuristic rates them high; OSV itself lists no CVSS. Fuzzer-only
+# edge-case parsing paths, low real-world impact. No expiry: the STALE check
+# will surface them for removal if upstream ever lands a fix.
+libxml2  OSV-2021-777  # OSS-Fuzz heap-UAF in xmlAddNextSibling; no upstream fix, low real-world impact
+libxml2  OSV-2024-698  # OSS-Fuzz heap-UAF in xmlCharEncCloseFunc; no upstream fix, low real-world impact

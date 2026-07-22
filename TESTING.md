@@ -390,7 +390,9 @@ gate plus safe-upgrade's per-upgrade OSV/NVD check are the CVE controls.
   `run_once_after_00-04_configure-git-hooks`. **DONE.**
 - **CI:** `.github/workflows/test.yml` — Tier A on `ubuntu-latest` for every push;
   Tier B on `macos-latest`. Both are GitHub-hosted; no self-hosted runner. A security
-  job runs the `brew vulns` desired-state CVE gate (high/critical fail the build).
+  job runs the `brew vulns` desired-state CVE gate (high/critical fail the build);
+  triaged findings are suppressed via `tests/cve_accept.txt`, which fails closed
+  when a suppression goes stale (fixed upstream) or expires.
 - **Local automation — DONE (brew leg):** `io.nettleton.brew-update` LaunchAgent
   (chezmoi-managed plist in `private_Library/LaunchAgents/`, bootstrapped/reloaded by
   `run_onchange_after_99-01_load-brew-update-agent` whenever the plist changes) runs

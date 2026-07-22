@@ -82,7 +82,12 @@ Shared helpers: `common.sh` (logging/counters/paths), `pkg.sh` (yaml accessors +
   of 10 + per-package fallback; one big query hits OSV's read timeout) over the
   rendered core-only Brewfile at **latest** versions; job fails on high/critical.
   `cve_scan_skiplist.txt` holds packages too OSV-heavy to scan at all (vim) —
-  still covered by safe-upgrade at upgrade time. Actions SHA-pinned.
+  still covered by safe-upgrade at upgrade time. `cve_accept.txt` suppresses
+  individually-triaged `(formula, OSV-ID)` findings from the gate (still shown +
+  in the artifact); it fails closed on drift — a suppression whose finding was
+  fixed upstream (STALE) or whose `(expires …)` passed re-fails the build.
+  Findings print to the log and upload as the `cve-findings` artifact. Actions
+  SHA-pinned.
   Known gap: `brew vulns` resolves packages via source repos, so **casks are
   absent** from the scan (~98 formulae) — casks rely on safe-upgrade's NVD
   mapping at upgrade time and their own self-updaters.
