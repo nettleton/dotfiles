@@ -20,6 +20,11 @@
 #      interactive `mise run update` (Touch ID sudo), and post a macOS
 #      notification so stale pkg casks aren't discovered by accident.
 #
+# Between 4 and 5 it also tracks "pin-blocked dependents": packages clean enough
+# to upgrade that couldn't pour because a held/pinned transitive dep isn't latest
+# ("You must `brew unpin …`"). These are NOT in the staleness cap's held set, so
+# they're counted separately (blocked_since.txt) — reported only, never forced.
+#
 # Then an authoritative "package changes this run" summary: a real
 # Cellar/Caskroom version diff (before vs after), because brew's own per-step
 # "Upgraded N" line over-reports — it counts dependents it planned to upgrade
@@ -39,9 +44,10 @@ upgrade_capped=0
 [[ "${1:-}" == "--upgrade-capped" || -n "${UPGRADE_CAPPED:-}" ]] && upgrade_capped=1
 
 STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/chezmoi-dotfiles-tests"
-HELD_STATE="$STATE_DIR/held_since.txt"   # lines: <pkg>|<epoch first seen held>
+HELD_STATE="$STATE_DIR/held_since.txt"        # lines: <pkg>|<epoch first seen held>
+BLOCKED_STATE="$STATE_DIR/blocked_since.txt"  # lines: <pkg>|<epoch first pin-blocked>
 mkdir -p "$STATE_DIR"
-touch "$HELD_STATE"
+touch "$HELD_STATE" "$BLOCKED_STATE"
 
 RUN_LOG="$(mktemp -t daily-update-log.XXXXXX)"
 brewfile="$(mktemp -t daily-update-brewfile.XXXXXX)"
@@ -181,6 +187,43 @@ else
       echo "WARN: capped '$p' neither installed nor declared — skipping"
     fi
   done <<<"$capped"
+fi
+
+# Pin-blocked dependents: packages that are CLEAN (old enough to upgrade) and
+# that safe-upgrade tried to upgrade, but Homebrew refused the pour because a
+# held/pinned transitive dependency isn't at its latest version ("You must
+# `brew unpin …`"). These are NEVER in the "Held (too fresh)" set, so the
+# staleness cap above can't see them — track them separately and count how long
+# each has been continuously blocked. Report only; nothing is forced.
+echo "==> pin-blocked dependents (clean, but a held/pinned dep blocks the pour):"
+# dependent<TAB>blocking-deps, deduped; last occurrence wins (post mid-run
+# state). BSD awk: `\t` in a string is a real tab; -F'`' splits on backticks.
+blocked_pairs="$(grep -E 'brew unpin .* as installing .* requires the latest version of pinned' "$RUN_LOG" 2>/dev/null \
+  | awk -F'`' '{ deps=$2; sub(/^brew unpin /,"",deps); n=split($3,a," "); print a[3]"\t"deps }' \
+  | sort -u)"
+blocked_names="$(printf '%s' "$blocked_pairs" | cut -f1 | sed '/^$/d' | sort -u)"
+
+# Update state: keep first-seen epoch for still-blocked; add new; drop resolved
+# (mirrors the held_since bookkeeping so "days blocked" is CONTINUOUS).
+new_blocked="$(mktemp -t blocked-state.XXXXXX)"
+while IFS= read -r pkg; do
+  [[ -n "$pkg" ]] || continue
+  since="$(grep -m1 "^$pkg|" "$BLOCKED_STATE" | cut -d'|' -f2 || true)"
+  printf '%s|%s\n' "$pkg" "${since:-$now}" >>"$new_blocked"
+done <<<"$blocked_names"
+mv "$new_blocked" "$BLOCKED_STATE"
+
+if [[ -z "$blocked_names" ]]; then
+  echo "  none"
+else
+  while IFS= read -r pkg; do
+    [[ -n "$pkg" ]] || continue
+    since="$(grep -m1 "^$pkg|" "$BLOCKED_STATE" | cut -d'|' -f2)"
+    days=$(( (now - ${since:-$now}) / 86400 ))
+    needs="$(printf '%s\n' "$blocked_pairs" | awk -F'\t' -v p="$pkg" '$1==p{v=$2} END{if(v!="")print v}')"
+    flag=""; [[ "$days" -gt "$STALENESS_CAP" ]] && flag=" [STARVING >${STALENESS_CAP}d]"
+    printf '  %-16s blocked %sd — needs: %s%s\n' "$pkg" "$days" "$needs" "$flag"
+  done <<<"$blocked_names"
 fi
 
 echo "==> [5/5] sudo-required casks (pkg installers can't sudo unattended)"
