@@ -20,6 +20,11 @@
 #      interactive `mise run update` (Touch ID sudo), and post a macOS
 #      notification so stale pkg casks aren't discovered by accident.
 #
+# Then an authoritative "package changes this run" summary: a real
+# Cellar/Caskroom version diff (before vs after), because brew's own per-step
+# "Upgraded N" line over-reports — it counts dependents it planned to upgrade
+# even when a held/pinned dependency blocks the actual pour.
+#
 # Usage: daily_update.sh [--upgrade-capped]
 # Env:   MIN_AGE (7) · STALENESS_CAP days (21) · UPGRADE_CAPPED=1
 #
@@ -40,7 +45,36 @@ touch "$HELD_STATE"
 
 RUN_LOG="$(mktemp -t daily-update-log.XXXXXX)"
 brewfile="$(mktemp -t daily-update-brewfile.XXXXXX)"
-trap 'rm -f "$RUN_LOG" "$brewfile"' EXIT
+before_versions="$(mktemp -t daily-update-before.XXXXXX)"
+after_versions="$(mktemp -t daily-update-after.XXXXXX)"
+trap 'rm -f "$RUN_LOG" "$brewfile" "$before_versions" "$after_versions"' EXIT
+
+# Authoritative "what actually changed" reporting. brew's own per-step
+# "Upgraded N packages" line counts dependents it PLANNED to upgrade even when a
+# pinned/held dependency then blocks the pour, so it over-reports (e.g. gstreamer
+# is listed as upgraded but never actually lands while ca-certificates is held).
+# We instead diff the real Cellar/Caskroom versions before vs after the run, so
+# the summary reflects what landed on disk, not what brew intended.
+TAB="$(printf '\t')"
+snapshot_versions() { # -> sorted "type|name<TAB>ver[,ver...]" (formulae + casks)
+  { brew list --versions --formula 2>/dev/null | sed 's/^/formula /'
+    brew list --versions --cask    2>/dev/null | sed 's/^/cask /'; } \
+  | awk '{ t=$1; n=$2; v=""; for (i=3;i<=NF;i++) v=v (i>3?",":"") $i;
+           print t"|"n"\t"v }' \
+  | LC_ALL=C sort -t"$TAB" -k1,1
+}
+report_version_changes() { # $1=before-file $2=after-file
+  local key bv av changed=0 type name
+  while IFS="$TAB" read -r key bv av; do
+    [[ "$bv" == "$av" ]] && continue
+    changed=1; type="${key%%|*}"; name="${key#*|}"
+    if   [[ "$bv" == "__NONE__" ]]; then printf '  installed  %-7s %s %s\n'      "$type" "$name" "$av"
+    elif [[ "$av" == "__NONE__" ]]; then printf '  removed    %-7s %s %s\n'      "$type" "$name" "$bv"
+    else                                 printf '  upgraded   %-7s %s %s -> %s\n' "$type" "$name" "$bv" "$av"
+    fi
+  done < <(LC_ALL=C join -t"$TAB" -a1 -a2 -e '__NONE__' -o '0,1.2,2.2' "$1" "$2")
+  [[ "$changed" -eq 0 ]] && echo "  (no installed versions changed this run)"
+}
 
 # GitHub token for safe-upgrade/install release-age checks (5000/hr vs 60/hr):
 # deliberately NOT fetched via `op read` — with 1Password app integration any
@@ -51,6 +85,7 @@ trap 'rm -f "$RUN_LOG" "$brewfile"' EXIT
 # outdated-set scan; safe-* fails closed if the limit is ever hit.
 
 echo "==> daily update starting $(date '+%Y-%m-%d %H:%M:%S')"
+snapshot_versions > "$before_versions"
 
 echo "==> [1/5] safe-upgrade --self"
 brew safe-upgrade --self || echo "WARN: --self failed (continuing)"
@@ -181,5 +216,9 @@ else
     echo "sudo failure(s) detected ($sudo_hits) but no outdated pkg casks remain — inspect the run output above"
   fi
 fi
+
+echo "==> package changes this run (authoritative — actual Cellar/Caskroom diff):"
+snapshot_versions > "$after_versions"
+report_version_changes "$before_versions" "$after_versions"
 
 echo "==> daily update done $(date '+%Y-%m-%d %H:%M:%S') (${SECONDS}s elapsed)"
