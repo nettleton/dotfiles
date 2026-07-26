@@ -1,0 +1,44 @@
+#!/usr/bin/env fish
+#
+# Install/reconcile calBuddy launchd services (mirror-sync, alfred).
+# run_onchange keyed on the config hash below, so changing any
+# [services.*] definition (command/interval) reinstalls the plist to pick
+# up the change. Editing config.toml for any other reason also re-fires
+# this — harmless, since `service install` is idempotent (it unloads,
+# rewrites the plist, and reloads).
+#
+# config hash: {{ include "dot_config/calBuddy/config.toml.tmpl" | sha256sum }}
+
+fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
+
+# calBuddy is installed by 01_install-brew-packages but can be legitimately
+# absent (safe-install age hold, or a failed install). Exit nonzero so this
+# is NOT recorded as done and retries on the next apply — dotfiles are
+# unaffected since all scripts run in the after phase.
+if not command -q calBuddy
+  echo "calBuddy not installed (held or failed in 01_install-brew-packages); will retry on next apply" >&2
+  exit 1
+end
+
+{{- if (or .is_personal_machine .is_work_machine) }}
+# Exchange machine — install both services. The plist check just picks the
+# right message; under run_onchange we always (re)install so config changes
+# take effect.
+for svc in mirror-sync alfred
+  if test -f ~/Library/LaunchAgents/io.nettleton.calBuddy.$svc.plist
+    echo "calBuddy: $svc service present, reinstalling to apply config change"
+  else
+    echo "calBuddy: installing $svc service"
+  end
+  calbuddy service install $svc
+end
+{{- else }}
+# Not an Exchange machine — these services have nothing to query. Remove
+# stale plists if a prior role left them behind.
+for svc in mirror-sync alfred
+  if test -f ~/Library/LaunchAgents/io.nettleton.calBuddy.$svc.plist
+    echo "calBuddy: removing $svc service (no Exchange account on this machine)"
+    calbuddy service uninstall $svc
+  end
+end
+{{- end }}

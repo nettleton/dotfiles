@@ -32,6 +32,12 @@ exclude_source_types = ["exchange", "birthdays"]
 #   Names must match exactly as shown in 'calBuddy calendars'.
 exclude_calendars = ["2022 Europe Trip", "2024 Europe Trip", "2024 Aruba"]
 
+[tags]
+enabled = true
+source_field = "notes"     # or "title" / "both"
+hashtags = false           # opt in to #hashtags too (marker works without this)
+strip_from_output = true
+
 {{ if (or .is_personal_machine .is_work_machine) -}}
 [accounts.work]
 provider = "exchange"
@@ -79,9 +85,34 @@ target_account_type = "local"
 # Define launchd services to run calBuddy commands on a schedule.
 # Install with: calBuddy service install <name>
 #
+# Services only exist on Exchange machines (personal, work). Wife/child
+# machines get no [services.*] tables at all.
+{{ if (or .is_personal_machine .is_work_machine) -}}
 [services.mirror-sync]
 command = "mirror run"
 interval = 900  # seconds between runs (default: 900 = 15 min)
+
+# Writes the Alfred calendar JSON on a schedule (consumed by an Alfred
+# workflow). Options are structured keys (ADR-0037): command/interval are
+# reserved, every other key becomes a --long-option. calendars is an
+# explicit per-machine allowlist, account-scoped (alias:name) because both
+# Exchange accounts expose a "Calendar"; mirror targets (MW/PSC) are omitted
+# where they'd duplicate Exchange. Absolute paths because launchd args
+# aren't shell-expanded. `service install` validates the reconstructed
+# command, so a mistyped key fails at install time.
+[services.alfred]
+command = "events"
+interval = 300  # 5 minutes
+from-now = true
+{{ if .is_personal_machine -}}
+calendars = ["work:Calendar", "church:Calendar", "local:Josh"]
+{{ else -}}
+calendars = ["work:Calendar", "local:PSC", "local:Josh"]
+{{ end -}}
+exclude-categories = "alfredIgnore"
+template = "{{ .chezmoi.homeDir }}/.config/calBuddy/alfred.stencil"
+output = "{{ .chezmoi.homeDir }}/.cache/calBuddy/alfred.json"
+{{- end }}
 
 # ── Persistent CLI defaults ──────────────────────────────────────────
 #

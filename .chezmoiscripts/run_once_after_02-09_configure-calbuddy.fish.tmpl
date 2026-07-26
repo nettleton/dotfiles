@@ -27,12 +27,8 @@ if calBuddy accounts list | string match -q "work: not authenticated"
 else
   echo "calBuddy: Already logged in work, skipping"
 end
-if test -f ~/Library/LaunchAgents/io.nettleton.calBuddy.mirror-sync.plist
-  echo "calBuddy: sync service installed, skipping"
-else
-  echo "calBuddy: installing mirror-sync service"
-  calbuddy service install mirror-sync
-end
 {{- end }}
 
-calBuddy --generate-completion-script fish > ~/.config/fish/completions/calBuddy.fish
+# Shell completions are installed by the Homebrew formula
+# (generate_completions_from_executable), so they regenerate from the exact
+# installed binary on every brew install/upgrade — no manual regen needed here.

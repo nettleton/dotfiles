@@ -1,0 +1,39 @@
+{{/* chezmoi:template:left-delimiter=[[ right-delimiter=]] */}}
+{
+  "items": [
+    {% for e in events %}{% if not forloop.first %},{% endif %}
+    {
+      "title": {{ e.title | json }},
+      "subtitle": {{ e.startTime | json }},
+      "arg": {{ e.title | json }},
+      "match": {{ e.title | json }},
+      "icon": { "type": "fileicon", "path": "/System/Applications/Calendar.app" },
+      "variables": {
+        "videoconferenceUrls": {{ e.meetingUrl | json }},
+        "referenceUrls": {{ e.referenceUrls | join:"!" | json }},
+        "lightsOn": [[ if .is_personal_machine ]]true[[ else ]]false[[ end ]],
+        "joinVideo": true
+      },
+      "mods": {
+        "cmd": {
+          "subtitle": "Video only",
+          "variables": {
+            "lightsOn": false,
+            "joinVideo": true,
+            "videoconferenceUrls": {{ e.meetingUrl | json }},
+            "referenceUrls": {{ e.referenceUrls | join:"!" | json }}
+          }
+        },
+        "alt": {
+          "subtitle": "References only",
+          "variables": {
+            "lightsOn": false,
+            "joinVideo": false,
+            "videoconferenceUrls": {{ e.meetingUrl | json }},
+            "referenceUrls": {{ e.referenceUrls | join:"!" | json }}
+          }
+        }
+      }
+    }{% endfor %}
+  ]
+}
