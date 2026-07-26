@@ -6,7 +6,7 @@
   <string>io.nettleton.calendar.poller</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/opt/homebrew/bin/node</string>
+    <string>{{ .chezmoi.homeDir }}/.local/share/mise/shims/node</string>
     <string>{{ .chezmoi.homeDir }}/.config/nvim/getCalendarEvents.js</string>
   </array>
   <key>RunAtLoad</key>
