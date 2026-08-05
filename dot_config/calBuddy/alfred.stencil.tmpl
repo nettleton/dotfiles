@@ -11,6 +11,7 @@
       "variables": {
         "videoconferenceUrls": {{ e.meetingUrl | json }},
         "referenceUrls": {{ e.referenceUrls | join:"!" | json }},
+        "noteType": "existing",
         "lightsOn": [[ if .is_personal_machine ]]true[[ else ]]false[[ end ]],
         "joinVideo": true
       },
