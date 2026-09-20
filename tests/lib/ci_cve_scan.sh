@@ -101,7 +101,10 @@ done
 
 # Merge findings arrays into one informational artifact (the gate is the exit
 # code, not this file). Only files that parse as JSON (failed scans were
-# deleted; belt-and-braces). `brew vulns --json` emits [] for a clean batch.
+# deleted; belt-and-braces). Since `brew vulns` moved into brew core its
+# --json output is {findings: [...], skipped_formulae: [...]}, not a bare
+# array — unwrap .findings from each batch so the merged artifact is a plain
+# array of finding records (the shape the extraction below expects).
 valid_json() { local f; for f in "$@"; do [[ -s "$f" ]] && jq empty "$f" 2>/dev/null && echo "$f"; done; }
 json_files=()
 while IFS= read -r f; do json_files+=("$f"); done < <(valid_json "$work"/out.*)
@@ -109,7 +112,7 @@ if [[ "${#json_files[@]}" -eq 0 ]]; then
   echo "no valid scan output produced"
   exit 2
 fi
-jq -s 'add // []' "${json_files[@]}" > "$outdir/cve-findings.json"
+jq -s '[.[].findings // []] | add // []' "${json_files[@]}" > "$outdir/cve-findings.json"
 vuln_pkgs="$(jq 'length' "$outdir/cve-findings.json")"
 echo "merged findings from ${#json_files[@]} scan(s): $vuln_pkgs package(s) with high/critical vulnerabilities"
 
