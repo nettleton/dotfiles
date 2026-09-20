@@ -9,10 +9,6 @@ set -euo pipefail
 existing_sudo_askpass="${SUDO_ASKPASS:-}"
 unset SUDO_ASKPASS
 
-{{ if eq .chezmoi.arch "arm64" -}}
-find /Library/Apple/usr/lib/ -name "*Rosetta*" || sudo softwareupdate --install-rosetta
-{{ end -}}
-
 export HOMEBREW_GITHUB_API_TOKEN="$(op read 'op://Family/nettleton-homebrew-install-token/token')"
 # Same token raises the GitHub API limit for safe-install's release-age checks
 # (60/hr unauthenticated -> 5000/hr). Without it a fresh-machine bootstrap of
