@@ -25,6 +25,14 @@
 # ("You must `brew unpin …`"). These are NOT in the staleness cap's held set, so
 # they're counted separately (blocked_since.txt) — reported only, never forced.
 #
+# After the version diff it also runs a linkage sweep: `brew linkage --test`
+# surfaces formulae that reference dylibs no longer on disk — the "held while
+# a soname-partner moved" foot-gun. If a dependent's revision bump is held
+# (NVD 429, bottle-SHA block, freshness) while its dependency's soname changes
+# under it, the installed dependent still links to a dylib that no longer
+# exists — "held" then means "broken". Reported + notified + `brew reinstall`
+# suggested; nothing is auto-reinstalled (the daily job stays advisory).
+#
 # Then an authoritative "package changes this run" summary: a real
 # Cellar/Caskroom version diff (before vs after), because brew's own per-step
 # "Upgraded N" line over-reports — it counts dependents it planned to upgrade
@@ -53,7 +61,8 @@ RUN_LOG="$(mktemp -t daily-update-log.XXXXXX)"
 brewfile="$(mktemp -t daily-update-brewfile.XXXXXX)"
 before_versions="$(mktemp -t daily-update-before.XXXXXX)"
 after_versions="$(mktemp -t daily-update-after.XXXXXX)"
-trap 'rm -f "$RUN_LOG" "$brewfile" "$before_versions" "$after_versions"' EXIT
+linkage_report="$(mktemp -t daily-update-linkage.XXXXXX)"
+trap 'rm -f "$RUN_LOG" "$brewfile" "$before_versions" "$after_versions" "$linkage_report"' EXIT
 
 # Authoritative "what actually changed" reporting. brew's own per-step
 # "Upgraded N packages" line counts dependents it PLANNED to upgrade even when a
@@ -263,5 +272,46 @@ fi
 echo "==> package changes this run (authoritative — actual Cellar/Caskroom diff):"
 snapshot_versions > "$after_versions"
 report_version_changes "$before_versions" "$after_versions"
+
+# Linkage sweep: `brew linkage --test` reads the actual Mach-O dyld metadata
+# of every installed formula and exits non-zero on any reference to a dylib
+# that no longer exists. Catches the case where an upgrade (or a partial-hold
+# gate) leaves an installed dependent linked against a removed soname —
+# tree-sitter 0.26 -> 0.27 while neovim's revision bump sat held by NVD 429s
+# and then a bottle-SHA block, so `nvim` on disk still asked for
+# libtree-sitter.0.26.dylib. Single invocation, no args = full sweep in ~2s.
+echo "==> linkage health (installed formulae -> existing dylibs):"
+if brew linkage --test >"$linkage_report" 2>&1; then
+  echo "  all installed formulae link cleanly"
+else
+  # A broken formula shows a "==> Checking <name> linkage" banner immediately
+  # followed by "Broken dependencies:". Non-broken formulae get the banner
+  # only. `sort -u` is belt-and-braces — `--test` gives each name once.
+  broken="$(awk '
+    /^==> Checking .* linkage$/{f=$3; next}
+    /^Broken dependencies:/{if(f){print f; f=""}}
+  ' "$linkage_report" | sort -u)"
+  if [[ -z "$broken" ]]; then
+    echo "  brew linkage --test exited non-zero but reported no 'Broken dependencies:' blocks — inspect the sweep log"
+    sed -n '1,40p' "$linkage_report" | sed 's/^/  | /'
+  else
+    echo "BROKEN LINKAGE — installed formulae referencing dylibs that no longer exist:"
+    while IFS= read -r pkg; do
+      [[ -n "$pkg" ]] || continue
+      printf '  - %s\n' "$pkg"
+    done <<<"$broken"
+    # Join the newline-separated broken list into a single space-separated
+    # line for the reinstall command. `xargs` (no args) collapses newlines to
+    # single spaces without a trailing one — cleaner than `printf '%s '`, which
+    # emits a stray trailing space that ends up in the copy-pasted command.
+    broken_line="$(printf '%s\n' "$broken" | xargs)"
+    echo "fix (still gated through safe-upgrade at next run; reinstall is unconditional):"
+    echo "  brew reinstall $broken_line"
+    if command -v osascript >/dev/null 2>&1; then
+      msg="Broken dylib linkage — run: brew reinstall $broken_line"
+      osascript -e "display notification \"$msg\" with title \"brew daily update\"" 2>/dev/null || true
+    fi
+  fi
+fi
 
 echo "==> daily update done $(date '+%Y-%m-%d %H:%M:%S') (${SECONDS}s elapsed)"
