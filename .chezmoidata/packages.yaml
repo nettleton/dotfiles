@@ -158,14 +158,12 @@ packages:
       - claude
       - handbrake-app
       - hazel
-      - makemkv
       - moneydance
       - openin
       - receipts
       - resilio-sync
       - signal
       - tailscale-app
-      - xld
       - xquartz
   mas:
     apps:
