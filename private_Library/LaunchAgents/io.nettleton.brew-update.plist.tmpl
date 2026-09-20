@@ -16,10 +16,20 @@
     <string>{{ .chezmoi.homeDir }}/.local/share/chezmoi/tests/wrapper/daily_update.sh</string>
     <string>--upgrade-capped</string>
   </array>
+  <!-- HOMEBREW_NVD_API_KEY, not NVD_API_KEY: `brew` re-execs safe-upgrade
+       through env -i with a HOMEBREW_* allowlist, so a plain NVD_API_KEY is
+       dropped and the run gets silently throttled to 5 req/30s (with a key
+       it's 50 req/30s). See ADR-0002 and dependency_security_check.py's
+       _nvd_api_key(). Resolved at chezmoi-apply time via onepasswordRead —
+       apply is interactive, so op's GUI prompt is fine here; run-time `op`
+       calls from this LaunchAgent are still forbidden (see daily_update.sh
+       comment block).  -->
   <key>EnvironmentVariables</key>
   <dict>
     <key>PATH</key>
     <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>HOMEBREW_NVD_API_KEY</key>
+    <string>{{ onepasswordRead "op://Private/NIST NVD API Key/credential" }}</string>
   </dict>
   <!-- RunAtLoad: also fire at login and on plist reload — covers fire times
        missed while the machine was off or the agent not yet loaded. The
