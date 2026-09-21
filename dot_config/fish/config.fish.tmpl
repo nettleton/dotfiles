@@ -52,6 +52,13 @@ set -gx WORK_MAC_SCREENS_ALIAS ah-{{ .work.user }}-m
 set -gx WORK_LINUX {{ .work.hostnames.linux }}
 set -gx LOCATION AH
 
+# Local shim adding macOS 27 (Golden Gate) to safe-upgrade 0.4.3's bottle
+# codename table — see ~/.local/bin/safe-upgrade-bottle-resolver.py. Paired
+# with functions/brew.fish so interactive `brew safe-*` picks it up
+# (brew's env -i drops BREW_SAFE_*). Retire together once upstream ships
+# (27, "golden_gate").
+set -gx BREW_SAFE_BOTTLE_RESOLVER "$HOME/.local/bin/safe-upgrade-bottle-resolver.py"
+
 # END ENV
 
 # ALIASES / ABBREVIATIONS

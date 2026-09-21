@@ -51,6 +51,19 @@ STALENESS_CAP="${STALENESS_CAP:-21}"
 upgrade_capped=0
 [[ "${1:-}" == "--upgrade-capped" || -n "${UPGRADE_CAPPED:-}" ]] && upgrade_capped=1
 
+# BREW_SAFE_BOTTLE_RESOLVER: local shim adding macOS 27 (Golden Gate) to
+# safe-upgrade 0.4.3's bottle codename table. Without it every bottle-SHA
+# check on this host false-positives as `[BLOCKED] SHA mismatch` and the
+# updater is locked out of every outdated formula. `brew`'s env -i filter
+# (/opt/homebrew/bin/brew) allowlists HOMEBREW_* + a small fixed set —
+# BREW_SAFE_* is stripped — so we MUST invoke brew-safe-{upgrade,install}
+# directly (formula's write_env_script bin, same script under the hood as
+# `brew safe-*`, minus the env sanitization). Retire this export and revert
+# the brew-safe-* call sites to `brew safe-*` once upstream ships (27,
+# "golden_gate") in bottle_resolver._CODENAMES — check per the wrapper's
+# docstring.
+export BREW_SAFE_BOTTLE_RESOLVER="$HOME/.local/bin/safe-upgrade-bottle-resolver.py"
+
 STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/chezmoi-dotfiles-tests"
 HELD_STATE="$STATE_DIR/held_since.txt"        # lines: <pkg>|<epoch first seen held>
 BLOCKED_STATE="$STATE_DIR/blocked_since.txt"  # lines: <pkg>|<epoch first pin-blocked>
@@ -103,10 +116,10 @@ echo "==> daily update starting $(date '+%Y-%m-%d %H:%M:%S')"
 snapshot_versions > "$before_versions"
 
 echo "==> [1/5] safe-upgrade --self"
-brew safe-upgrade --self || echo "WARN: --self failed (continuing)"
+brew-safe-upgrade --self || echo "WARN: --self failed (continuing)"
 
 echo "==> [2/5] safe-upgrade --yes --min-age $MIN_AGE (installed packages)"
-brew safe-upgrade --yes --min-age "$MIN_AGE" 2>&1 | tee -a "$RUN_LOG"
+brew-safe-upgrade --yes --min-age "$MIN_AGE" 2>&1 | tee -a "$RUN_LOG"
 
 echo "==> [3/5] reconcile declared set (retries previously-held installs)"
 # Personal packages only on non-work machines — ask chezmoi (allowed here).
@@ -139,13 +152,13 @@ missing_casks="$(missing_of "$(awk -F'"' '/^cask /{print $2}' "$brewfile")" "$in
 
 if [[ -n "$missing_formulae" ]]; then
   # shellcheck disable=SC2086
-  brew safe-install --min-age "$MIN_AGE" $missing_formulae 2>&1 | tee -a "$RUN_LOG"
+  brew-safe-install --min-age "$MIN_AGE" $missing_formulae 2>&1 | tee -a "$RUN_LOG"
 else
   echo "all declared formulae installed — nothing to reconcile"
 fi
 if [[ -n "$missing_casks" ]]; then
   # shellcheck disable=SC2086
-  brew safe-install --cask --min-age "$MIN_AGE" $missing_casks 2>&1 | tee -a "$RUN_LOG"
+  brew-safe-install --cask --min-age "$MIN_AGE" $missing_casks 2>&1 | tee -a "$RUN_LOG"
 else
   echo "all declared casks installed — nothing to reconcile"
 fi
@@ -187,11 +200,11 @@ else
   while IFS= read -r p; do
     [[ -n "$p" ]] || continue
     if brew list "$p" >/dev/null 2>&1 || brew list --cask "$p" >/dev/null 2>&1; then
-      brew safe-upgrade --yes --min-age 0 "$p" || echo "WARN: capped upgrade of $p failed"
+      brew-safe-upgrade --yes --min-age 0 "$p" || echo "WARN: capped upgrade of $p failed"
     elif grep -q "^cask \"\(.*/\)\?$p\"" "$brewfile"; then
-      brew safe-install --cask --min-age 0 "$p" || echo "WARN: capped install of $p failed"
+      brew-safe-install --cask --min-age 0 "$p" || echo "WARN: capped install of $p failed"
     elif grep -q "^brew \"\(.*/\)\?$p\"" "$brewfile"; then
-      brew safe-install --min-age 0 "$p" || echo "WARN: capped install of $p failed"
+      brew-safe-install --min-age 0 "$p" || echo "WARN: capped install of $p failed"
     else
       echo "WARN: capped '$p' neither installed nor declared — skipping"
     fi
