@@ -25,6 +25,12 @@ Library/LaunchAgents/io.nettleton.brew-update.plist
 .netrc
 .config/pip/pip.conf
 .config/uv/uv.toml
+.claude/skills/teamcity
+{{- end }}
+{{- if .is_work_machine }}
+# Owned by the corporate devai tool on work machines (gateway env, hooks,
+# policy permissions); chezmoi managing it too just thrashes.
+.claude/settings.json
 {{- end }}
 
 # Test suite — source-only, never applied to $HOME.
