@@ -20,8 +20,8 @@ export GOBIN="$GOPATH/bin"
 export GOROOT=$(go env GOROOT)
 {{ if .is_work_machine -}}
 export GOPROXY=http://iat-go-proxy-prod-01.{{ .work.domain }}:7000/go-proxy
-export GOPRIVATE=golang.dhcp,github.{{ .work.domain }}
-export GONOPROXY=github.{{ .work.domain }}
+export GOPRIVATE='*.{{ .work.domain }},golang.dhcp'
+export GONOPROXY='*.{{ .work.domain }}'
 export MW_USE_LOCAL_GO=true
 export MW_USE_LOCAL_GOLANGCI_LINT=true
 export GOLANGCILINTLOCATION=$(dirname $(which golangci-lint))

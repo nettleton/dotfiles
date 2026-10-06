@@ -48,7 +48,7 @@ All template variables are defined here. Only 2 interactive prompts (company, ta
 ### Package Data (`.chezmoidata/packages.yaml`)
 Declarative package lists for brew (taps, brews, casks, personal variants), fisher, go, and Mac App Store apps. Referenced in templates as `.packages.*`. Editing this file triggers `run_onchange_` scripts to re-run.
 
-### Tool Versions (`dot_config/mise/config.toml`)
+### Tool Versions (`dot_config/mise/config.toml.tmpl`)
 Python, Node, and their global packages (npm, pip) are managed by mise. This replaces pyenv and brew-installed node.
 
 Note: `nettleton/tap` is a private repo fetched over HTTPS via the gh credential helper (`[credential "https://github.com"]` in dot_gitconfig) — deliberately not SSH, which would route `brew update` through the 1Password agent and prompt during unattended runs. `run_once_after_00-05` converts pre-existing SSH clones.

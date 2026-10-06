@@ -2,7 +2,7 @@
 
 fish_add_path /opt/homebrew/bin /opt/homebrew/sbin
 
-# mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+# mise config hash: {{ includeTemplate "dot_config/mise/config.toml.tmpl" . | sha256sum }}
 
 # mise is installed by 01_install-brew-packages but can be legitimately absent
 # (safe-install freshness hold, or a declined override). Exit nonzero so this

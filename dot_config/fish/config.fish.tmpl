@@ -25,8 +25,8 @@ set -gx MATLAB_JAVA $JAVA_HOME
 set -x GOROOT (go env GOROOT)
 {{ if .is_work_machine }}
 set -x GOPROXY http://iat-go-proxy-prod-01.{{ .work.domain }}:7000/go-proxy
-set -x GOPRIVATE golang.dhcp,github.{{ .work.domain }}
-set -x GONOPROXY github.{{ .work.domain }}
+set -x GOPRIVATE "*.{{ .work.domain }},golang.dhcp"
+set -x GONOPROXY "*.{{ .work.domain }}"
 set -x MW_USE_LOCAL_GO true
 set -x MW_USE_LOCAL_GOLANGCI_LINT true
 set -x GOLANGCILINTLOCATION (dirname (which golangci-lint))

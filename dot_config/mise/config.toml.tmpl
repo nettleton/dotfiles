@@ -5,3 +5,30 @@ node = "latest"
 pipx = "latest"
 "npm:neovim" = "latest"
 "npm:npm" = "latest"
+{{- if .is_work_machine }}
+{{- $mirror := printf "artifactory.%s/artifactory/mw-mise-int-dev-local" .work.domain }}
+"go:github.{{ .work.domain }}/development/opi-flightsql-client/cmd/o11y" = "0.6.10"
+
+[settings]
+disable_backends = ["asdf"]
+use_versions_host = true
+use_versions_host_track = false
+python = { compile = false }
+java = { shorthand_vendor = "corretto" }
+
+# Route tool downloads through the internal Artifactory mirror.
+[settings.url_replacements]
+"nodejs.org/dist"                                                = "{{ $mirror }}/node"
+"github.com/astral-sh/python-build-standalone/releases/download" = "{{ $mirror }}/python"
+"corretto.aws/downloads/resources"                               = "{{ $mirror }}/java"
+"mise-java.jdx.dev"                                              = "{{ $mirror }}/tools"
+"get.helm.sh"                                                    = "{{ $mirror }}/helm"
+"dl.google.com"                                                  = "{{ $mirror }}"
+"mise-versions.jdx.dev"                                          = "{{ $mirror }}"
+
+[env]
+GOPROXY = "http://iat-go-proxy-prod-01.{{ .work.domain }}:7000/go-proxy"
+GOPRIVATE = "*.{{ .work.domain }},golang.dhcp"
+GONOPROXY = "*.{{ .work.domain }}"
+GOTOOLCHAIN = "local"
+{{- end }}
