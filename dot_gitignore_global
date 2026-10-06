@@ -79,3 +79,7 @@ workspace
 .vscode
 
 .perforce
+
+# Claude Code #
+###################
+**/.claude/settings.local.json
