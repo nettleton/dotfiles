@@ -49,11 +49,11 @@ cat >"$brewfile" <<EOF
 tap "{{ .name }}"{{ with get . "url" }}, "{{ . }}"{{ end }}{{ if get . "trusted" }}, trusted: true{{ end }}
 {{ end -}}
 {{ range .packages.brew.brews | sortAlpha | uniq -}}
-brew "{{ . }}"
+brew "{{ . }}"{{ if has . $.packages.brew.trusted_formulae }}, trusted: true{{ end }}
 {{ end -}}
 {{ if .personalpackages -}}
 {{ range .packages.brew.personal_brews | sortAlpha | uniq -}}
-brew "{{ . }}"
+brew "{{ . }}"{{ if has . $.packages.brew.trusted_formulae }}, trusted: true{{ end }}
 {{ end -}}
 {{ end -}}
 {{ range .packages.brew.casks | sortAlpha | uniq -}}

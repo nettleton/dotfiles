@@ -17,6 +17,14 @@ packages:
         trusted: true
       - name: sharkyger/tap
         trusted: true
+    # Formula-level trust (beyond tap trust). `brew upgrade <user/tap/formula>`
+    # records these on its own (safe-upgrade --self does, daily), and
+    # `brew bundle cleanup --force` rewrites trust.json from the Brewfile's
+    # `trusted:` options, so anything brew adds must be declared here or the
+    # two thrash. Rendered as `trusted: true` on the Brewfile brew line AND
+    # into ~/.homebrew/trust.json.
+    trusted_formulae:
+      - "sharkyger/tap/safe-upgrade"
     brews:
       - awscli
       - bat
