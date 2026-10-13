@@ -32,3 +32,8 @@ GOPRIVATE = "*.{{ .work.domain }},golang.dhcp"
 GONOPROXY = "*.{{ .work.domain }}"
 GOTOOLCHAIN = "local"
 {{- end }}
+
+# Authenticate GitHub API calls (release lookups, attestation checks) via gh,
+# whose token lives in the macOS Keychain where gh_cli_tokens can't read it.
+[settings.github]
+credential_command = "gh auth token -h github.com"
