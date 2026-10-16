@@ -15,10 +15,11 @@
 #      --min-age 0 — a deliberate, bounded policy exception (still CVE/SHA
 #      checked). chezmoi apply NEVER forces; only this updater can, opt-in.
 #   5. sudo summary: pkg-installer casks (mactex, tailscale-app, …) run
-#      `sudo installer`, which fails without a TTY when this job runs
-#      unattended. Detect those failures, list the casks that need an
-#      interactive `mise run update` (Touch ID sudo), and post a macOS
-#      notification so stale pkg casks aren't discovered by accident.
+#      `sudo installer`. Unattended runs export HOMEBREW_NO_SUDO=1 (below),
+#      so those fail with "sudo is disabled by HOMEBREW_NO_SUDO" instead of
+#      popping a GUI Touch ID prompt. Detect those failures, list the casks
+#      that need an interactive `mise run update` (Touch ID sudo), and post
+#      a macOS notification so stale pkg casks aren't discovered by accident.
 #
 # Between 4 and 5 it also tracks "pin-blocked dependents": packages clean enough
 # to upgrade that couldn't pour because a held/pinned transitive dep isn't latest
@@ -50,6 +51,16 @@ MIN_AGE="${MIN_AGE:-7}"
 STALENESS_CAP="${STALENESS_CAP:-21}"
 upgrade_capped=0
 [[ "${1:-}" == "--upgrade-capped" || -n "${UPGRADE_CAPPED:-}" ]] && upgrade_capped=1
+
+# Unattended runs must NEVER sudo: pam_tid (Touch ID sudo, 00-01) prompts via
+# a GUI dialog even with no TTY, so a background brew run can pop a Touch ID
+# prompt indistinguishable from malware (seen 2026-10-14: cask `uninstall
+# launchctl:` stanzas — Homebrew always tries a system-domain pass with sudo).
+# HOMEBREW_NO_SUDO makes brew skip optional sudo passes entirely and fail
+# required ones (pkg-installer casks) with the recognizable error phase 5
+# greps for. Interactive runs keep sudo so `mise run update` can upgrade pkg
+# casks with Touch ID. HOMEBREW_* survives brew's env -i allowlist re-exec.
+[[ -t 0 ]] || export HOMEBREW_NO_SUDO=1
 
 # BREW_SAFE_BOTTLE_RESOLVER: local shim adding macOS 27 (Golden Gate) to
 # safe-upgrade 0.4.3's bottle codename table. Without it every bottle-SHA
@@ -248,10 +259,11 @@ else
   done <<<"$blocked_names"
 fi
 
-echo "==> [5/5] sudo-required casks (pkg installers can't sudo unattended)"
-# Unattended sudo fails with a recognizable message; attribute it to the
-# outdated pkg-installer casks (minus any merely age-held ones) and surface.
-sudo_hits="$(grep -cE 'a terminal is required to read the password|no tty present and no askpass' "$RUN_LOG" || true)"
+echo "==> [5/5] sudo-required casks (sudo disabled unattended via HOMEBREW_NO_SUDO)"
+# Sudo is disabled for unattended runs (export above) and fails with a
+# recognizable message — as would any legacy no-tty prompt; attribute it to
+# the outdated pkg-installer casks (minus any merely age-held ones) and surface.
+sudo_hits="$(grep -cE 'sudo is disabled by HOMEBREW_NO_SUDO|a terminal is required to read the password|no tty present and no askpass' "$RUN_LOG" || true)"
 if [[ "${sudo_hits:-0}" -eq 0 ]]; then
   echo "no sudo failures detected"
 else

@@ -8,8 +8,11 @@
        staleness cap. --upgrade-capped = the `mise run update:auto` variant;
        invoked directly so the job doesn't depend on mise activation.
        (Re)loaded by run_onchange_after_99-01_load-brew-update-agent when this
-       file changes. pkg-installer casks can't sudo unattended — the updater
-       detects that and posts a notification to run `mise run update`. -->
+       file changes. Unattended runs export HOMEBREW_NO_SUDO=1 (tty check in
+       daily_update.sh) so brew never sudo-prompts — pam_tid (Touch ID sudo)
+       would pop a GUI dialog even with no TTY. pkg-installer casks then fail
+       with a recognizable error; the updater detects that and posts a
+       notification to run `mise run update` interactively. -->
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
