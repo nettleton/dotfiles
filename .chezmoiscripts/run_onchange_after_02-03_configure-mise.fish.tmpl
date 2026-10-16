@@ -20,9 +20,70 @@ set pipbin "$HOME/.local/bin"
 mkdir -p "$pipbin"
 echo $fish_user_paths | grep -q "$pipbin"; or set -U fish_user_paths $fish_user_paths "$pipbin"
 
-# Create dedicated neovim Python virtualenv
+# Create dedicated neovim Python virtualenv. The venv symlinks whatever mise
+# python created it, so a mise python upgrade that prunes the old version dir
+# leaves bin/python3 dangling — directory present, interpreter gone (the venv
+# flavor of the daily updater's broken-linkage check). Recreate when broken.
 set nvim_venv "$HOME/.local/share/nvim/python-venv"
+# (probe via sh: fish aborts the whole `if` with "Unknown command" when the
+# path is a dangling symlink — the exact case this guard exists for)
+if test -d "$nvim_venv"; and not sh -c '"$0" -c ""' "$nvim_venv/bin/python3" >/dev/null 2>&1
+    echo "nvim venv python is broken (mise python upgraded?) — recreating"
+    rm -rf "$nvim_venv"
+end
 if not test -d "$nvim_venv"
     python3 -m venv "$nvim_venv"
 end
-"$nvim_venv/bin/pip" install --quiet --upgrade pynvim
+
+# Provision pynvim if absent — installs aren't gated, matching the brew
+# scripts' install-vs-upgrade split (the gate's job is to slow upgrades, not
+# block provisioning).
+if not "$nvim_venv/bin/python3" -c 'import pynvim' >/dev/null 2>&1
+    "$nvim_venv/bin/pip" install --quiet pynvim
+end
+
+# CVE-gated upgrade of pip + pynvim: resolve what pip WOULD install (--dry-run
+# --report), query OSV (api.osv.dev — aggregates PYSEC + GHSA for PyPI, the
+# same DB pip-audit reads) for those exact pins, and upgrade only if every
+# candidate is clean. NOT pip-audit: its -r mode builds a scratch venv whose
+# ensurepip SIGABRTs under mise python 3.14. curl -sf + jq -e make every
+# failure mode (HTTP error, malformed response, vuln found) hold the upgrade
+# — fail closed, like safe-*. A held, stale-but-working pip here is harmless.
+if command -q jq
+    set -l report (mktemp -t nvim-venv-report.XXXXXX)
+    set -l candidates (mktemp -t nvim-venv-candidates.XXXXXX)
+    set -l osv_resp (mktemp -t nvim-venv-osv.XXXXXX)
+    if "$nvim_venv/bin/pip" install --quiet --disable-pip-version-check \
+            --upgrade --dry-run --report "$report" pip pynvim
+        jq -r '.install[]?.metadata | "\(.name)==\(.version)"' "$report" >"$candidates"
+        if not test -s "$candidates"
+            echo "nvim venv pip/pynvim already current"
+        else
+            set -l clean 0
+            if jq -R -s 'split("\n") | map(select(length > 0) | split("==")
+                       | {package: {name: .[0], ecosystem: "PyPI"}, version: .[1]})
+                       | {queries: .}' "$candidates" \
+                    | curl -sf --max-time 60 -H 'Content-Type: application/json' \
+                        -d @- https://api.osv.dev/v1/querybatch >"$osv_resp"
+                jq -e '[.results[]? | .vulns // empty] | flatten | length == 0' \
+                    "$osv_resp" >/dev/null; and set clean 1
+            end
+            if test $clean -eq 1
+                "$nvim_venv/bin/pip" install --quiet --upgrade pip pynvim
+                echo "nvim venv upgraded (OSV-clean): "(string join ' ' <"$candidates")
+            else
+                echo "WARN: nvim venv upgrade HELD — OSV flagged a candidate (or the check failed):"
+                if test -s "$osv_resp"
+                    paste -d' ' "$candidates" (jq -r '.results[]? | [.vulns[]?.id] | join(",")' "$osv_resp" | psub) | sed 's/^/  - /'
+                else
+                    sed 's/^/  - /' "$candidates"
+                end
+            end
+        end
+    else
+        echo "WARN: pip dry-run resolution failed — nvim venv upgrade skipped"
+    end
+    rm -f "$report" "$candidates" "$osv_resp"
+else
+    echo "jq not installed (held or declined in 01) — nvim venv upgrade skipped"
+end
