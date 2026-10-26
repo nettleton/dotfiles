@@ -24,3 +24,10 @@
 # will surface them for removal if upstream ever lands a fix.
 libxml2  OSV-2021-777  # OSS-Fuzz heap-UAF in xmlAddNextSibling; no upstream fix, low real-world impact
 libxml2  OSV-2024-698  # OSS-Fuzz heap-UAF in xmlCharEncCloseFunc; no upstream fix, low real-world impact
+
+# --- pillow ---------------------------------------------------------------
+# Multi-frame loaders can reuse stale native image storage after mode
+# transitions. Fix exists only as upstream commits — no release cuts it yet,
+# so no installable version clears it. Short expiry to force re-review once a
+# fixed Pillow release ships.
+pillow   CVE-2026-96639  # multi-frame loader stale-storage reuse; fix only in upstream commits, no release yet (expires 2026-11-30)
