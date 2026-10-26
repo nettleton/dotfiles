@@ -60,7 +60,9 @@ exclude_response_status = ["declined"]
 
 # ── Calendar mirroring ──────────────────────────────────────────────
 #
-# Mirror events from one account into a local/iCloud calendar.
+# Mirror events from one account into another calendar: pull (default)
+# writes into a local/iCloud calendar, direction = "push" writes into an
+# Exchange calendar.
 # Run with: calBuddy mirror run
 #
 {{ if (or .is_personal_machine .is_work_machine) -}}
@@ -78,6 +80,47 @@ target_account_type = "local"           # "local" (default) or "icloud"
 source_account = "church"
 target_calendar = "PSC"
 target_account_type = "local"
+
+# Push personal events onto the work Exchange calendar as private OOO
+# blocks. Opt in per event by adding [calBuddy:tags=workMirrorOOO] to its
+# notes ([tags] above parses the marker). The transform replaces categories,
+# so the source tag never reaches Exchange; the work → MW pull mirror skips
+# these mirror copies (needs v0.9.4+). Personal machine only; cross-machine dedup
+# (ADR-0041) still covers it if another machine ever runs this mirror.
+[mirrors.work-ooo]
+direction = "push"
+source_account = "local"
+source_categories = ["workMirrorOOO"]
+target_account = "work"
+target_calendar = "Calendar"
+
+[mirrors.work-ooo.transform]
+title = "OOO"                      # hide the original title, even from delegates
+show_as = "oof"
+sensitivity = "private"
+categories = ["PTO", "alfredIgnore"]
+clear_body = true                  # don't copy personal notes to work
+clear_location = true              # or where you'll be (needs v0.9.2+)
+link_back = true                   # body gets an ical:// link to the original
+
+# Every church event → work as private OOO, no tagging needed. Reads the
+# church account directly (not the PSC pull copy). Mirror ids scope dedup,
+# so this and work-ooo can share the target calendar (needs v0.9.3+).
+[mirrors.work-church-ooo]
+direction = "push"
+source_account = "church"
+source_calendars = ["Calendar"]    # skip Birthdays etc.
+target_account = "work"
+target_calendar = "Calendar"
+
+[mirrors.work-church-ooo.transform]
+title = "OOO"
+show_as = "oof"
+sensitivity = "private"
+categories = ["PTO", "alfredIgnore"]
+clear_body = true
+clear_location = true
+link_back = true                   # body gets the church event's Outlook link
 {{- end }}
 
 # ── Scheduled services ─────────────────────────────────────────────
