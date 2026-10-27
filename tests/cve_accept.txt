@@ -25,6 +25,13 @@
 libxml2  OSV-2021-777  # OSS-Fuzz heap-UAF in xmlAddNextSibling; no upstream fix, low real-world impact
 libxml2  OSV-2024-698  # OSS-Fuzz heap-UAF in xmlCharEncCloseFunc; no upstream fix, low real-world impact
 
+# --- curl -----------------------------------------------------------------
+# HTTP/2 upload use-after-free. Fixed upstream in 8.23.0, but the CI runner's
+# Homebrew core still ships 8.22.0, so there is no version to upgrade to yet
+# on the scan host. Short expiry: the STALE check will force removal once the
+# runner lands 8.23.0 (or the expiry re-gates it for a look if it drags on).
+curl     CURL-CVE-2026-92392  # HTTP/2 upload UAF; fixed in 8.23.0, not yet on the CI runner (ships 8.22.0) (expires 2026-11-30)
+
 # --- pillow ---------------------------------------------------------------
 # Multi-frame loaders can reuse stale native image storage after mode
 # transitions. Fix exists only as upstream commits — no release cuts it yet,
