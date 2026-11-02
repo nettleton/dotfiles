@@ -186,6 +186,12 @@ sup_n=$(wc -l < "$suppressed" | tr -d '[:space:]')
 gate_n=$(wc -l < "$gated"      | tr -d '[:space:]')
 stale_n=$(wc -l < "$stale"     | tr -d '[:space:]')
 
+# Machine-readable sibling lists (empty files when none) next to the findings
+# artifact: "<formula>\t<id>" per line. The self-heal reconciler consumes
+# cve-stale.tsv; cve-gated.tsv is informational (what still needs triage).
+cut -f1,2 "$stale" > "$outdir/cve-stale.tsv"
+cut -f1,2 "$gated" > "$outdir/cve-gated.tsv"
+
 if [[ "$sup_n" -gt 0 ]]; then
   echo ""
   echo "accepted — suppressed via tests/cve_accept.txt (shown above, kept in artifact):"
