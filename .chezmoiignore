@@ -4,6 +4,7 @@ README.md
 CLAUDE.md
 ROADMAP.md
 .luarc.json
+.config/swiftbar/openconnectstatus.2m.sh
 {{- if not .is_personal_machine }}
 Library/LaunchAgents/io.nettleton.calendar.poller.plist
 {{- end }}
