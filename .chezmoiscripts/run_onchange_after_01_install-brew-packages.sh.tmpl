@@ -98,6 +98,12 @@ missing_of() { # <declared-names> <installed-names> -> declared-not-installed,
         [[ -n "$m" ]] && printf '%s\n' "$declared" | grep -E "(^|/)${m}$" | head -1
       done
 }
+# BREW_SAFE_BOTTLE_RESOLVER: local shim adding macOS 27 (Golden Gate) to
+# safe-upgrade 0.4.3's bottle codename table (see daily_update.sh). Without it
+# every bottle-SHA check false-positives as `[BLOCKED] SHA mismatch`. brew's
+# env -i strips BREW_SAFE_*, so call brew-safe-install directly. Retire with
+# the other shim sites once upstream ships (27, "golden_gate").
+export BREW_SAFE_BOTTLE_RESOLVER="$HOME/.local/bin/safe-upgrade-bottle-resolver.py"
 install_missing() { # $1=label  $2=brew-list-kind (formula|cask)  $3=safe-install kind flag  $4=declared tokens
   local label="$1" kind="$2" kindflag="$3" declared="$4" missing held
   missing="$(missing_of "$declared" "$(brew list --"$kind" -1 2>/dev/null || true)")"
@@ -108,12 +114,12 @@ install_missing() { # $1=label  $2=brew-list-kind (formula|cask)  $3=safe-instal
   # First pass: the normal freshness hold. `|| true` because an all-held batch
   # can exit non-zero; the recompute below is the authoritative check.
   # shellcheck disable=SC2086
-  brew safe-install $kindflag --min-age 7 $missing || true
+  brew-safe-install $kindflag --min-age 7 $missing || true
   held="$(missing_of "$declared" "$(brew list --"$kind" -1 2>/dev/null || true)")"
   [[ -z "$held" ]] && return 0
   echo "" >&2
   echo "Declared $label still missing after the freshness-hold pass: $held" >&2
-  echo "(bottle < 7 days old, or blocked by a CVE)." >&2
+  echo "(bottle < 7 days old, or blocked by a CVE/SHA check)." >&2
   if [[ ! -e /dev/tty ]]; then
     echo "non-interactive run — leaving held; the daily updater installs once aged out." >&2
     return 0
@@ -125,8 +131,8 @@ install_missing() { # $1=label  $2=brew-list-kind (formula|cask)  $3=safe-instal
   case "$reply" in
     [yY]*)
       # shellcheck disable=SC2086
-      brew safe-install $kindflag --min-age 0 $held \
-        || echo "WARN: could not install $held (likely a live CVE block); continuing." >&2 ;;
+      brew-safe-install $kindflag --min-age 0 $held \
+        || echo "WARN: could not install $held (CVE or SHA block — see output above); continuing." >&2 ;;
     *) echo "Left held; the daily updater will install it once it ages out." >&2 ;;
   esac
 }
