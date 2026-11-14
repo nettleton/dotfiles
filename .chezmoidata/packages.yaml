@@ -172,6 +172,7 @@ packages:
       - signal
       - tailscale-app
       - xquartz
+      - zoom
   mas:
     apps:
       - name: 1Blocker
