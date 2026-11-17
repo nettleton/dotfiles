@@ -81,6 +81,7 @@ Two phases. `run_before_` scripts run before anything is applied (bootstrap only
 - On `.is_child_machine` (the only multi-user machine), `~/.homebrew/brew.env` (`private_dot_homebrew/brew.env.tmpl`) sets `HOMEBREW_CASK_OPTS=--fontdir=/Library/Fonts` so font casks install system-wide. brew reads it on every invocation (this script, interactive shells); `/Library/Fonts` is admin-group-writable, so no sudo. Fonts installed before the change stay in `~/Library/Fonts` until reinstalled
 - Re-runs automatically when `packages.yaml` brew lists change
 - Auth via 1Password shell plugin; the op-sourced GitHub token is exported as `GH_TOKEN` for safe-install's release-age checks
+- `~/.homebrew/brew.env` also sets `HOMEBREW_NVD_API_KEY` (from 1Password at apply time) on every machine, so every safe-upgrade/safe-install run uses the 50 req/30s NVD rate limit instead of the anonymous 5 req/30s. It must be the `HOMEBREW_` spelling: brew drops non-`HOMEBREW_*` env vars before running external commands
 
 **`02-*` Configure brew-installed packages** (`run_once_after_`)
 - `02-00` — Fish shell (/etc/shells, chsh, fisher plugins, tide settings)
