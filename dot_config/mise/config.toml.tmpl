@@ -7,7 +7,7 @@ pipx = "latest"
 "npm:npm" = "latest"
 {{- if .is_work_machine }}
 {{- $mirror := printf "artifactory.%s/artifactory/mw-mise-int-dev-local" .work.domain }}
-"go:github.{{ .work.domain }}/development/opi-flightsql-client/cmd/o11y" = "0.6.10"
+"go:github.{{ .work.domain }}/development/opi-flightsql-client/cmd/o11y" = "latest"
 
 [settings]
 disable_backends = ["asdf"]
