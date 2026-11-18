@@ -54,7 +54,13 @@ jobs:
       - name: Install tooling
         # `brew vulns` is a built-in command (merged into brew core; the
         # homebrew/brew-vulns tap is archived) — nothing to install for it.
-        run: brew install yq
+        # `brew update` first: GitHub runners ship Homebrew with auto-update
+        # disabled, so without it the scan reads the image's stale formula
+        # index and flags CVEs already patched in the live formulae — defeating
+        # the "LATEST versions" this gate claims to check.
+        run: |
+          brew update
+          brew install yq
       - name: Render Brewfile (declared set, latest versions)
         # Tapped tokens (vendor/tap/name) are dropped: their taps aren't on the
         # runner (nettleton/tap is private and never can be), and brew vulns
