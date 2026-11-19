@@ -1,0 +1,90 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+# Install/update MailMate bundles declared in .chezmoidata/packages.yaml.
+#
+# Each repo is cloned to ~/.local/share/mailmate/bundles/<name> (a real git
+# working copy you can `cd` into and `git pull`), and every *.mmbundle dir
+# found inside it is symlinked into MailMate's user Bundles folder — the
+# documented, supported extension point. Clones live in XDG data, not in
+# Application Support, so only symlinks sit under the app's directory.
+#
+# Clones over SSH (git@host:owner/name) through the 1Password SSH agent. Unlike
+# the brew path (which forces HTTPS to stay prompt-free under the unattended
+# daily LaunchAgent), this script only runs during an interactive `chezmoi
+# apply` on a list change, or your own `git pull` — so an agent approval prompt
+# is fine. Re-runs when this list changes (run_onchange); routine upstream
+# pulls are manual or on list change.
+set -euo pipefail
+shopt -s nullglob
+
+SRC_ROOT="$HOME/.local/share/mailmate/bundles"
+DEST="$HOME/Library/Application Support/MailMate/Bundles"
+
+if [ ! -d /Applications/MailMate.app ]; then
+  echo "MailMate not installed; skipping bundle install"
+  exit 0
+fi
+
+mkdir -p "$SRC_ROOT" "$DEST"
+
+# Declared bundle repos (host/owner/name).
+repos=(
+{{- range .packages.mailmate }}
+  "{{ . }}"
+{{- end }}
+)
+
+# Symlinks we (re)create this run; used below to prune ones we no longer own.
+kept_links=()
+
+for spec in ${repos[@]+"${repos[@]}"}; do
+  name="${spec##*/}"            # leaf, e.g. mailmate-export-to-project
+  host="${spec%%/*}"            # e.g. github.com
+  path="${spec#*/}"            # e.g. nettleton/mailmate-export-to-project
+  dir="$SRC_ROOT/$name"
+  url="git@${host}:${path}.git"
+
+  if [ -d "$dir/.git" ]; then
+    echo "updating $name"
+    git -C "$dir" pull --ff-only --quiet || echo "  warning: pull failed for $name (leaving existing clone in place)"
+  else
+    echo "cloning $name"
+    if ! git clone --quiet "$url" "$dir"; then
+      echo "  warning: clone failed for $name; skipping"
+      continue
+    fi
+  fi
+
+  # Link every bundle in this repo (root or nested; a repo may ship several).
+  while IFS= read -r bundle; do
+    link="$DEST/$(basename "$bundle")"
+    ln -sfn "$bundle" "$link"
+    kept_links+=("$link")
+    echo "  linked $(basename "$bundle")"
+  done < <(find "$dir" -type d -iname '*.mmbundle' -not -path '*/.git/*')
+done
+
+# Prune symlinks we own (pointing into SRC_ROOT) that are now dangling or whose
+# repo was dropped from the list. Real bundle dirs and foreign symlinks are
+# left untouched; dropped clones are kept on disk (remove them by hand).
+for link in "$DEST"/*; do
+  [ -L "$link" ] || continue
+  target="$(readlink "$link")"
+  case "$target" in
+    "$SRC_ROOT"/*) ;;
+    *) continue ;;
+  esac
+
+  keep=0
+  for k in ${kept_links[@]+"${kept_links[@]}"}; do
+    if [ "$k" = "$link" ]; then keep=1; break; fi
+  done
+
+  if [ "$keep" -eq 0 ] || [ ! -e "$link" ]; then
+    echo "pruning $(basename "$link")"
+    rm -f "$link"
+  fi
+done
+
+exit 0
+{{ end -}}

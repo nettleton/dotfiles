@@ -46,7 +46,7 @@ All template variables are defined here. Only 2 interactive prompts (company, ta
 - `.op.*` — 1Password item references for secrets (SSH keys, tokens)
 
 ### Package Data (`.chezmoidata/packages.yaml`)
-Declarative package lists for brew (taps, brews, casks, personal variants), fisher, go, and Mac App Store apps. Referenced in templates as `.packages.*`. Editing this file triggers `run_onchange_` scripts to re-run.
+Declarative package lists for brew (taps, brews, casks, personal variants), fisher, go, Mac App Store apps, and MailMate bundles (git repos). Referenced in templates as `.packages.*`. Editing this file triggers `run_onchange_` scripts to re-run.
 
 ### Tool Versions (`dot_config/mise/config.toml.tmpl`)
 Python, Node, and their global packages (npm, pip) are managed by mise. This replaces pyenv and brew-installed node.
@@ -103,6 +103,7 @@ Two phases. `run_before_` scripts run before anything is applied (bootstrap only
 **`04-*` Install & configure apps** (mixed)
 - `04-00` — Configure MailMate (`run_once_after_`; installed via `mailmate@beta` cask)
 - `04-01` — Install Mac App Store apps (`run_onchange_after_`, from `.packages.mas.*`)
+- `04-02` — Install MailMate bundles (`run_onchange_after_`, from `.packages.mailmate`). Clones each git repo (over SSH via the 1Password agent) to `~/.local/share/mailmate/bundles/<name>`, then symlinks every `*.mmbundle` found inside (root or nested; case-insensitive) into `~/Library/Application Support/MailMate/Bundles/` — the supported user extension point, which then holds only symlinks. Prunes our own stale/dangling symlinks; leaves unmanaged bundles, foreign symlinks, and dropped clones alone. SSH (not HTTPS like the brew path) is fine here because this only runs during an interactive apply or a manual `git pull`, never the unattended daily updater. Repos remain real working copies: `cd` in and `git pull` to update manually.
 
 **`05-*` macOS system configuration** (`run_once_after_`)
 - `05-00` — Setup other users
