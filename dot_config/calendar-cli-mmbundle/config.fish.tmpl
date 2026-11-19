@@ -1,0 +1,32 @@
+{{- /*
+Private config for the Calendar CLI MailMate bundle.
+
+Rendered by chezmoi so the bundle repo itself stays generic and public: the
+bundle's add.fish sources this file when present and falls back to safe
+defaults when it is absent. The work domain and calendar routing live here,
+templated from chezmoi data — never committed to the bundle repo.
+
+Contract (bundle reads these; unset -> bundle defaults = everything personal):
+  CALCLI_WORK_DOMAIN                email domain that routes to the work calendar
+  CALCLI_WORK_CALENDAR_NAME         calendar name for work events
+  CALCLI_WORK_CALENDAR_ACCOUNT      calendar account for work events
+  CALCLI_PERSONAL_CALENDAR_NAME     calendar name for personal events
+  CALCLI_PERSONAL_CALENDAR_ACCOUNT  calendar account for personal events
+  CALCLI_WORK_RULES                 "1" enables employer-specific rules
+                                    (e.g. Time Off Request -> @work reminder)
+
+Gated on .work.domain (populated on personal/work machines, "" on wife/child),
+so work routing matches current behaviour wherever a work account exists.
+*/ -}}
+# Managed by chezmoi (dot_config/calendar-cli-mmbundle/config.fish.tmpl) — do not edit.
+{{ if .work.domain -}}
+set -gx CALCLI_WORK_DOMAIN "{{ .work.domain }}"
+set -gx CALCLI_WORK_CALENDAR_NAME "Calendar"
+set -gx CALCLI_WORK_CALENDAR_ACCOUNT "work"
+set -gx CALCLI_WORK_RULES "1"
+{{- else -}}
+set -gx CALCLI_WORK_DOMAIN ""
+set -gx CALCLI_WORK_RULES "0"
+{{- end }}
+set -gx CALCLI_PERSONAL_CALENDAR_NAME "Josh"
+set -gx CALCLI_PERSONAL_CALENDAR_ACCOUNT "local"

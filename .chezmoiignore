@@ -33,6 +33,11 @@ Library/LaunchAgents/io.nettleton.brew-update.plist
 # policy permissions); chezmoi managing it too just thrashes.
 .claude/settings.json
 {{- end }}
+{{- if or .is_wife_machine .is_child_machine }}
+# MailMate is only used on the primary user's personal/work machines; its
+# bundle config has no purpose on the wife/child machines.
+.config/calendar-cli-mmbundle/config.fish
+{{- end }}
 
 # Test suite — source-only, never applied to $HOME.
 # (Dotfiles at the source root — .github/, .mise.toml — are not applied by
