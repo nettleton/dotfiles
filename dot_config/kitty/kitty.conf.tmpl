@@ -1563,6 +1563,16 @@ map shift+cmd+down scroll_to_prompt 1
 #::  For ways to use nvim, scroll to the bottom of this thread: https://github.com/kovidgoyal/kitty/issues/719
 map alt+cmd+i launch --stdin-source=@last_cmd_output --stdin-add-formatting --type=overlay less +G -R
 
+#:: Coding-session: grab a command the agent printed and send it to the
+#:: session's terminal pane — no copy/paste, no mouse. Pick ANY ONE line of the
+#:: command (single-line hints, so plain Enter confirms — no Esc); the handler
+#:: expands that one pick to the whole surrounding command block (the indented
+#:: run bounded by blank lines / agent markers) and pastes it as one block.
+#:: hyper+y pastes (review in the terminal, then press Enter); hyper+r pastes
+#:: and runs. Handler: send_to_session_terminal.py
+map ctrl+shift+opt+cmd+y kitten hints --type line --customize-processing send_to_session_terminal.py
+map ctrl+shift+opt+cmd+r kitten hints --type line --customize-processing send_to_session_terminal.py -- --run
+
 #::  To get the output of the first command on the screen, use
 #::  @first_cmd_output_on_screen. To get the output of the last jumped
 #::  to command, use @last_visited_cmd_output.
