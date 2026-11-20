@@ -10,6 +10,10 @@
   },
   "hooks": {},
   "model": "claude-opus-5-5",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
   "permissions": {
     "allow": [
       "Bash(git status*)",
