@@ -18,6 +18,25 @@ function code-session -d "Transform current kitty tab into a coding session layo
 
     set -l dirname (basename "$dir")
 
+    # Already inside a coding session? Don't nest a second splits layout.
+    # Every pane is tagged with CODING_SESSION_ROLE at launch (agent/terminal/
+    # nvim). The agent pane (or a legacy session started before role tagging,
+    # which only has the terminal-window id) relaunches the agent in place — e.g.
+    # the agent exited and you typed `cs` again. The terminal and nvim panes hop
+    # to the agent pane instead of spawning a nested session.
+    if set -q CODING_SESSION_ROLE; or set -q CODING_SESSION_TERMINAL_KITTY_WINDOW_ID
+        if not set -q CODING_SESSION_ROLE; or test "$CODING_SESSION_ROLE" = agent
+            cd "$dir"
+            $agent
+        else if set -q CODING_SESSION_AGENT_KITTY_WINDOW_ID
+            kitty @ focus-window --match id:$CODING_SESSION_AGENT_KITTY_WINDOW_ID 2>/dev/null
+            or echo "code-session: already inside this coding session ($CODING_SESSION_ROLE pane)"
+        else
+            echo "code-session: already inside this coding session ($CODING_SESSION_ROLE pane)"
+        end
+        return
+    end
+
     # Get current OS window and tab IDs from kitty
     set -l my_window_id $KITTY_WINDOW_ID
     set -l tab_info (kitty @ ls --match id:$my_window_id 2>/dev/null | python3 -c "
@@ -45,10 +64,10 @@ for osw in data:
     kitty @ goto-layout --match id:$my_window_id splits
 
     # Launch nvim (right side) via interactive login shell so the window stays open after nvim exits
-    set -l nvim_window_id (kitty @ launch --location=vsplit --cwd="$dir" --env TEAMCITY_RO=1 fish -l -i -C "nvim --listen $nvim_sock")
+    set -l nvim_window_id (kitty @ launch --location=vsplit --cwd="$dir" --env TEAMCITY_RO=1 --env CODING_SESSION_ROLE=nvim --env CODING_SESSION_AGENT_KITTY_WINDOW_ID=$my_window_id fish -l -i -C "nvim --listen $nvim_sock")
 
     # Launch terminal (below nvim) — hsplit the now-focused nvim window, then refocus agent
-    set -l terminal_window_id (kitty @ launch --location=hsplit --cwd="$dir" --env TEAMCITY_RO=1)
+    set -l terminal_window_id (kitty @ launch --location=hsplit --cwd="$dir" --env TEAMCITY_RO=1 --env CODING_SESSION_ROLE=terminal --env CODING_SESSION_AGENT_KITTY_WINDOW_ID=$my_window_id)
     kitty @ focus-window --match id:$my_window_id
 
     # Set tab title
@@ -57,6 +76,8 @@ for osw in data:
     # Export session variables into this shell before exec
     set -gx CODING_SESSION_NVIM_SOCK "$nvim_sock"
     set -gx CODING_SESSION_TERMINAL_KITTY_WINDOW_ID "$terminal_window_id"
+    set -gx CODING_SESSION_ROLE agent
+    set -gx CODING_SESSION_AGENT_KITTY_WINDOW_ID "$my_window_id"
     set -gx TEAMCITY_RO 1
 
     # Run the agent as a child so the shell remains when it exits
