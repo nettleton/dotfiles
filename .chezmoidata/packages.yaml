@@ -257,3 +257,4 @@ packages:
   # Update: `chezmoi apply` after editing this list, or `git pull` in the clone.
   mailmate:
     - github.com/nettleton/mailmate-export-to-project
+    - github.com/nettleton/mailmate-calendar-cli
