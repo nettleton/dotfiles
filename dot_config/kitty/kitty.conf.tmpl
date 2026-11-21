@@ -777,9 +777,17 @@ enabled_layouts tall,horizontal,vertical,grid,fat,splits
 
 #: Tab bar
 
-# tab_bar_edge bottom
+tab_bar_edge left
 
-#: Which edge to show the tab bar on, top or bottom
+#: Which edge to show the tab bar on: top, bottom, left or right. `left`
+#: gives a vertical tab bar down the side, so each coding-session (cs) tab
+#: shows up as a row in a persistent sidebar (needs kitty >= 0.48). The three
+#: tab_title_* options below only take effect for a vertical (left/right) bar:
+#: cap the sidebar width and let long titles wrap instead of truncating.
+
+tab_title_max_length 24
+tab_title_max_lines 2
+tab_title_wrap yes
 
 # tab_bar_margin_width 0.0
 
