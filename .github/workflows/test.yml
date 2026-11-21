@@ -49,18 +49,29 @@ jobs:
   tier-b:
     name: CVE scan (desired state)
     runs-on: macos-latest
+    env:
+      # Scan the *live* homebrew-core formulae, not the runner image's cached
+      # API snapshot. The hosted macOS image ships a stale formula index, and a
+      # plain `brew update` does not reliably advance it (observed: git pinned
+      # at 2.56.0 while core already shipped the patched 2.56.1) — so the gate
+      # flags CVEs on versions these machines never install, e.g. a false
+      # CVE-2026-111760 against git 2.56.0. Forcing the git-backed core tap
+      # makes `brew update`/`brew vulns` resolve the same versions `brew
+      # install` would. Set job-wide so the scan step inherits it and resolves
+      # formulae identically to the update step.
+      HOMEBREW_NO_INSTALL_FROM_API: 1
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Install tooling
         # `brew vulns` is a built-in command (merged into brew core; the
         # homebrew/brew-vulns tap is archived) — nothing to install for it.
-        # `brew update` first: GitHub runners ship Homebrew with auto-update
-        # disabled, so without it the scan reads the image's stale formula
-        # index and flags CVEs already patched in the live formulae — defeating
-        # the "LATEST versions" this gate claims to check.
+        # `brew update` fetches the git-backed core tap to its live HEAD (see
+        # the job `env` above for why that, not the API snapshot). The git
+        # version echo records what the gate actually scanned.
         run: |
           brew update
           brew install yq
+          echo "resolved git formula version: $(brew info --json=v2 git | yq -r '.formulae[0].versions.stable')"
       - name: Render Brewfile (declared set, latest versions)
         # Tapped tokens (vendor/tap/name) are dropped: their taps aren't on the
         # runner (nettleton/tap is private and never can be), and brew vulns
