@@ -1,43 +1,117 @@
-function code-session -d "Transform current kitty tab into a coding session layout"
-    set -l dir (test -n "$argv[1]" && echo $argv[1] || pwd)
-    set -l agent $argv[2..]
+# code-session (cs): turn a kitty tab into a coding session layout — an agent
+# pane with nvim (vsplit) and a shell (hsplit). Also manages parallel sessions
+# in git worktrees that live in a hidden managed root, so ~/sandbox stays clean.
+#
+# Usage:
+#   cs [dir] [agent...]      session for dir (default: cwd). In a repo that has
+#                            managed worktrees, prompts to resume/new/plain.
+#   cs -w <slug> [agent...]  create (or reuse) a managed worktree for the current
+#                            repo on a branch derived from <slug>, open it in a
+#                            new tab.
+#   cs list                  list this repo's managed worktrees.
+#   cs rm <slug|path>        remove a managed worktree (git worktree remove).
+#   cs --build <dir> [..]    internal: build the layout here with no discovery
+#                            (used when opening a worktree in a fresh tab).
+#
+# Worktrees: ~/.local/share/code-session/worktrees/<repo>-<slug>/ — you never
+# cd there yourself; `git worktree list` attributes them to the repo, and
+# sessions key off the directory so `claude --continue` resumes the right one.
+# Cleanup is always explicit (cs rm / cs list), never automatic on agent exit.
 
-    set dir (realpath "$dir")
-    if not test -d "$dir"
-        echo "code-session: $dir is not a directory"
+function __cs_root --description "Managed worktree root"
+    echo "$HOME/.local/share/code-session/worktrees"
+end
+
+function __cs_default_agent --description "Default agent command, one word per line"
+{{- if .is_work_machine }}
+    printf '%s\n' devai launch claude
+{{- else }}
+    printf '%s\n' claude
+{{- end }}
+end
+
+function __cs_slugify --description "Sanitize text into a branch/dir slug"
+    string lower -- "$argv" | string replace -ra '[^a-z0-9]+' '-' | string trim -c '-'
+end
+
+function __cs_list_worktrees --argument-names dir --description "Paths of this repo's managed worktrees"
+    test -n "$dir"; or set dir (pwd)
+    set -l root (__cs_root)
+    for line in (git -C "$dir" worktree list --porcelain 2>/dev/null)
+        string match -rq '^worktree (?<p>.*)' -- $line; or continue
+        string match -q -- "$root/*" "$p"; and echo "$p"
+    end
+end
+
+function __cs_list_worktrees_pretty --description "Pretty-print managed worktrees for cs list"
+    set -l wts (__cs_list_worktrees)
+    if test (count $wts) -eq 0
+        echo "code-session: no managed worktrees for this repo"
+        return 0
+    end
+    for p in $wts
+        set -l b (git -C "$p" rev-parse --abbrev-ref HEAD 2>/dev/null)
+        set -l st (git -C "$p" status --porcelain 2>/dev/null)
+        set -l dirty ""
+        test (count $st) -gt 0; and set dirty " (dirty)"
+        printf '  %s  [%s]%s\n    %s\n' (basename "$p") "$b" "$dirty" "$p"
+    end
+end
+
+function __cs_remove_worktree --argument-names target --description "Remove a managed worktree"
+    if test -z "$target"
+        echo "code-session: usage: cs rm <slug|path>"
         return 1
     end
-
-    if test (count $agent) -eq 0
-{{ if .is_work_machine -}}
-        set agent devai launch claude
-{{ else -}}
-        set agent claude
-{{ end -}}
-    end
-
-    set -l dirname (basename "$dir")
-
-    # Already inside a coding session? Don't nest a second splits layout.
-    # Every pane is tagged with CODING_SESSION_ROLE at launch (agent/terminal/
-    # nvim). The agent pane (or a legacy session started before role tagging,
-    # which only has the terminal-window id) relaunches the agent in place — e.g.
-    # the agent exited and you typed `cs` again. The terminal and nvim panes hop
-    # to the agent pane instead of spawning a nested session.
-    if set -q CODING_SESSION_ROLE; or set -q CODING_SESSION_TERMINAL_KITTY_WINDOW_ID
-        if not set -q CODING_SESSION_ROLE; or test "$CODING_SESSION_ROLE" = agent
-            cd "$dir"
-            $agent
-        else if set -q CODING_SESSION_AGENT_KITTY_WINDOW_ID
-            kitty @ focus-window --match id:$CODING_SESSION_AGENT_KITTY_WINDOW_ID 2>/dev/null
-            or echo "code-session: already inside this coding session ($CODING_SESSION_ROLE pane)"
-        else
-            echo "code-session: already inside this coding session ($CODING_SESSION_ROLE pane)"
+    set -l path "$target"
+    if not string match -q '/*' "$path"
+        set -l top (git rev-parse --show-toplevel 2>/dev/null)
+        if test -z "$top"
+            echo "code-session: not inside a git repository"
+            return 1
         end
-        return
+        set path (__cs_root)/(basename "$top")-(__cs_slugify "$target")
     end
+    git worktree remove "$path"
+    and echo "code-session: removed worktree $path"
+end
 
-    # Get current OS window and tab IDs from kitty
+function __cs_open_tab --argument-names dir --description "Open a coding session for dir in a new kitty tab"
+    set -l env_args
+    if test "$argv[2]" = --resume
+        set env_args --env CODING_SESSION_RESUME=1
+    end
+    kitty @ launch --type=tab --cwd "$dir" $env_args fish -l -i -C "code-session --build '$dir'"
+    or echo "code-session: failed to open a new tab (is kitty remote control enabled?)"
+end
+
+function __cs_new_worktree_session --argument-names slug --description "Create (or reuse) a managed worktree and open it in a new tab"
+    set slug (__cs_slugify "$slug")
+    if test -z "$slug"
+        echo "code-session: need a slug, e.g. cs -w fix-login"
+        return 1
+    end
+    set -l top (git rev-parse --show-toplevel 2>/dev/null)
+    if test -z "$top"
+        echo "code-session: not inside a git repository"
+        return 1
+    end
+    set -l wtpath (__cs_root)/(basename "$top")-$slug
+    if not test -d "$wtpath"
+        mkdir -p (__cs_root)
+        if git -C "$top" show-ref --verify --quiet "refs/heads/$slug"
+            git -C "$top" worktree add "$wtpath" "$slug"; or return 1
+        else
+            git -C "$top" worktree add -b "$slug" "$wtpath"; or return 1
+        end
+    end
+    __cs_open_tab "$wtpath"
+end
+
+function __cs_build_layout --argument-names dir --description "Build the splits layout in the current tab and run the agent"
+    set -l agent $argv[2..]
+
+    # Get this tab's OS-window and tab IDs from kitty.
     set -l my_window_id $KITTY_WINDOW_ID
     set -l tab_info (kitty @ ls --match id:$my_window_id 2>/dev/null | python3 -c "
 import json, sys
@@ -70,8 +144,8 @@ for osw in data:
     set -l terminal_window_id (kitty @ launch --location=hsplit --cwd="$dir" --env TEAMCITY_RO=1 --env CODING_SESSION_ROLE=terminal --env CODING_SESSION_AGENT_KITTY_WINDOW_ID=$my_window_id)
     kitty @ focus-window --match id:$my_window_id
 
-    # Set tab title
-    kitty @ set-tab-title --match id:$my_window_id "Coding Session: $dirname"
+    # Set tab title — basename is unique for worktrees (<repo>-<slug>)
+    kitty @ set-tab-title --match id:$my_window_id "Coding Session: "(basename "$dir")
 
     # Export session variables into this shell before exec
     set -gx CODING_SESSION_NVIM_SOCK "$nvim_sock"
@@ -83,4 +157,108 @@ for osw in data:
     # Run the agent as a child so the shell remains when it exits
     cd "$dir"
     $agent
+end
+
+function code-session -d "Turn a kitty tab into a coding session layout; manage worktree sessions"
+    # ---- subcommands / flags ----
+    switch "$argv[1]"
+        case list --list
+            __cs_list_worktrees_pretty
+            return
+        case rm --rm
+            __cs_remove_worktree "$argv[2]"
+            return
+        case -w --worktree
+            __cs_new_worktree_session "$argv[2]"
+            return
+        case --build
+            # Internal: build the layout here with no discovery prompt. The
+            # agent defaults to the machine default; CODING_SESSION_RESUME (set
+            # by __cs_open_tab --resume) appends --continue to pick the dir's
+            # most recent session back up. NOTE: on work machines this becomes
+            # `devai launch claude --continue`; adjust if devai doesn't forward.
+            set -l bdir $argv[2]
+            set -l bagent $argv[3..]
+            if test (count $bagent) -eq 0
+                set bagent (__cs_default_agent)
+                if set -q CODING_SESSION_RESUME
+                    set bagent $bagent --continue
+                end
+            end
+            set -e CODING_SESSION_RESUME
+            __cs_build_layout "$bdir" $bagent
+            return
+    end
+
+    # ---- normal path: dir + agent ----
+    set -l dir (test -n "$argv[1]" && echo $argv[1] || pwd)
+    set -l agent $argv[2..]
+
+    set dir (realpath "$dir")
+    if not test -d "$dir"
+        echo "code-session: $dir is not a directory"
+        return 1
+    end
+
+    if test (count $agent) -eq 0
+        set agent (__cs_default_agent)
+    end
+
+    # Already inside a coding session? Don't nest a second splits layout.
+    # Every pane is tagged with CODING_SESSION_ROLE at launch (agent/terminal/
+    # nvim). The agent pane (or a legacy session started before role tagging,
+    # which only has the terminal-window id) relaunches the agent in place — e.g.
+    # the agent exited and you typed `cs` again. The terminal and nvim panes hop
+    # to the agent pane instead of spawning a nested session.
+    if set -q CODING_SESSION_ROLE; or set -q CODING_SESSION_TERMINAL_KITTY_WINDOW_ID
+        if not set -q CODING_SESSION_ROLE; or test "$CODING_SESSION_ROLE" = agent
+            cd "$dir"
+            $agent
+        else if set -q CODING_SESSION_AGENT_KITTY_WINDOW_ID
+            kitty @ focus-window --match id:$CODING_SESSION_AGENT_KITTY_WINDOW_ID 2>/dev/null
+            or echo "code-session: already inside this coding session ($CODING_SESSION_ROLE pane)"
+        else
+            echo "code-session: already inside this coding session ($CODING_SESSION_ROLE pane)"
+        end
+        return
+    end
+
+    # Worktree discovery: if dir is a repo with managed worktrees (and isn't
+    # itself one), offer to resume/new/plain. Skipped when non-interactive.
+    set -l in_wt 0
+    string match -q -- (__cs_root)/'*' "$dir"; and set in_wt 1
+    if isatty stdin; and test "$in_wt" = 0
+        set -l wts (__cs_list_worktrees "$dir")
+        if test (count $wts) -gt 0
+            echo "Managed worktrees for "(basename "$dir")":"
+            for i in (seq (count $wts))
+                echo "  [$i] "(basename "$wts[$i]")" ("(git -C "$wts[$i]" rev-parse --abbrev-ref HEAD 2>/dev/null)")"
+            end
+            read -l -P "resume [#] / [n]ew <slug> / [p]lain / [c]ancel: " ans
+            set ans (string trim -- "$ans")
+            set -l tok (string split -- ' ' "$ans")
+            switch "$tok[1]"
+                case '' c cancel
+                    return 0
+                case n new
+                    if test -z "$tok[2]"
+                        echo "code-session: need a slug: n <slug>"
+                        return 1
+                    end
+                    __cs_new_worktree_session "$tok[2]"
+                    return
+                case p plain
+                    # fall through to a plain session in this tab
+                case '*'
+                    if string match -rq '^[0-9]+$' -- "$tok[1]"; and test "$tok[1]" -ge 1; and test "$tok[1]" -le (count $wts)
+                        __cs_open_tab "$wts[$tok[1]]" --resume
+                        return
+                    end
+                    echo "code-session: unrecognized choice '$ans'"
+                    return 1
+            end
+        end
+    end
+
+    __cs_build_layout "$dir" $agent
 end
