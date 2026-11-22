@@ -1190,6 +1190,18 @@ startup_session notes.kittysession
 #: variables in the path are expanded. Changing this option by
 #: reloading the config is not supported.
 
+restore_session_after_logout yes
+
+#: Save kitty's state (OS-window size/position/state and each window's
+#: scrollback) at logout, restart or shutdown and restore it on next
+#: start, like other apps do (kitty >= 0.50). On macOS the state is
+#: encrypted per-instance in the login keychain and only restored by a
+#: kitty signed by the same developer — a self-built or differently-
+#: signed kitty won't restore it. Note: only the shell is restarted,
+#: not the programs that were running, so a coding session's agent/nvim
+#: panes come back as plain shells with their old scrollback — re-run
+#: `cs` (which resumes via `claude --continue`) to pick them back up.
+
 # clipboard_control write-clipboard write-primary read-clipboard-ask read-primary-ask
 
 #: Allow programs running in kitty to read and write from the
