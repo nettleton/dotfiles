@@ -1,0 +1,14 @@
+# 1Password SSH agent: which vaults' keys are offered.
+# Without this file only the Private vault is served; once it exists, ONLY the
+# vaults listed here are, so Private must stay listed.
+# https://developer.1password.com/docs/ssh/agent/config
+
+[[ssh-keys]]
+vault = "Private"
+{{- if or .is_work_machine .is_personal_machine }}
+
+# every key for reaching company hosts/machines lives in the company vault;
+# personal machines need it too (they ssh into the work machines)
+[[ssh-keys]]
+vault = {{ .work.companyname | quote }}
+{{- end }}

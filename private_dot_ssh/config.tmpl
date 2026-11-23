@@ -19,6 +19,10 @@ Host insidelabs-git.{{ .work.domain }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/gitlab_internal.pub
   {{- template "1password" }}
+Host gitlab.{{ .work.domain }}
+  User {{ .work.user }}
+  IdentityFile ~/.ssh/gitlab_iat.pub
+  {{- template "1password" }}
 Host github.{{ .work.domain }}
   User {{ .work.user }}
   IdentityFile ~/.ssh/github_internal.pub

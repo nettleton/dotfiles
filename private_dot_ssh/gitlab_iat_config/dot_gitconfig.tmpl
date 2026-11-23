@@ -1,0 +1,15 @@
+{{- if .is_work_machine -}}
+[user]
+  name = "Joshua Wang"
+  email = {{ .work.email }}
+  signingkey = {{ onepasswordRead .op.urls.gitlab_iat }}
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+  gpgsign = true
+{{- end -}}

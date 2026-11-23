@@ -59,6 +59,10 @@
 {{ if .is_work_machine }}
 [url "git@github.{{ .work.domain }}:"]
     insteadOf = https://github.{{ .work.domain }}
+[url "git@insidelabs-git.{{ .work.domain }}:"]
+    insteadOf = https://insidelabs-git.{{ .work.domain }}/
+[url "git@gitlab.{{ .work.domain }}:"]
+    insteadOf = https://gitlab.{{ .work.domain }}/
 {{- end }}
 # HTTPS github.com auth via the gh CLI's stored token. Prompt-free in
 # unattended contexts (launchd brew update fetching private taps) — unlike
@@ -83,6 +87,10 @@
   path = ~/.ssh/gitlab_internal_config/.gitconfig
 [includeIf "hasconfig:remote.*.url:https://*-git.{{ .work.domain }}/**"]
   path = ~/.ssh/gitlab_internal_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:git@gitlab.{{ .work.domain }}:*/**"]
+  path = ~/.ssh/gitlab_iat_config/.gitconfig
+[includeIf "hasconfig:remote.*.url:https://gitlab.{{ .work.domain }}/**"]
+  path = ~/.ssh/gitlab_iat_config/.gitconfig
 {{- end }}
 {{ if .is_personal_machine }}
 [includeIf "hasconfig:remote.*.url:git@gitlab.com:*/**"]
