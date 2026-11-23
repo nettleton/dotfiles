@@ -27,6 +27,9 @@ complete -c code-session -n __fish_use_subcommand -a '(__fish_complete_directori
 complete -c code-session -n __fish_use_subcommand -s w -l worktree -x \
     -a '(__cs_complete_slugs)' -d 'Create/reuse a worktree on <slug>'
 
-# rm <slug|path>: existing slugs, plus directory paths.
+# rm [slug|.|path] [--force]: existing slugs, `.` for the current worktree,
+# directory paths, and the --force flag.
 complete -c code-session -n '__fish_seen_subcommand_from rm --rm' -a '(__cs_complete_slugs)' -d worktree
+complete -c code-session -n '__fish_seen_subcommand_from rm --rm' -a . -d 'This worktree'
 complete -c code-session -n '__fish_seen_subcommand_from rm --rm' -a '(__fish_complete_directories)'
+complete -c code-session -n '__fish_seen_subcommand_from rm --rm' -s f -l force -d 'Remove even with uncommitted changes'

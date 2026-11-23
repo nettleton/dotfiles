@@ -1,6 +1,19 @@
 function code-session-close -d "Tear down the current coding session: nvim, agent, and all three kitty panes"
+    # Optional: `csx --rm` (or `cs rm .`) also removes the managed worktree.
+    set -l do_rm 0
+    if contains -- --rm $argv
+        set do_rm 1
+    end
+    # The worktree helpers live in code-session.fish; a plain terminal/nvim pane
+    # may not have autoloaded them yet. The file only defines functions, so
+    # sourcing it is side-effect free.
+    if test $do_rm -eq 1; and not functions -q __cs_remove_worktree
+        source $__fish_config_dir/functions/code-session.fish 2>/dev/null
+    end
+
     # 1. Only act inside a kitty window; if we can't talk to kitty there is nothing to do.
     if test -z "$KITTY_WINDOW_ID"
+        test $do_rm -eq 1; and __cs_remove_worktree
         return 0
     end
 
@@ -101,8 +114,10 @@ for w in tab.get("windows", []):
         end
     end
 
-    # 1 (cont). If this isn't a coding session, do nothing.
+    # 1 (cont). If this isn't a coding session, do nothing (but still honor --rm,
+    # e.g. a plain tab that happens to be cd'd into a managed worktree).
     if not string match -q "Coding Session:*" -- $title; and test (count $nvim_socks) -eq 0
+        test $do_rm -eq 1; and __cs_remove_worktree
         return 0
     end
 
@@ -198,6 +213,14 @@ for e in d:
         end
         test $alive -eq 0; and break
         sleep 0.2
+    end
+
+    # --rm: now that nvim has quit and the agent has stopped, the worktree is free
+    # to remove. __cs_remove_worktree steps the shell out to the main worktree and
+    # confirms before discarding a dirty tree; if the user declines, keep the
+    # worktree but still close the session panes below.
+    if test $do_rm -eq 1
+        __cs_remove_worktree; or echo "code-session: worktree kept; closing session panes"
     end
 
     # Close every pane. Do the window we're sitting in last, since that ends this shell.

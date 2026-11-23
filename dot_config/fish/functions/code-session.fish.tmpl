@@ -9,7 +9,11 @@
 #                            repo on a branch derived from <slug>, open it in a
 #                            new tab.
 #   cs list                  list this repo's managed worktrees.
-#   cs rm <slug|path>        remove a managed worktree (git worktree remove).
+#   cs rm [slug|.|path]      remove a managed worktree (default: the current
+#                            one). Run from inside its session, this also tears
+#                            the session down (panes/agent/nvim), like csx.
+#                            Prompts before discarding uncommitted changes;
+#                            --force skips the prompt. `csx --rm` does the same.
 #   cs --build <dir> [..]    internal: build the layout here with no discovery
 #                            (used when opening a worktree in a fresh tab).
 #
@@ -58,21 +62,86 @@ function __cs_list_worktrees_pretty --description "Pretty-print managed worktree
     end
 end
 
-function __cs_remove_worktree --argument-names target --description "Remove a managed worktree"
-    if test -z "$target"
-        echo "code-session: usage: cs rm <slug|path>"
-        return 1
-    end
-    set -l path "$target"
-    if not string match -q '/*' "$path"
-        set -l top (git rev-parse --show-toplevel 2>/dev/null)
-        if test -z "$top"
+function __cs_current_worktree --description "Path of the managed worktree containing PWD, if any"
+    set -l top (git rev-parse --show-toplevel 2>/dev/null)
+    test -n "$top"; or return 1
+    string match -q -- (__cs_root)/'*' "$top"; or return 1
+    echo "$top"
+end
+
+function __cs_main_worktree --description "Path of the repo's main (non-managed) worktree, from anywhere in the repo"
+    # --git-common-dir resolves to the MAIN checkout's .git even from a linked
+    # worktree, so a slug always resolves against <repo>, never the worktree
+    # we happen to be standing in (that was the <repo>-foo-foo bug).
+    set -l common (git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+    test -n "$common"; or return 1
+    dirname "$common"
+end
+
+function __cs_remove_worktree --description "Remove a managed worktree (resolves slug/'.'/path; confirms before discarding changes)"
+    argparse f/force -- $argv; or return 1
+    set -l target $argv[1]
+
+    # Resolve target -> absolute worktree path.
+    set -l path
+    if test -z "$target"; or test "$target" = .
+        set path (__cs_current_worktree)
+        if test -z "$path"
+            echo "code-session: not inside a managed worktree — pass a slug, e.g. cs rm fix-login"
+            return 1
+        end
+    else if string match -q '/*' "$target"
+        set path "$target"
+    else
+        set -l main (__cs_main_worktree)
+        if test -z "$main"
             echo "code-session: not inside a git repository"
             return 1
         end
-        set path (__cs_root)/(basename "$top")-(__cs_slugify "$target")
+        set path (__cs_root)/(basename "$main")-(__cs_slugify "$target")
     end
-    git worktree remove "$path"
+
+    # It must be one of ours, and it must exist.
+    if not string match -q -- (__cs_root)/'*' "$path"
+        echo "code-session: $path is not a managed worktree"
+        return 1
+    end
+    if not test -d "$path"
+        echo "code-session: no managed worktree at $path"
+        return 1
+    end
+
+    # Confirm before discarding a dirty tree. Commits on the branch survive a
+    # worktree removal, so only uncommitted/untracked changes are at stake.
+    if not set -q _flag_force
+        set -l dirty (git -C "$path" status --porcelain 2>/dev/null)
+        if test (count $dirty) -gt 0
+            set -l b (git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null)
+            if isatty stdin
+                echo "code-session: $path has uncommitted changes (commits on '$b' are kept):"
+                git -C "$path" status --short
+                read -l -P "Remove and discard these changes? [y/N]: " ans
+                if not string match -qr '^[yY]' -- "$ans"
+                    echo "code-session: kept $path"
+                    return 1
+                end
+            else
+                echo "code-session: $path has uncommitted changes; re-run with --force to remove"
+                return 1
+            end
+        end
+    end
+
+    # If we're standing inside the target, step out to the main worktree first so
+    # the shell isn't left in a deleted directory.
+    set -l here (git rev-parse --show-toplevel 2>/dev/null)
+    if test "$here" = "$path"
+        set -l main (__cs_main_worktree)
+        test -n "$main"; and cd "$main"
+    end
+
+    # We've already handled the dirty confirmation ourselves, so force here.
+    git worktree remove --force "$path"
     and echo "code-session: removed worktree $path"
 end
 
@@ -166,7 +235,27 @@ function code-session -d "Turn a kitty tab into a coding session layout; manage 
             __cs_list_worktrees_pretty
             return
         case rm --rm
-            __cs_remove_worktree "$argv[2]"
+            # Work out whether the target is the worktree we're sitting in. If so,
+            # removing it also means tearing down this session's panes, so hand off
+            # to code-session-close --rm (quit nvim, stop the agent, remove, close).
+            # Any other target is just a worktree removal, leaving panes alone.
+            set -l rest $argv[2..]
+            set -l tgt (string match -v -- '-f' $rest | string match -v -- '--force')[1]
+            set -l cur (__cs_current_worktree)
+            set -l tgtpath
+            if test -z "$tgt"; or test "$tgt" = .
+                set tgtpath "$cur"
+            else if string match -q '/*' "$tgt"
+                set tgtpath "$tgt"
+            else if test -n "$cur"
+                set -l main (__cs_main_worktree)
+                test -n "$main"; and set tgtpath (__cs_root)/(basename "$main")-(__cs_slugify "$tgt")
+            end
+            if test -n "$cur"; and test "$cur" = "$tgtpath"; and set -q KITTY_WINDOW_ID
+                code-session-close --rm
+            else
+                __cs_remove_worktree $rest
+            end
             return
         case -w --worktree
             __cs_new_worktree_session "$argv[2]"
