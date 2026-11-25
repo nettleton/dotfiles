@@ -25,6 +25,7 @@
 	"^s"	= "saveDocument:";
 	// l Label
 	"v"	= "moveToMailbox:";
+	"x"	= ( "performBundleItemWithUUID:", "93D642D2-52A1-4842-9F4B-14BF35B9667D" ); // Export to Project → Copy to Project Folder…
 	"#"   = "deleteMessage:";
 
 	"I"	= ( "setTag:", "\\Seen", "nextMessage:");
