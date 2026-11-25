@@ -86,5 +86,12 @@ for link in "$DEST"/*; do
   fi
 done
 
+# MailMate caches its bundle scan in BundlesIndex.binary and only rescans when
+# it notices a bundle dir's mtime change — new/changed symlinks don't trip it,
+# so freshly linked bundles stay invisible across restarts. Drop the cache so
+# the next launch rebuilds it (a running MailMate needs a quit + relaunch).
+rm -f "$HOME/Library/Caches/com.freron.MailMate/BundlesIndex.binary"
+echo "cleared MailMate bundle index (restart MailMate to load bundle changes)"
+
 exit 0
 {{ end -}}
